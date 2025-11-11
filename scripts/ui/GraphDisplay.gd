@@ -28,11 +28,10 @@ func display_graph(g) -> void:
 	if graph.has_method("get_edges"):
 		for e in graph.get_edges():
 			_spawn_edge(e)
-	# Publish that a graph was displayed (payload can be the graph or summary)
+	# Emit graph displayed signal with the Graph object
 	if Engine.has_singleton("EventBus"):
 		var eb = Engine.get_singleton("EventBus")
-		if eb and eb.has_method("publish"):
-			eb.publish("graph_displayed", {"nodes": graph.get_vertices().size() if graph.has_method("get_vertices") else 0, "edges": graph.get_edges().size() if graph.has_method("get_edges") else 0})
+		eb.graph_displayed.emit(graph)
 
 func _clear() -> void:
 	for nv in node_views.values():

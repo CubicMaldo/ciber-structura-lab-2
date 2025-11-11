@@ -17,11 +17,10 @@ func _populate() -> void:
         list.add_child(btn)
 
 func _on_mission_selected(mission_id: String) -> void:
-    # publish mission_selected event
+    # Emit mission selected signal with typed parameter
     if Engine.has_singleton("EventBus"):
         var eb = Engine.get_singleton("EventBus")
-        if eb and eb.has_method("publish"):
-            eb.publish("mission_selected", {"id": mission_id})
+        eb.mission_selected.emit(mission_id)
     if Engine.has_singleton("GameManager"):
         var gm = Engine.get_singleton("GameManager")
         if gm and gm.has_method("start_mission"):

@@ -14,11 +14,10 @@ func start_mission(mission_id: String) -> void:
         var sm = Engine.get_singleton("SceneManager")
         if sm and sm.has_method("change_to_mission"):
             sm.change_to_mission(mission_id)
-    # Publish mission started event
+    # Emit mission started signal with typed parameter
     if Engine.has_singleton("EventBus"):
         var eb = Engine.get_singleton("EventBus")
-        if eb and eb.has_method("publish"):
-            eb.publish("mission_started", {"id": mission_id})
+        eb.mission_started.emit(mission_id)
 
 func finish_mission(result: Dictionary) -> void:
     # placeholder: record result, show summary, return to mission select
@@ -27,8 +26,7 @@ func finish_mission(result: Dictionary) -> void:
         var sm = Engine.get_singleton("SceneManager")
         if sm and sm.has_method("change_to"):
             sm.change_to("res://scenes/MissionSelect.tscn")
-    # Publish mission finished event
+    # Emit mission finished signal with typed parameters
     if Engine.has_singleton("EventBus"):
-        var eb2 = Engine.get_singleton("EventBus")
-        if eb2 and eb2.has_method("publish"):
-            eb2.publish("mission_finished", result)
+        var eb = Engine.get_singleton("EventBus")
+        eb.mission_finished.emit(current_mission, result)

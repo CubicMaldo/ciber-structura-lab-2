@@ -6,6 +6,7 @@ signal mission_completed(result)
 
 var graph = null
 var ui = null
+var mission_id: String = "Mission_Unknown"  ## Override this in derived classes
 
 func setup(graph_model, display_node) -> void:
     graph = graph_model
@@ -25,8 +26,8 @@ func complete(result := {}) -> void:
         var gm = Engine.get_singleton("GameManager")
         if gm and gm.has_method("finish_mission"):
             gm.finish_mission(result)
-    # publish mission_completed via EventBus as well
+    # Emit mission completed signal via EventBus with typed parameters
     if Engine.has_singleton("EventBus"):
         var eb = Engine.get_singleton("EventBus")
-        if eb and eb.has_method("publish"):
-            eb.publish("mission_completed", result)
+        var success = result.get("status", "") == "done"
+        eb.mission_completed.emit(mission_id, success, result)
