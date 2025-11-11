@@ -158,6 +158,54 @@ static func bfs(graph: Graph, start_key) -> Dictionary:
 	return result
 
 
+## Realiza un recorrido DFS (Depth-First Search) iterativo desde un nodo inicial.
+## Retorna un diccionario con información del recorrido similar a BFS:
+## - visited: Array con el orden de visitas (preorder)
+## - levels: Dictionary { clave: nivel }
+## - parent: Dictionary { clave: padre }
+static func dfs(graph: Graph, start_key) -> Dictionary:
+	var result := {
+		"visited": [],
+		"levels": {},
+		"parent": {}
+	}
+
+	if graph == null or start_key == null or not graph.has_vertex(start_key):
+		return result
+
+	var stack: Array = [start_key]
+	var visited: Dictionary = {}
+	var levels: Dictionary = {}
+	var parent: Dictionary = {}
+
+	levels[start_key] = 0
+
+	while not stack.is_empty():
+		var current = stack.pop_back()
+		if visited.has(current):
+			continue
+		visited[current] = true
+		result["visited"].append(current)
+		var current_level: int = int(levels.get(current, 0))
+		# Obtener vecinos y empujar en orden invertido para simular DFS recursivo
+		var neighbor_weights: Dictionary = graph.get_neighbor_weights(current)
+		var neighbors: Array = []
+		for n in neighbor_weights.keys():
+			neighbors.append(n)
+		# push neighbors in reverse order so the first neighbor is processed first
+		for i in range(neighbors.size() - 1, -1, -1):
+			var neighbor = neighbors[i]
+			if visited.has(neighbor):
+				continue
+			parent[neighbor] = current
+			levels[neighbor] = current_level + 1
+			stack.append(neighbor)
+
+	result["levels"] = levels
+	result["parent"] = parent
+	return result
+
+
 static func _pop_lowest(queue: Array, distances: Dictionary):
 	var best_index := 0
 	var best_key = queue[0]

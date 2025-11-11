@@ -1,4 +1,5 @@
 extends Node
+@warning_ignore_start("unused_signal")
 ## EventBus (autoload "EventBus")
 ## Central event bus using Godot's native signal system.
 ## 

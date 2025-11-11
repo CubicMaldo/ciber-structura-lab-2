@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dmkecp3qqc6qo"]
 
-[ext_resource type="Script" uid="uid://d2y5afctafttb" path="res://scripts/ui/MissionSelect.gd" id="1"]
+[ext_resource type="Script" uid="uid://d2y5afctafttb" path="res://scripts/missions/MissionSelect.gd" id="1"]
 
 [node name="MissionSelect" type="Node2D"]
 script = ExtResource("1")

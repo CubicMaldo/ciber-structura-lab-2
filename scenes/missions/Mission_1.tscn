@@ -1,10 +1,184 @@
-[gd_scene format="4" type="Node2D"]
-[ext_resource path="res://scripts/missions/mission_1/Mission1.gd" type="Script" id="1"]
-[ext_resource path="res://scripts/ui/GraphDisplay.gd" type="Script" id="2"]
+[gd_scene load_steps=23 format=3 uid="uid://c0eh55ue0le5q"]
+
+[ext_resource type="Script" uid="uid://cgkcu22neyt76" path="res://scripts/missions/mission_1/Mission1.gd" id="1"]
+[ext_resource type="Script" uid="uid://f3rodujd6g18" path="res://scripts/utils/graphs/visuals/GraphDisplay.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://b7qv5xk8p3nt1" path="res://scenes/views/NodeView.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://c5h8lam2n4p6q" path="res://scenes/views/EdgeView.tscn" id="4"]
+[ext_resource type="Script" uid="uid://fgm4ahof83xw" path="res://scripts/utils/graphs/editor/GraphBuilder.gd" id="5_h74cb"]
+[ext_resource type="Script" uid="uid://5x1d3j1l85ra" path="res://scripts/utils/graphs/editor/GraphNodeData.gd" id="6_t440f"]
+[ext_resource type="Script" uid="uid://2whcwiw6slu" path="res://scripts/utils/graphs/editor/GraphConnectionData.gd" id="7_n2hvw"]
+[ext_resource type="Script" uid="uid://dkmqha3s6mcs" path="res://scripts/missions/mission_1/NetworkNodeMeta.gd" id="7_t440f"]
+
+[sub_resource type="Resource" id="NetworkNodeMeta_firewall"]
+script = ExtResource("7_t440f")
+hidden_message = "Registros sospechosos en horario nocturno."
+threat_level = 1
+device_type = "Firewall"
+display_name = "Firewall Central"
+
+[sub_resource type="Resource" id="GraphNodeData_firewall"]
+script = ExtResource("6_t440f")
+node_key = "Firewall Central"
+vertex_meta = SubResource("NetworkNodeMeta_firewall")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_database"]
+script = ExtResource("7_t440f")
+hidden_message = "Acceso inusual desde una IP interna."
+threat_level = 2
+device_type = "Database"
+display_name = "Base de Datos"
+
+[sub_resource type="Resource" id="GraphNodeData_database"]
+script = ExtResource("6_t440f")
+node_key = "Base de Datos"
+vertex_meta = SubResource("NetworkNodeMeta_database")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_mail"]
+script = ExtResource("7_t440f")
+hidden_message = "Correo con adjunto malicioso detectado."
+threat_level = 2
+display_name = "Servidor de Correo"
+
+[sub_resource type="Resource" id="GraphNodeData_mail"]
+script = ExtResource("6_t440f")
+node_key = "Servidor de Correo"
+vertex_meta = SubResource("NetworkNodeMeta_mail")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_proxy"]
+script = ExtResource("7_t440f")
+hidden_message = "Saltos extraños en la ruta."
+threat_level = 1
+device_type = "Proxy"
+display_name = "Proxy"
+
+[sub_resource type="Resource" id="GraphNodeData_proxy"]
+script = ExtResource("6_t440f")
+node_key = "Proxy"
+vertex_meta = SubResource("NetworkNodeMeta_proxy")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_router"]
+script = ExtResource("7_t440f")
+hidden_message = "Este nodo contiene el proceso raíz del virus."
+is_root = true
+threat_level = 3
+device_type = "Router"
+display_name = "Router Core"
+
+[sub_resource type="Resource" id="GraphNodeData_router"]
+script = ExtResource("6_t440f")
+node_key = "Router Core"
+vertex_meta = SubResource("NetworkNodeMeta_router")
+
+[sub_resource type="Resource" id="GraphConnectionData_1"]
+script = ExtResource("7_n2hvw")
+from_node = "Firewall Central"
+to_node = "Proxy"
+
+[sub_resource type="Resource" id="GraphConnectionData_2"]
+script = ExtResource("7_n2hvw")
+from_node = "Proxy"
+to_node = "Router Core"
+
+[sub_resource type="Resource" id="GraphConnectionData_3"]
+script = ExtResource("7_n2hvw")
+from_node = "Proxy"
+to_node = "Servidor de Correo"
+
+[sub_resource type="Resource" id="GraphConnectionData_4"]
+script = ExtResource("7_n2hvw")
+from_node = "Servidor de Correo"
+to_node = "Base de Datos"
+
 [node name="Mission_1" type="Node2D"]
-script = ExtResource( 1 )
+script = ExtResource("1")
+algorithm = "DFS"
+
 [node name="GraphDisplay" type="Node2D" parent="."]
-script = ExtResource( 2 )
+position = Vector2(576, 324)
+script = ExtResource("2")
+node_scene = ExtResource("3")
+edge_scene = ExtResource("4")
+
+[node name="GraphBuilder" type="Node" parent="."]
+script = ExtResource("5_h74cb")
+nodes = Array[ExtResource("6_t440f")]([SubResource("GraphNodeData_firewall"), SubResource("GraphNodeData_database"), SubResource("GraphNodeData_mail"), SubResource("GraphNodeData_proxy"), SubResource("GraphNodeData_router")])
+connections = Array[ExtResource("7_n2hvw")]([SubResource("GraphConnectionData_1"), SubResource("GraphConnectionData_2"), SubResource("GraphConnectionData_3"), SubResource("GraphConnectionData_4")])
+
 [node name="HUD" type="CanvasLayer" parent="."]
-[node name="TimerLabel" type="Label" parent="HUD"]
-text = "Time: 00:00"
+
+[node name="Panel" type="Panel" parent="HUD"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 310.0
+offset_bottom = 303.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Misión 1: Network Tracer"
+
+[node name="HSeparator" type="HSeparator" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AlgorithmLabel" type="Label" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Algoritmo de Búsqueda:"
+
+[node name="AlgorithmButtons" type="HBoxContainer" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="BFSButton" type="Button" parent="HUD/Panel/VBoxContainer/AlgorithmButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "BFS"
+
+[node name="DFSButton" type="Button" parent="HUD/Panel/VBoxContainer/AlgorithmButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "DFS"
+
+[node name="HSeparator2" type="HSeparator" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ControlButtons" type="HBoxContainer" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="HUD/Panel/VBoxContainer/ControlButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Iniciar"
+
+[node name="StepButton" type="Button" parent="HUD/Panel/VBoxContainer/ControlButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Paso"
+
+[node name="HSeparator3" type="HSeparator" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Estado: Listo"
+
+[node name="CluesLabel" type="Label" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Pistas encontradas: 0"
+
+[node name="ResultLabel" type="RichTextLabel" parent="HUD/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center][b]Resultado:[/b][/center]
+Encuentra el nodo raíz infectado."

@@ -8,25 +8,25 @@ extends Node
 var current_mission: String = ""
 
 func start_mission(mission_id: String) -> void:
-    current_mission = mission_id
-    # Use SceneManager autoload by fetching it from the root (avoid direct identifier)
-    if Engine.has_singleton("SceneManager"):
-        var sm = Engine.get_singleton("SceneManager")
-        if sm and sm.has_method("change_to_mission"):
-            sm.change_to_mission(mission_id)
-    # Emit mission started signal with typed parameter
-    if Engine.has_singleton("EventBus"):
-        var eb = Engine.get_singleton("EventBus")
-        eb.mission_started.emit(mission_id)
+	current_mission = mission_id
+	# Use SceneManager autoload by fetching it from the root (avoid direct identifier)
+	if Engine.has_singleton("SceneManager"):
+		var sm = Engine.get_singleton("SceneManager")
+		if sm and sm.has_method("change_to_mission"):
+			sm.change_to_mission(mission_id)
+	# Emit mission started signal with typed parameter
+	if Engine.has_singleton("EventBus"):
+		var eb = Engine.get_singleton("EventBus")
+		eb.mission_started.emit(mission_id)
 
 func finish_mission(result: Dictionary) -> void:
-    # placeholder: record result, show summary, return to mission select
-    print("Mission finished:", result)
-    if Engine.has_singleton("SceneManager"):
-        var sm = Engine.get_singleton("SceneManager")
-        if sm and sm.has_method("change_to"):
-            sm.change_to("res://scenes/MissionSelect.tscn")
-    # Emit mission finished signal with typed parameters
-    if Engine.has_singleton("EventBus"):
-        var eb = Engine.get_singleton("EventBus")
-        eb.mission_finished.emit(current_mission, result)
+	# placeholder: record result, show summary, return to mission select
+	print("Mission finished:", result)
+	if Engine.has_singleton("SceneManager"):
+		var sm = Engine.get_singleton("SceneManager")
+		if sm and sm.has_method("change_to"):
+			sm.change_to("res://scenes/MissionSelect.tscn")
+	# Emit mission finished signal with typed parameters
+	if Engine.has_singleton("EventBus"):
+		var eb = Engine.get_singleton("EventBus")
+		eb.mission_finished.emit(current_mission, result)

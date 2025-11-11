@@ -8,6 +8,9 @@ var endpoint_a: Vertex = null
 var endpoint_b: Vertex = null
 ## Peso de la arista.
 var weight: float = 0.0
+## FLujo de la arista
+var flux : int = 0
+
 ## Metadata asociada a la arista (puede ser Resource o null).
 var metadata: Resource = null
 
@@ -18,11 +21,18 @@ var metadata: Resource = null
 ## - `_a`: Vértice extremo A.
 ## - `_b`: Vértice extremo B. 
 ## - `_weight`: Peso inicial (float).
-func _init(_a: Vertex = null, _b: Vertex = null, _weight: float = 0.0, _metadata: Resource = null):
+func _init(
+	_a: Vertex = null,
+	 _b: Vertex = null,
+	 _weight: float = 0.0,
+	 _flux : int = 0,
+	 _metadata: Resource = null
+) -> void:
 	endpoint_a = _a
 	endpoint_b = _b
 	weight = _weight
 	metadata = _metadata
+	flux = _flux
 
 
 ## Devuelve un Array con los dos vértices extremos: [endpoint_a, endpoint_b].
