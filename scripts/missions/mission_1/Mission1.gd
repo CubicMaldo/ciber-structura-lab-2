@@ -3,9 +3,11 @@ extends "res://scripts/missions/MissionController.gd"
 ## El jugador recorre un grafo para encontrar el nodo raíz infectado.
 ## NOTA: El grafo se construye desde el nodo hijo "GraphBuilder" en la escena.
 
-@export var algorithm: String = "BFS" # "BFS" or "DFS"
+const RESTORATION_CODE := "RC-42-ALPHA"
+const DEFAULT_STATUS_PROMPT := "Selecciona BFS o DFS y presiona 'Iniciar rastreo'."
+const SUCCESS_STATUS_TEMPLATE := "Rastreo completado. Has encontrado el nodo raíz del virus: %s."
 
-var traversal_queue: Array = []
+@export var algorithm: String = "BFS" # "BFS" or "DFS"
 var visited := {}
 var found_clues: Array = []
 var is_running := false
@@ -13,6 +15,8 @@ var last_current = null
 
 var traversal_order: Array = []
 var traversal_index: int = 0
+var awaiting_selection: bool = false
+var candidate_nodes: Dictionary = {}
 
 # UI references
 @onready var bfs_button: Button = %BFSButton
@@ -45,20 +49,24 @@ func _ready() -> void:
 	if display:
 		setup(graph, display)
 		display.display_graph(graph)
+		if display.has_signal("node_selected"):
+			display.node_selected.connect(_on_graph_node_selected)
 	else:
 		push_warning("Mission_1: No se encontró GraphDisplay para visualización")
+	
+	_reset_before_traversal()
+	_update_status(DEFAULT_STATUS_PROMPT)
 
 func set_algorithm(alg: String) -> void:
 	algorithm = alg
 
 func start() -> void:
-	# Initialize traversal depending on selected algorithm
-	visited.clear()
-	traversal_order.clear()
-	traversal_index = 0
+	_reset_before_traversal()
+	_update_status("Preparando rastreo %s..." % algorithm)
 	var keys: Array = []
 	if graph and graph.has_method("get_nodes"):
 		keys = graph.get_nodes().keys()
+		keys.sort()
 	if keys.size() == 0:
 		push_error("Mission_1: graph is empty")
 		return
@@ -71,48 +79,224 @@ func start() -> void:
 		traversal_result = GraphAlgorithms.bfs(graph, start_key)
 	traversal_order = traversal_result.get("visited", [])
 	traversal_index = 0
+	if traversal_order.is_empty():
+		_update_status("No hay servidores conectados para rastrear.")
+		return
+
+	var first_key = traversal_order[0]
+	var first_vertex = graph.get_vertex(first_key)
+	var first_meta: NetworkNodeMeta = first_vertex.meta as NetworkNodeMeta if first_vertex else null
+	var first_label = _format_node_label(first_meta, first_key)
+	is_running = true
+	awaiting_selection = true
+	if continue_button:
+		continue_button.visible = false
+	if step_button:
+		step_button.disabled = true
+	if start_button:
+		start_button.disabled = true
+	_update_status("Punto de entrada identificado: %s. Asegurando la conexión inicial..." % first_label)
+	_process_player_selection(first_key, true)
 	# Emit mission logic started
 	EventBus.mission_logic_started.emit(mission_id)
 
 func step() -> void:
-	# Orchestrador: obtener siguiente clave y delegar responsabilidades
-	var next_key = _get_next_key()
-	if next_key == null:
-		complete({"status":"done"})
+	if not is_running:
+		_update_status("Inicia la misión y selecciona nodos en el grafo para avanzar.")
 		return
-	
-	if visited.has(next_key):
+	if not awaiting_selection:
+		_update_status("El rastreo ya concluyó. Revisa los resultados o presiona 'Continuar'.")
+		return
+	_update_status("Selecciona el siguiente nodo en el grafo siguiendo %s." % algorithm)
+	_show_candidate_hints()
+
+
+
+func _reset_before_traversal() -> void:
+	visited.clear()
+	found_clues.clear()
+	traversal_order.clear()
+	traversal_index = 0
+	last_current = null
+	is_running = false
+	awaiting_selection = false
+	if clues_label:
+		clues_label.text = "Pistas encontradas: 0"
+	if result_label:
+		result_label.text = ""
+	if continue_button:
+		continue_button.visible = false
+	if step_button:
+		step_button.disabled = true
+	if start_button:
+		start_button.disabled = false
+	_clear_candidate_highlights()
+	_reset_node_visuals()
+
+
+func _reset_node_visuals() -> void:
+	if not graph or not ui:
+		return
+	if not graph.has_method("get_nodes"):
+		return
+	var nodes_dict: Dictionary = graph.get_nodes()
+	if ui.has_method("set_node_state"):
+		for node_key in nodes_dict.keys():
+			ui.set_node_state(node_key, "unvisited")
+	var node_views_dict = ui.get("node_views")
+	if typeof(node_views_dict) == TYPE_DICTIONARY:
+		for node_view in node_views_dict.values():
+			if node_view and node_view.has_method("hide_clue"):
+				node_view.hide_clue()
+
+
+func _clear_candidate_highlights() -> void:
+	if candidate_nodes.is_empty():
+		return
+	if not ui or not ui.has_method("set_node_state"):
+		candidate_nodes.clear()
+		return
+	for node_key in candidate_nodes.keys():
+		if visited.has(node_key):
+			continue
+		ui.set_node_state(node_key, "unvisited")
+	candidate_nodes.clear()
+
+
+func _show_candidate_hints() -> void:
+	_clear_candidate_highlights()
+	if not awaiting_selection:
+		return
+	var expected_key = _get_expected_key()
+	if expected_key == null:
+		return
+	var secondary: Array = []
+	if algorithm == "DFS" and last_current != null:
+		var last_vertex = graph.get_vertex(last_current)
+		if last_vertex:
+			for neighbor in last_vertex.get_neighbor_keys():
+				if neighbor == expected_key:
+					continue
+				if visited.has(neighbor):
+					continue
+				secondary.append(neighbor)
+	elif algorithm == "BFS":
+		for i in range(0, min(3, traversal_order.size() - traversal_index)):
+			var idx_key = traversal_order[traversal_index + i]
+			if idx_key == expected_key:
+				continue
+			if visited.has(idx_key):
+				continue
+			secondary.append(idx_key)
+
+	_apply_candidate_states(expected_key, secondary)
+
+
+func _apply_candidate_states(primary_key, secondary: Array) -> void:
+	if ui and ui.has_method("set_node_state") and primary_key != null and not visited.has(primary_key):
+		ui.set_node_state(primary_key, "candidate")
+		candidate_nodes[primary_key] = "candidate"
+	for node_key in secondary:
+		if ui and ui.has_method("set_node_state") and not visited.has(node_key) and node_key != primary_key:
+			ui.set_node_state(node_key, "candidate")
+			candidate_nodes[node_key] = "candidate"
+
+
+func _format_node_label(node_meta: NetworkNodeMeta, node_key) -> String:
+	if node_meta:
+		if node_meta.display_name != "":
+			return "%s" % node_meta.display_name
+		if node_meta.device_type != "":
+			return "%s %s" % [node_meta.device_type, str(node_key)]
+	return "Servidor %s" % str(node_key)
+
+
+func _get_expected_key() -> Variant:
+	if traversal_index >= traversal_order.size():
+		return null
+	return traversal_order[traversal_index]
+
+
+func _on_graph_node_selected(node_key) -> void:
+	_process_player_selection(node_key)
+
+
+func _process_player_selection(node_key, _is_auto := false) -> void:
+	if not graph or not awaiting_selection:
+		return
+	if not is_running:
+		_update_status("Inicia la misión antes de interactuar con el grafo.")
+		return
+	var expected_key = _get_expected_key()
+	if expected_key == null:
+		awaiting_selection = false
+		return
+	if node_key != expected_key:
+		_handle_incorrect_selection(node_key)
+		return
+	if visited.has(node_key):
+		_update_status("Ese servidor ya fue asegurado. Elige otro destino.")
 		return
 
-	# Marcar previo como visitado si aplica
-	if last_current != null and last_current != next_key:
+	awaiting_selection = false
+	if last_current != null and last_current != node_key:
 		_mark_previous_visited(last_current)
 
-	# Establecer el nodo actual (modifica last_current y UI)
-	_set_current(next_key)
-
-	# Marcar como visitado en el modelo
-	visited[next_key] = true
-
-	# Manejar la visita del vértice (emite eventos, descubre pistas, completa si encuentra root)
-	var vertex = graph.get_vertex(next_key)
+	_set_current(node_key)
+	var vertex = graph.get_vertex(node_key)
+	visited[node_key] = true
 	if vertex:
-		var finished = _handle_vertex_visit(vertex, next_key)
+		var node_meta: NetworkNodeMeta = vertex.meta as NetworkNodeMeta
+		var node_label = _format_node_label(node_meta, node_key)
+		_update_status("Investigando %s..." % node_label)
+		var finished = _handle_vertex_visit(vertex, node_meta, node_key, node_label)
 		if finished:
+			_clear_candidate_highlights()
+			awaiting_selection = false
+			is_running = false
+			traversal_index = traversal_order.size()
 			return
 
+	traversal_index += 1
+	if traversal_index >= traversal_order.size():
+		_clear_candidate_highlights()
+		awaiting_selection = false
+		is_running = false
+		_update_status("El rastreo terminó sin detectar el nodo raíz. Revisa las pistas recopiladas.")
+		var exhausted_result := {
+			"status": "exhausted",
+			"clues": found_clues.duplicate(),
+			"order": traversal_order.duplicate(),
+			"algorithm": algorithm
+		}
+		complete(exhausted_result)
+		return
+
+	var remaining = traversal_order.size() - traversal_index
+	awaiting_selection = true
+	_update_status("Nodo asegurado. Determina el siguiente servidor usando %s (%d restantes)." % [algorithm, remaining])
+	_show_candidate_hints()
+
+
+func _handle_incorrect_selection(node_key) -> void:
+	if ui and ui.has_method("set_node_state"):
+		ui.set_node_state(node_key, "highlighted")
+		call_deferred("_reset_highlighted_node", node_key)
+		_update_status("Ese nodo no corresponde al recorrido %s. Revisa la lógica de %s." % [algorithm, algorithm])
+
+
+func _reset_highlighted_node(node_key) -> void:
+	if not ui:
+		return
+	if visited.has(node_key):
+		return
+	if ui.has_method("set_node_state"):
+		ui.set_node_state(node_key, "unvisited")
+	_show_candidate_hints()
 
 # ============================================================================
 # UI SETUP AND EVENT HANDLING
 # ============================================================================
-
-func _get_next_key() -> Variant:
-	# Return next key from traversal_order and advance the index, or null if finished
-	if traversal_index >= traversal_order.size():
-		return null
-	var k = traversal_order[traversal_index]
-	traversal_index += 1
-	return k
 
 
 func _mark_previous_visited(prev_key) -> void:
@@ -135,12 +319,11 @@ func _set_current(node_key) -> void:
 		ui.highlight_node(node_key)
 
 
-func _handle_vertex_visit(vertex, node_key) -> bool:
+func _handle_vertex_visit(vertex, node_meta: NetworkNodeMeta, node_key, node_label: String) -> bool:
 	# Emit node visited and process NetworkNodeMeta (clues, root detection).
 	# Returns true if mission completed (root found).
 	EventBus.node_visited.emit(vertex)
 
-	var node_meta = vertex.meta as NetworkNodeMeta
 	if node_meta:
 		if node_meta.has_clue():
 			var msg = node_meta.hidden_message
@@ -154,11 +337,15 @@ func _handle_vertex_visit(vertex, node_key) -> bool:
 			if ui and ui.has_method("set_node_state"):
 				ui.set_node_state(node_key, "root")
 			EventBus.node_state_changed.emit(vertex, "root")
+			_clear_candidate_highlights()
+			_update_status(SUCCESS_STATUS_TEMPLATE % node_label)
 			var result = {
-				"status":"done",
+				"status": "done",
 				"root": node_key,
-				"clues": found_clues,
-				"restoration_code": "RC-42-ALPHA"
+				"clues": found_clues.duplicate(),
+				"restoration_code": RESTORATION_CODE,
+				"algorithm": algorithm,
+				"order": traversal_order.duplicate()
 			}
 			complete(result)
 			return true
@@ -215,12 +402,6 @@ func _on_dfs_pressed() -> void:
 
 func _on_start_pressed() -> void:
 	start()
-	is_running = true
-	if step_button:
-		step_button.disabled = false
-	if start_button:
-		start_button.disabled = true
-	_update_status("Búsqueda iniciada...")
 
 
 func _on_step_pressed() -> void:
@@ -261,20 +442,24 @@ func _on_mission_completed(completed_mission_id: String, success: bool, result: 
 		var root = result.get("root", "?")
 		var code = result.get("restoration_code", "N/A")
 		var clues = result.get("clues", [])
+		var algorithm_used = result.get("algorithm", algorithm)
 		
-		_update_status("¡MISIÓN COMPLETADA!")
+		var root_label = str(root)
+		_update_status(SUCCESS_STATUS_TEMPLATE % root_label)
 		if result_label:
-			result_label.text = "[center][b][color=green]¡ÉXITO![/color][/b][/center]\n\n"
-			result_label.text += "[b]Nodo raíz encontrado:[/b] %s\n" % str(root)
-			result_label.text += "[b]Código de restauración:[/b] %s\n\n" % code
+			result_label.text = "[center][b][color=green]Rastreo completado[/color][/b][/center]\n\n"
+			result_label.text += "Has encontrado el nodo raíz del virus: %s\n" % root_label
+			result_label.text += "Código de restauración desbloqueado: %s\n" % code
+			result_label.text += "Algoritmo utilizado: %s\n\n" % algorithm_used
 			result_label.text += "[b]Pistas recopiladas:[/b]\n"
 			for i in range(clues.size()):
 				result_label.text += "%d. %s\n" % [i + 1, clues[i]]
 			result_label.text += "\n[center][color=yellow]Presiona 'Continuar' para volver al menú[/color][/center]"
 	else:
-		_update_status("Búsqueda completada")
+		_update_status("El rastro del virus sigue activo. Reintenta el análisis o revisa las pistas.")
 		if result_label:
-			result_label.text = "[center][b]Búsqueda finalizada[/b][/center]\n\nRevisar los resultados."
+			result_label.text = "[center][b][color=orange]Rastreo inconcluso[/color][/b][/center]\n\n"
+			result_label.text += "El virus NEMESIS continúa oculto. Analiza las pistas y reinicia el rastreo desde el menú."
 
 
 func _update_status(message: String) -> void:

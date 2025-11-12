@@ -9,7 +9,7 @@ extends Node2D
 
 @export var node_scene: PackedScene
 @export var edge_scene: PackedScene
-@export_enum("circular", "grid", "force_directed", "hierarchical") var layout_type: String = "circular"
+@export_enum("circular", "grid", "force_directed", "hierarchical") var layout_type: String = "hierarchical"
 @export var layout_radius: float = 250.0
 @export var layout_spacing: float = 150.0
 
@@ -17,6 +17,8 @@ var graph = null
 var node_views := {}
 var edge_views := []
 var layout_component: GraphLayout = null
+
+signal node_selected(node_key)
 
 
 ## Display a Graph instance (model) on screen with automatic layout
@@ -97,6 +99,8 @@ func _spawn_node(v_data) -> Node:
 	else:
 		key = str(v_data)
 	node_views[key] = inst
+	if inst and inst.has_signal("node_selected"):
+		inst.node_selected.connect(_on_node_view_selected)
 	return inst
 
 
@@ -164,3 +168,9 @@ func _apply_layout(node_keys: Array) -> void:
 	for key in positions.keys():
 		if node_views.has(key):
 			node_views[key].global_position = positions[key]
+
+
+func _on_node_view_selected(node_key) -> void:
+	if not node_views.has(node_key):
+		return
+	node_selected.emit(node_key)

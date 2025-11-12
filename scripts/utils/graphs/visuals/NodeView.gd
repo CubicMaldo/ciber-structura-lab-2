@@ -3,6 +3,8 @@ extends Node2D
 ## Supports multiple states (unvisited, current, visited, root) with color coding
 ## Modular component that reacts to state changes independently of mission logic
 
+signal node_selected(node_id)
+
 var node_id = null
 var node_meta = null
 var current_state: String = "unvisited"
@@ -13,6 +15,8 @@ const STATE_COLORS := {
 	"current": Color(1.0, 0.8, 0.0, 1.0),       # Amarillo
 	"visited": Color(0.4, 0.8, 0.4, 1.0),       # Verde
 	"root": Color(0.9, 0.2, 0.2, 1.0),          # Rojo
+	"candidate": Color(0.45, 0.55, 1.0, 1.0),   # Azul brillante (nodo sugerido)
+	"candidate_secondary": Color(0.45, 0.55, 1.0, 1.0), # Igual que candidate para mantener la intriga
 	"highlighted": Color(1.0, 0.5, 0.0, 1.0)    # Naranja
 }
 
@@ -66,7 +70,7 @@ func set_state(new_state: String) -> void:
 				break
 	
 	# Add scale animation for emphasis
-	if new_state == "current" or new_state == "root":
+	if new_state == "current" or new_state == "root" or new_state == "candidate":
 		_animate_pulse()
 
 
@@ -87,3 +91,12 @@ func _animate_pulse() -> void:
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(self, "scale", Vector2(1.3, 1.3), 0.3)
 	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.3)
+
+
+func _unhandled_input(event) -> void:
+	if node_id == null:
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		var local_pos: Vector2 = to_local(event.position)
+		if local_pos.length() <= 36.0:
+			emit_signal("node_selected", node_id)

@@ -204,7 +204,7 @@ to_node = "IDS"
 script = ExtResource("1")
 
 [node name="GraphDisplay" type="Node2D" parent="."]
-position = Vector2(576, 324)
+position = Vector2(576, 150)
 script = ExtResource("2")
 node_scene = ExtResource("3")
 edge_scene = ExtResource("4")
@@ -220,89 +220,86 @@ connections = Array[ExtResource("7_n2hvw")]([SubResource("GraphConnectionData_1"
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -146.5
-offset_right = 300.0
-offset_bottom = 146.5
+offset_left = 16.0
+offset_top = -136.5
+offset_right = 273.0
+offset_bottom = 136.5
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MarginContainer" type="MarginContainer" parent="HUD/Panel"]
+layout_mode = 0
+offset_right = 257.0
+offset_bottom = 272.5
 
-[node name="TitleLabel" type="Label" parent="HUD/Panel/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Misión 1: Network Tracer"
 
-[node name="HSeparator" type="HSeparator" parent="HUD/Panel/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="AlgorithmLabel" type="Label" parent="HUD/Panel/VBoxContainer"]
+[node name="AlgorithmLabel" type="Label" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Algoritmo de Búsqueda:"
 
-[node name="AlgorithmButtons" type="HBoxContainer" parent="HUD/Panel/VBoxContainer"]
+[node name="AlgorithmButtons" type="HBoxContainer" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="BFSButton" type="Button" parent="HUD/Panel/VBoxContainer/AlgorithmButtons"]
+[node name="BFSButton" type="Button" parent="HUD/Panel/MarginContainer/VBoxContainer/AlgorithmButtons"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "BFS"
 
-[node name="DFSButton" type="Button" parent="HUD/Panel/VBoxContainer/AlgorithmButtons"]
+[node name="DFSButton" type="Button" parent="HUD/Panel/MarginContainer/VBoxContainer/AlgorithmButtons"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "DFS"
 
-[node name="HSeparator2" type="HSeparator" parent="HUD/Panel/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ControlButtons" type="HBoxContainer" parent="HUD/Panel/VBoxContainer"]
+[node name="ControlButtons" type="HBoxContainer" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="StartButton" type="Button" parent="HUD/Panel/VBoxContainer/ControlButtons"]
+[node name="StartButton" type="Button" parent="HUD/Panel/MarginContainer/VBoxContainer/ControlButtons"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Iniciar"
 
-[node name="StepButton" type="Button" parent="HUD/Panel/VBoxContainer/ControlButtons"]
+[node name="StepButton" type="Button" parent="HUD/Panel/MarginContainer/VBoxContainer/ControlButtons"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Paso"
 
-[node name="ContinueButton" type="Button" parent="HUD/Panel/VBoxContainer/ControlButtons"]
+[node name="ContinueButton" type="Button" parent="HUD/Panel/MarginContainer/VBoxContainer/ControlButtons"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Continuar"
 
-[node name="HSeparator3" type="HSeparator" parent="HUD/Panel/VBoxContainer"]
+[node name="HSeparator3" type="HSeparator" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="StatusLabel" type="Label" parent="HUD/Panel/VBoxContainer"]
+[node name="StatusLabel" type="Label" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Estado: Listo"
 
-[node name="CluesLabel" type="Label" parent="HUD/Panel/VBoxContainer"]
+[node name="CluesLabel" type="Label" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Pistas encontradas: 0"
 
-[node name="ResultLabel" type="RichTextLabel" parent="HUD/Panel/VBoxContainer"]
+[node name="ResultLabel" type="RichTextLabel" parent="HUD/Panel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
