@@ -22,12 +22,13 @@ var metadata: Resource = null
 ## - `_b`: Vértice extremo B. 
 ## - `_weight`: Peso inicial (float).
 func _init(
-	_a: Vertex = null,
+	 _a: Vertex = null,
 	 _b: Vertex = null,
 	 _weight: float = 0.0,
 	 _flux : int = 0,
 	 _metadata: Resource = null
 ) -> void:
+	
 	endpoint_a = _a
 	endpoint_b = _b
 	weight = _weight
