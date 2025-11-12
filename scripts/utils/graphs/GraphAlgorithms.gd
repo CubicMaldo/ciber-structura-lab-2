@@ -237,3 +237,194 @@ static func _jaccard_index(keys_a: Array, keys_b: Array) -> float:
 	if union_size <= 0.0:
 		return 0.0
 	return float(intersection) / union_size
+
+
+# ============================================================================
+# ALGORITMOS DE FLUJO MÁXIMO (MAXIMUM FLOW)
+# ============================================================================
+
+## Calcula el flujo máximo entre dos nodos usando el algoritmo de Edmonds-Karp (BFS).
+## Este algoritmo modifica el grafo, estableciendo el flujo en cada arista.
+##
+## Retorna un diccionario con:
+## - max_flow: int - El flujo máximo alcanzado
+## - flow_paths: Array - Caminos aumentantes encontrados
+## - saturated_edges: Array - Aristas saturadas (flux == capacity)
+##
+## Argumentos:
+## - graph: El grafo (se modificarán los valores de flux en las aristas)
+## - source: Nodo fuente
+## - sink: Nodo sumidero
+## - reset_flux: Si true, resetea todos los flujos antes de calcular (por defecto true)
+static func max_flow_edmonds_karp(graph: Graph, source, sink, reset_flux: bool = true) -> Dictionary:
+	var result := {
+		"max_flow": 0,
+		"flow_paths": [],
+		"saturated_edges": []
+	}
+	
+	if graph == null or source == null or sink == null:
+		return result
+	
+	if not graph.has_vertex(source) or not graph.has_vertex(sink):
+		return result
+	
+	if source == sink:
+		return result
+	
+	# Resetear flujos si se solicita
+	if reset_flux:
+		graph.reset_all_flux()
+	
+	var max_flow := 0
+	
+	# Mientras exista un camino aumentante
+	while true:
+		var path_info = _find_augmenting_path_bfs(graph, source, sink)
+		if not path_info.has("path") or path_info["path"].is_empty():
+			break
+		
+		var path: Array = path_info["path"]
+		var bottleneck: int = path_info["bottleneck"]
+		
+		# Aumentar flujo en el camino
+		for i in range(path.size() - 1):
+			var u = path[i]
+			var v = path[i + 1]
+			graph.add_edge_flux(u, v, bottleneck)
+		
+		max_flow += bottleneck
+		result["flow_paths"].append({
+			"path": path,
+			"flow": bottleneck
+		})
+	
+	result["max_flow"] = max_flow
+	
+	# Recopilar aristas saturadas
+	var flow_edges = graph.get_flow_edges()
+	for edge_info in flow_edges:
+		if edge_info["residual"] <= 0.0:
+			result["saturated_edges"].append({
+				"source": edge_info["source"],
+				"target": edge_info["target"],
+				"capacity": edge_info["capacity"]
+			})
+	
+	return result
+
+
+## Encuentra un camino aumentante usando BFS (para Edmonds-Karp).
+## Retorna un diccionario con el camino y el cuello de botella.
+static func _find_augmenting_path_bfs(graph: Graph, source, sink) -> Dictionary:
+	var result := {
+		"path": [],
+		"bottleneck": 0
+	}
+	
+	var queue: Array = [source]
+	var visited: Dictionary = {source: true}
+	var parent: Dictionary = {}
+	var found := false
+	
+	# BFS para encontrar camino con capacidad residual
+	while not queue.is_empty() and not found:
+		var current = queue.pop_front()
+		
+		if current == sink:
+			found = true
+			break
+		
+		var neighbor_weights = graph.get_neighbor_weights(current)
+		for neighbor in neighbor_weights.keys():
+			if visited.has(neighbor):
+				continue
+			
+			# Verificar si hay capacidad residual
+			var residual = graph.get_edge_residual_capacity(current, neighbor)
+			if residual > 0.0:
+				visited[neighbor] = true
+				parent[neighbor] = current
+				queue.append(neighbor)
+	
+	if not found:
+		return result
+	
+	# Reconstruir camino
+	var path: Array = []
+	var cursor = sink
+	while cursor != source:
+		path.insert(0, cursor)
+		cursor = parent.get(cursor, null)
+		if cursor == null:
+			return result
+	path.insert(0, source)
+	
+	# Calcular cuello de botella (mínima capacidad residual)
+	var bottleneck := INF
+	for i in range(path.size() - 1):
+		var u = path[i]
+		var v = path[i + 1]
+		var residual = graph.get_edge_residual_capacity(u, v)
+		bottleneck = min(bottleneck, residual)
+	
+	result["path"] = path
+	result["bottleneck"] = int(bottleneck)
+	return result
+
+
+## Calcula el corte mínimo después de ejecutar un algoritmo de flujo máximo.
+## Devuelve los conjuntos de nodos alcanzables desde la fuente (S) y el resto (T).
+##
+## IMPORTANTE: Ejecuta max_flow_edmonds_karp antes de llamar a esta función.
+##
+## Retorna:
+## - reachable_from_source: Array - Nodos alcanzables desde source usando aristas no saturadas
+## - cut_edges: Array - Aristas del corte mínimo
+## - cut_capacity: float - Suma de capacidades de las aristas del corte
+static func min_cut(graph: Graph, source) -> Dictionary:
+	var result := {
+		"reachable_from_source": [],
+		"cut_edges": [],
+		"cut_capacity": 0.0
+	}
+	
+	if graph == null or source == null or not graph.has_vertex(source):
+		return result
+	
+	# BFS usando solo aristas con capacidad residual > 0
+	var queue: Array = [source]
+	var reachable: Dictionary = {source: true}
+	
+	while not queue.is_empty():
+		var current = queue.pop_front()
+		result["reachable_from_source"].append(current)
+		
+		var neighbor_weights = graph.get_neighbor_weights(current)
+		for neighbor in neighbor_weights.keys():
+			if reachable.has(neighbor):
+				continue
+			
+			var residual = graph.get_edge_residual_capacity(current, neighbor)
+			if residual > 0.0:
+				reachable[neighbor] = true
+				queue.append(neighbor)
+	
+	# Encontrar aristas del corte (de S a T)
+	var cut_capacity := 0.0
+	for node in result["reachable_from_source"]:
+		var neighbor_weights = graph.get_neighbor_weights(node)
+		for neighbor in neighbor_weights.keys():
+			if not reachable.has(neighbor):
+				var edge = graph.get_edge_resource(node, neighbor)
+				if edge:
+					result["cut_edges"].append({
+						"source": node,
+						"target": neighbor,
+						"capacity": edge.weight,
+						"flux": edge.flux
+					})
+					cut_capacity += edge.weight
+	
+	result["cut_capacity"] = cut_capacity
+	return result

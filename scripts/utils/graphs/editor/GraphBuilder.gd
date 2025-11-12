@@ -37,8 +37,8 @@ func build_graph() -> Graph:
 	for conn in connections:
 		if conn and conn.from_node != "" and conn.to_node != "":
 			var edge_meta = conn.get_edge_metadata()
-			# Graph.connect_vertices acepta edge_metadata como parámetro
-			graph.connect_vertices(conn.from_node, conn.to_node, conn.weight, null, null, edge_meta)
+			# Graph.connect_vertices acepta edge_metadata y initial_flux como parámetros
+			graph.connect_vertices(conn.from_node, conn.to_node, conn.weight, null, null, edge_meta, conn.flux)
 	
 	graph_built.emit(graph)
 	return graph

@@ -143,9 +143,10 @@ func get_node_count() -> int:
 ## Argumentos:
 ## - `a`: Nodo origen.
 ## - `b`: Nodo destino.
-## - `weight`: Peso de la conexión (debe ser positivo).
+## - `weight`: Peso de la conexión / capacidad (debe ser positivo).
 ## - `edge_metadata`: Resource opcional con metadata de la arista.
-func add_connection(a, b, weight: float, edge_metadata: Resource = null) -> void:
+## - `initial_flux`: Flujo inicial de la arista (por defecto 0).
+func add_connection(a, b, weight: float, edge_metadata: Resource = null, initial_flux: int = 0) -> void:
 	if a == b:
 		push_error("Graph.add_connection: cannot connect node to itself")
 		return
@@ -162,14 +163,13 @@ func add_connection(a, b, weight: float, edge_metadata: Resource = null) -> void
 	var vb: Vertex = vertices[b]
 	var edge: Edge = va.edges.get(b)
 	if edge == null:
-		edge = Edge.new(va, vb, weight)
-		if edge_metadata != null:
-			edge.metadata = edge_metadata
+		edge = Edge.new(va, vb, weight, initial_flux, edge_metadata)
 		va.edges[b] = edge
 		vb.edges[a] = edge
 		emit_signal("edge_added", a, b)
 	else:
 		edge.weight = weight
+		edge.flux = initial_flux
 		if edge_metadata != null:
 			edge.metadata = edge_metadata
 
@@ -179,14 +179,15 @@ func add_connection(a, b, weight: float, edge_metadata: Resource = null) -> void
 ## Argumentos:
 ## - `a`: Nodo origen.
 ## - `b`: Nodo destino.
-## - `weight`: Peso de la conexión (por defecto 1.0).
+## - `weight`: Peso de la conexión / capacidad (por defecto 1.0).
 ## - `meta_a`: Resource opcional para metadata del nodo A.
 ## - `meta_b`: Resource opcional para metadata del nodo B.
 ## - `edge_metadata`: Resource opcional con metadata de la arista.
-func connect_vertices(a, b, weight := 1.0, meta_a: Resource = null, meta_b: Resource = null, edge_metadata: Resource = null) -> void:
+## - `initial_flux`: Flujo inicial (por defecto 0).
+func connect_vertices(a, b, weight := 1.0, meta_a: Resource = null, meta_b: Resource = null, edge_metadata: Resource = null, initial_flux: int = 0) -> void:
 	ensure_node(a, meta_a)
 	ensure_node(b, meta_b)
-	add_connection(a, b, weight, edge_metadata)
+	add_connection(a, b, weight, edge_metadata, initial_flux)
 
 
 ## Elimina la arista entre dos nodos si existe.
@@ -247,7 +248,7 @@ func has_edge(a, b) -> bool:
 ## [br]
 ## Cada entrada tiene el formato:
 ## ```
-## { "source": a, "target": b, "weight": w }
+## { "source": a, "target": b, "weight": w, "flux": f }
 ## ```
 func get_edges() -> Array:
 	var out: Array = []
@@ -259,7 +260,8 @@ func get_edges() -> Array:
 				out.append({
 					"source": e.endpoint_a.key,
 					"target": e.endpoint_b.key,
-					"weight": e.weight
+					"weight": e.weight,
+					"flux": e.flux
 				})
 	return out
 
@@ -311,14 +313,106 @@ func get_vertex_meta(key, field, default = null):
 	return v.meta.get(field, default) if v else default
 
 # ============================================================================
+# OPERACIONES DE FLUJO (NETWORK FLOW)
+# ============================================================================
+
+## Establece el flujo de una arista entre dos nodos.
+## Devuelve `true` si el flujo es válido y se estableció correctamente.
+##
+## Argumentos:
+## - `a`: Nodo origen.
+## - `b`: Nodo destino.
+## - `flux_value`: Valor de flujo a establecer.
+func set_edge_flux(a, b, flux_value: int) -> bool:
+	var edge = get_edge_resource(a, b)
+	if edge:
+		return edge.set_flux(flux_value)
+	return false
+
+
+## Agrega flujo a una arista existente.
+## Devuelve `true` si se pudo agregar sin exceder la capacidad.
+##
+## Argumentos:
+## - `a`: Nodo origen.
+## - `b`: Nodo destino.
+## - `amount`: Cantidad de flujo a agregar (puede ser negativo).
+func add_edge_flux(a, b, amount: int) -> bool:
+	var edge = get_edge_resource(a, b)
+	if edge:
+		return edge.add_flux(amount)
+	return false
+
+
+## Obtiene el flujo actual de una arista.
+## Devuelve el flujo o 0 si la arista no existe.
+func get_edge_flux(a, b) -> int:
+	var edge = get_edge_resource(a, b)
+	return edge.flux if edge else 0
+
+
+## Obtiene la capacidad residual de una arista (capacity - flux).
+## Devuelve la capacidad residual o 0.0 si la arista no existe.
+func get_edge_residual_capacity(a, b) -> float:
+	var edge = get_edge_resource(a, b)
+	return edge.residual_capacity() if edge else 0.0
+
+
+## Resetea el flujo de todas las aristas a 0.
+func reset_all_flux() -> void:
+	for vertex in vertices.values():
+		for edge in vertex.edges.values():
+			edge.flux = 0
+
+
+## Devuelve el flujo total que sale de un nodo (suma de flujos salientes).
+## Nota: En grafos no dirigidos, esto suma el flujo de todas las aristas conectadas.
+func get_outgoing_flux(node_key) -> int:
+	var vertex: Vertex = vertices.get(node_key)
+	if not vertex:
+		return 0
+	
+	var total_flux := 0
+	for edge: Edge in vertex.edges.values():
+		total_flux += edge.flux
+	return total_flux
+
+
+## Devuelve información de todas las aristas con flujo.
+## Formato: Array de { "source": a, "target": b, "capacity": w, "flux": f, "residual": r }
+func get_flow_edges() -> Array:
+	var out: Array = []
+	for a_key in vertices:
+		var va: Vertex = vertices[a_key]
+		for b_key in va.edges:
+			if _is_primary_endpoint(a_key, b_key):
+				var e: Edge = va.edges[b_key]
+				out.append({
+					"source": e.endpoint_a.key,
+					"target": e.endpoint_b.key,
+					"capacity": e.weight,
+					"flux": e.flux,
+					"residual": e.residual_capacity()
+				})
+	return out
+
+# ============================================================================
 # DEPURACIÓN
 # ============================================================================
 
 ## Imprime en consola todos los nodos y sus conexiones.
-func debug_print():
+## Si `show_flux` es true, muestra información de flujo (flux/capacity).
+func debug_print(show_flux: bool = false):
 	for k in vertices:
 		var v: Vertex = vertices[k]
-		print("%s -> %s" % [str(k), str(v.get_neighbor_weights())])
+		if show_flux:
+			var connections: Array = []
+			for neighbor_key in v.edges:
+				var edge: Edge = v.edges[neighbor_key]
+				connections.append("%s (flux: %d/%0.1f)" % [str(neighbor_key), edge.flux, edge.weight])
+			print("%s -> [%s]" % [str(k), ", ".join(connections)])
+		else:
+			print("%s -> %s" % [str(k), str(v.get_neighbor_weights())])
 
 # ============================================================================
 # INTERNOS

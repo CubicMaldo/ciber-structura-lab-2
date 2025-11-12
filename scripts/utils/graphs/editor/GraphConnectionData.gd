@@ -10,8 +10,11 @@ extends Resource
 ## Nodo destino (debe coincidir con el node_key de un GraphNodeData)
 @export var to_node: String = ""
 
-## Peso de la conexión
+## Peso de la conexión (capacidad en redes de flujo)
 @export var weight: float = 1.0
+
+## Flujo inicial de la arista (para modelado de redes)
+@export var flux: int = 0
 
 ## Metadata de la arista (EdgeMeta o cualquier subclase)
 ## Opcional - si no se proporciona, se crea EdgeMeta básico

@@ -1,15 +1,18 @@
 ## Representa una arista no dirigida entre dos `Vertex`.
 ## Nombres neutrales (`endpoint_a`/`endpoint_b`) evitan implicar dirección.
+## En el contexto de redes de flujo:
+## - `weight` representa la capacidad máxima de la arista
+## - `flux` representa el flujo actual que pasa por la arista (debe ser <= weight)
 class_name Edge
 
 ## Vértice extremo A.
 var endpoint_a: Vertex = null
 ## Vértice extremo B.
 var endpoint_b: Vertex = null
-## Peso de la arista.
+## Peso de la arista (capacidad máxima en redes de flujo).
 var weight: float = 0.0
-## FLujo de la arista
-var flux : int = 0
+## Flujo actual en la arista (debe ser <= weight).
+var flux: int = 0
 
 ## Metadata asociada a la arista (puede ser Resource o null).
 var metadata: Resource = null
@@ -20,20 +23,22 @@ var metadata: Resource = null
 ## Argumentos:
 ## - `_a`: Vértice extremo A.
 ## - `_b`: Vértice extremo B. 
-## - `_weight`: Peso inicial (float).
+## - `_weight`: Peso inicial (float, representa capacidad en redes de flujo).
+## - `_flux`: Flujo actual en la arista (int, debe ser <= weight en redes de flujo).
+## - `_metadata`: Resource opcional con metadata adicional.
 func _init(
 	 _a: Vertex = null,
 	 _b: Vertex = null,
 	 _weight: float = 0.0,
-	 _flux : int = 0,
+	 _flux: int = 0,
 	 _metadata: Resource = null
 ) -> void:
 	
 	endpoint_a = _a
 	endpoint_b = _b
 	weight = _weight
-	metadata = _metadata
 	flux = _flux
+	metadata = _metadata
 
 
 ## Devuelve un Array con los dos vértices extremos: [endpoint_a, endpoint_b].
@@ -72,3 +77,44 @@ func has_endpoint(endpoint) -> bool:
 	if endpoint is Vertex:
 		q = endpoint.key
 	return (endpoint_a and endpoint_a.key == q) or (endpoint_b and endpoint_b.key == q)
+
+
+## Devuelve la capacidad residual disponible (capacity - flux).
+## Útil para algoritmos de flujo máximo.
+func residual_capacity() -> float:
+	return weight - float(flux)
+
+
+## Intenta agregar flujo a la arista.
+## Devuelve `true` si se pudo agregar el flujo sin exceder la capacidad.
+##
+## Argumentos:
+## - `amount`: Cantidad de flujo a agregar (puede ser negativo para reducir).
+func add_flux(amount: int) -> bool:
+	var new_flux = flux + amount
+	if new_flux < 0 or float(new_flux) > weight:
+		return false
+	flux = new_flux
+	return true
+
+
+## Establece el flujo de la arista con validación de capacidad.
+## Devuelve `true` si el flujo es válido (0 <= flux <= weight).
+##
+## Argumentos:
+## - `new_flux`: Nuevo valor de flujo.
+func set_flux(new_flux: int) -> bool:
+	if new_flux < 0 or float(new_flux) > weight:
+		return false
+	flux = new_flux
+	return true
+
+
+## Resetea el flujo a 0.
+func reset_flux() -> void:
+	flux = 0
+
+
+## Devuelve `true` si la arista está saturada (flux == weight).
+func is_saturated() -> bool:
+	return float(flux) >= weight

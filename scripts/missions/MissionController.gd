@@ -22,12 +22,7 @@ func step() -> void:
 
 func complete(result := {}) -> void:
 	emit_signal("mission_completed", result)
-	if Engine.has_singleton("GameManager"):
-		var gm = Engine.get_singleton("GameManager")
-		if gm and gm.has_method("finish_mission"):
-			gm.finish_mission(result)
-	# Emit mission completed signal via EventBus with typed parameters
-	if Engine.has_singleton("EventBus"):
-		var eb = Engine.get_singleton("EventBus")
-		var success = result.get("status", "") == "done"
-		eb.mission_completed.emit(mission_id, success, result)
+	GameManager.finish_mission(result)
+	
+	var success = result.get("status", "") == "done"
+	EventBus.mission_completed.emit(mission_id, success, result)
