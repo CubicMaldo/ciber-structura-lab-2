@@ -130,18 +130,15 @@ static func bfs(graph: Graph, start_key) -> Dictionary:
 		return result
 	
 	var queue: Array = [start_key]
-	var visited: Dictionary = {}
-	var levels: Dictionary = {}
-	var parent: Dictionary = {}
+	var visited: Dictionary = {start_key: true}
 	
-	visited[start_key] = true
-	levels[start_key] = 0
+	result["levels"][start_key] = 0
 	
 	while not queue.is_empty():
 		var current = queue.pop_front()
 		result["visited"].append(current)
 		
-		var current_level: int = int(levels.get(current, 0))
+		var current_level: int = result["levels"][current]
 		var neighbor_weights: Dictionary = graph.get_neighbor_weights(current)
 		
 		for neighbor in neighbor_weights.keys():
@@ -149,12 +146,10 @@ static func bfs(graph: Graph, start_key) -> Dictionary:
 				continue
 			
 			visited[neighbor] = true
-			levels[neighbor] = current_level + 1
-			parent[neighbor] = current
+			result["levels"][neighbor] = current_level + 1
+			result["parent"][neighbor] = current
 			queue.append(neighbor)
 	
-	result["levels"] = levels
-	result["parent"] = parent
 	return result
 
 
@@ -175,34 +170,35 @@ static func dfs(graph: Graph, start_key) -> Dictionary:
 
 	var stack: Array = [start_key]
 	var visited: Dictionary = {}
-	var levels: Dictionary = {}
-	var parent: Dictionary = {}
-
-	levels[start_key] = 0
+	
+	result["levels"][start_key] = 0
 
 	while not stack.is_empty():
 		var current = stack.pop_back()
+		
 		if visited.has(current):
 			continue
+		
 		visited[current] = true
 		result["visited"].append(current)
-		var current_level: int = int(levels.get(current, 0))
-		# Obtener vecinos y empujar en orden invertido para simular DFS recursivo
+		
+		var current_level: int = result["levels"][current]
 		var neighbor_weights: Dictionary = graph.get_neighbor_weights(current)
-		var neighbors: Array = []
-		for n in neighbor_weights.keys():
-			neighbors.append(n)
-		# push neighbors in reverse order so the first neighbor is processed first
+		
+		# Convertir a array y procesar en orden inverso para mantener
+		# el orden de exploración consistente con DFS recursivo
+		var neighbors: Array = neighbor_weights.keys()
 		for i in range(neighbors.size() - 1, -1, -1):
 			var neighbor = neighbors[i]
 			if visited.has(neighbor):
 				continue
-			parent[neighbor] = current
-			levels[neighbor] = current_level + 1
-			stack.append(neighbor)
-
-	result["levels"] = levels
-	result["parent"] = parent
+			
+			# Solo establecer nivel y padre si aún no se han establecido
+			if not result["levels"].has(neighbor):
+				result["levels"][neighbor] = current_level + 1
+				result["parent"][neighbor] = current
+				stack.append(neighbor)
+	
 	return result
 
 

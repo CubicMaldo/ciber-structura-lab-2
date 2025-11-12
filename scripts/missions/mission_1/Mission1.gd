@@ -15,17 +15,16 @@ var traversal_order: Array = []
 var traversal_index: int = 0
 
 # UI references
-var bfs_button: Button
-var dfs_button: Button
-var start_button: Button
-var step_button: Button
-var continue_button: Button
-var status_label: Label
-var clues_label: Label
-var result_label: RichTextLabel
+@onready var bfs_button: Button = %BFSButton
+@onready var dfs_button: Button = %DFSButton
+@onready var start_button: Button = %StartButton
+@onready var step_button: Button = %StepButton
+@onready var continue_button: Button = %ContinueButton
+@onready var status_label: Label = %StatusLabel
+@onready var clues_label: Label = %CluesLabel
+@onready var result_label: RichTextLabel = %ResultLabel
 
 func _ready() -> void:
-	_setup_ui_references()
 	_connect_ui_signals()
 	_subscribe_to_events()
 	mission_id = "Mission_1"
@@ -76,85 +75,95 @@ func start() -> void:
 	EventBus.mission_logic_started.emit(mission_id)
 
 func step() -> void:
-	# Step through the precomputed traversal_order
-	if traversal_index >= traversal_order.size():
+	# Orchestrador: obtener siguiente clave y delegar responsabilidades
+	var next_key = _get_next_key()
+	if next_key == null:
 		complete({"status":"done"})
 		return
-
-	var current_key = traversal_order[traversal_index]
-	traversal_index += 1
-
-	if visited.has(current_key):
+	
+	if visited.has(next_key):
 		return
-	visited[current_key] = true
 
-	# Prepare EventBus reference for later emits
+	# Marcar previo como visitado si aplica
+	if last_current != null and last_current != next_key:
+		_mark_previous_visited(last_current)
 
-	# CRITICAL: Mark previous node as visited BEFORE doing anything with current node
-	if ui and ui.has_method("set_node_state"):
-		if last_current != null and last_current != current_key:
-			ui.set_node_state(last_current, "visited")
-			var prev_v = graph.get_vertex(last_current)
-			if prev_v:
-				EventBus.node_state_changed.emit(prev_v, "visited")
+	# Establecer el nodo actual (modifica last_current y UI)
+	_set_current(next_key)
 
-	# Update last_current IMMEDIATELY after clearing the previous one
-	last_current = current_key
+	# Marcar como visitado en el modelo
+	visited[next_key] = true
 
-	# Now set current node as "current" state
-	if ui and ui.has_method("set_node_state"):
-		ui.set_node_state(current_key, "current")
-	elif ui and ui.has_method("highlight_node"):
-		ui.highlight_node(current_key)
-
-	# Emit node visited with Vertex object and reveal hidden message
-
-	var vertex = graph.get_vertex(current_key)
+	# Manejar la visita del vértice (emite eventos, descubre pistas, completa si encuentra root)
+	var vertex = graph.get_vertex(next_key)
 	if vertex:
-		EventBus.node_visited.emit(vertex)
-			
-		# Type-safe access to NetworkNodeMeta
-		var node_meta = vertex.meta as NetworkNodeMeta
-		if node_meta:
-			# Check for hidden message/clue
-			if node_meta.has_clue():
-				var msg = node_meta.hidden_message
-				found_clues.append(msg)
-				# Show clue visually on the node
-				if ui and ui.has_method("show_node_clue"):
-					ui.show_node_clue(current_key, msg)
-				# Update clues label immediately
-				_update_clues_display()
-				print("Pista encontrada en %s: %s" % [str(current_key), msg])
-			
-			# Check if root - if found, mark as root and complete
-			if node_meta.is_root:
-				# Highlight root node with special state
-				if ui and ui.has_method("set_node_state"):
-					ui.set_node_state(current_key, "root")
-				EventBus.node_state_changed.emit(vertex, "root")
-				var result = {
-					"status":"done",
-					"root": current_key,
-					"clues": found_clues,
-					"restoration_code": "RC-42-ALPHA"
-				}
-				complete(result)
+		var finished = _handle_vertex_visit(vertex, next_key)
+		if finished:
+			return
 
 
 # ============================================================================
 # UI SETUP AND EVENT HANDLING
 # ============================================================================
 
-func _setup_ui_references() -> void:
-	bfs_button = get_node_or_null("HUD/Panel/VBoxContainer/AlgorithmButtons/BFSButton")
-	dfs_button = get_node_or_null("HUD/Panel/VBoxContainer/AlgorithmButtons/DFSButton")
-	start_button = get_node_or_null("HUD/Panel/VBoxContainer/ControlButtons/StartButton")
-	step_button = get_node_or_null("HUD/Panel/VBoxContainer/ControlButtons/StepButton")
-	continue_button = get_node_or_null("HUD/Panel/VBoxContainer/ControlButtons/ContinueButton")
-	status_label = get_node_or_null("HUD/Panel/VBoxContainer/StatusLabel")
-	clues_label = get_node_or_null("HUD/Panel/VBoxContainer/CluesLabel")
-	result_label = get_node_or_null("HUD/Panel/VBoxContainer/ResultLabel")
+func _get_next_key() -> Variant:
+	# Return next key from traversal_order and advance the index, or null if finished
+	if traversal_index >= traversal_order.size():
+		return null
+	var k = traversal_order[traversal_index]
+	traversal_index += 1
+	return k
+
+
+func _mark_previous_visited(prev_key) -> void:
+	# Mark previous node visually and emit the appropriate EventBus signal
+	if prev_key == null:
+		return
+	if ui and ui.has_method("set_node_state"):
+		ui.set_node_state(prev_key, "visited")
+	var prev_v = graph.get_vertex(prev_key)
+	if prev_v:
+		EventBus.node_state_changed.emit(prev_v, "visited")
+
+
+func _set_current(node_key) -> void:
+	# Update last_current and set UI state for the current node
+	last_current = node_key
+	if ui and ui.has_method("set_node_state"):
+		ui.set_node_state(node_key, "current")
+	elif ui and ui.has_method("highlight_node"):
+		ui.highlight_node(node_key)
+
+
+func _handle_vertex_visit(vertex, node_key) -> bool:
+	# Emit node visited and process NetworkNodeMeta (clues, root detection).
+	# Returns true if mission completed (root found).
+	EventBus.node_visited.emit(vertex)
+
+	var node_meta = vertex.meta as NetworkNodeMeta
+	if node_meta:
+		if node_meta.has_clue():
+			var msg = node_meta.hidden_message
+			found_clues.append(msg)
+			if ui and ui.has_method("show_node_clue"):
+				ui.show_node_clue(node_key, msg)
+			_update_clues_display()
+			print("Pista encontrada en %s: %s" % [str(node_key), msg])
+
+		if node_meta.is_root:
+			if ui and ui.has_method("set_node_state"):
+				ui.set_node_state(node_key, "root")
+			EventBus.node_state_changed.emit(vertex, "root")
+			var result = {
+				"status":"done",
+				"root": node_key,
+				"clues": found_clues,
+				"restoration_code": "RC-42-ALPHA"
+			}
+			complete(result)
+			return true
+
+	return false
 
 
 func _connect_ui_signals() -> void:
