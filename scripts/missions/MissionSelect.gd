@@ -18,10 +18,5 @@ func _populate() -> void:
 
 func _on_mission_selected(mission_id: String) -> void:
 	# Emit mission selected signal with typed parameter
-	if Engine.has_singleton("EventBus"):
-		var eb = Engine.get_singleton("EventBus")
-		eb.mission_selected.emit(mission_id)
-	if Engine.has_singleton("GameManager"):
-		var gm = Engine.get_singleton("GameManager")
-		if gm and gm.has_method("start_mission"):
-			gm.start_mission(mission_id)
+	EventBus.mission_selected.emit(mission_id)
+	GameManager.start_mission(mission_id)

@@ -21,3 +21,23 @@ func change_to_mission(mission_id: String) -> void:
     if Engine.has_singleton("EventBus"):
         var eb = Engine.get_singleton("EventBus")
         eb.mission_change_requested.emit(mission_id, path)
+
+func change_to_packed(packed_scene: PackedScene) -> void:
+    # Change to a scene given a PackedScene resource.
+    # Mirrors the behavior of `change_to(path)` but accepts a PackedScene.
+    # Emits `EventBus.scene_changed` with the resource path if available.
+    if packed_scene == null:
+        return
+    var err = get_tree().change_scene_to(packed_scene)
+    if err != OK:
+        var rpath = "(unknown)"
+        if packed_scene is Resource and packed_scene.resource_path != "":
+            rpath = packed_scene.resource_path
+        push_error("Failed to change scene to PackedScene %s (err=%s)" % [rpath, str(err)])
+    # Emit scene changed signal with typed parameter (use resource_path when available)
+    if Engine.has_singleton("EventBus"):
+        var eb = Engine.get_singleton("EventBus")
+        var emit_path = ""
+        if packed_scene is Resource and packed_scene.resource_path != "":
+            emit_path = packed_scene.resource_path
+        eb.scene_changed.emit(emit_path)

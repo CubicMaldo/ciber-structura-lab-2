@@ -35,7 +35,7 @@ func _ready() -> void:
 		graph = graph_builder.get_graph()
 		print("Mission_1: Grafo cargado desde GraphBuilder con %d nodos" % graph.get_nodes().size())
 	else:
-		push_error("Mission_1: No se encontró nodo GraphBuilder. Asegúrate de agregarlo como hijo en la escena.")
+		push_error("Mission_1: No se encontró nodo GraphBuilder.")
 		# Crear grafo vacío para evitar crashes
 		graph = Graph.new()
 		return
@@ -137,7 +137,12 @@ func step() -> void:
 						ui.set_node_state(current_key, "root")
 					if eb:
 						eb.node_state_changed.emit(vertex, "root")
-					var result = {"status":"done", "root": current_key, "clues": found_clues, "restoration_code": "RC-42-ALPHA"}
+					var result = {
+						"status":"done",
+						"root": current_key,
+						"clues": found_clues,
+						"restoration_code": "RC-42-ALPHA"
+						}
 					complete(result)
 
 
@@ -249,7 +254,8 @@ func _on_mission_completed(completed_mission_id: String, success: bool, result: 
 	else:
 		_update_status("Búsqueda completada")
 		if result_label:
-			result_label.text = "[center][b]Búsqueda finalizada[/b][/center]\n\nRevisar los resultados."
+			result_label.text = "
+			[center][b]Búsqueda finalizada[/b][/center]\n\nRevisar los resultados."
 
 
 func _update_status(message: String) -> void:
