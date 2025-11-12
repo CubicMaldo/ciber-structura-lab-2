@@ -164,6 +164,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Paso"
 
+[node name="ContinueButton" type="Button" parent="HUD/Panel/VBoxContainer/ControlButtons"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Continuar"
+
 [node name="HSeparator3" type="HSeparator" parent="HUD/Panel/VBoxContainer"]
 layout_mode = 2
 

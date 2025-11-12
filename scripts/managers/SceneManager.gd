@@ -9,18 +9,14 @@ func change_to(path: String) -> void:
     if err != OK:
         push_error("Failed to change scene to %s (err=%s)" % [path, str(err)])
     # Emit scene changed signal with typed parameter
-    if Engine.has_singleton("EventBus"):
-        var eb = Engine.get_singleton("EventBus")
-        eb.scene_changed.emit(path)
+    EventBus.scene_changed.emit(path)
 
 func change_to_mission(mission_id: String) -> void:
     # map mission id to a scene path (convention: scenes/missions/Mission_<n>.tscn)
     var path = "res://scenes/missions/%s.tscn" % mission_id
     change_to(path)
     # Emit mission change request signal with typed parameters
-    if Engine.has_singleton("EventBus"):
-        var eb = Engine.get_singleton("EventBus")
-        eb.mission_change_requested.emit(mission_id, path)
+    EventBus.mission_change_requested.emit(mission_id, path)
 
 func change_to_packed(packed_scene: PackedScene) -> void:
     # Change to a scene given a PackedScene resource.
@@ -35,9 +31,7 @@ func change_to_packed(packed_scene: PackedScene) -> void:
             rpath = packed_scene.resource_path
         push_error("Failed to change scene to PackedScene %s (err=%s)" % [rpath, str(err)])
     # Emit scene changed signal with typed parameter (use resource_path when available)
-    if Engine.has_singleton("EventBus"):
-        var eb = Engine.get_singleton("EventBus")
-        var emit_path = ""
-        if packed_scene is Resource and packed_scene.resource_path != "":
+    var emit_path = ""
+    if packed_scene is Resource and packed_scene.resource_path != "":
             emit_path = packed_scene.resource_path
-        eb.scene_changed.emit(emit_path)
+    EventBus.scene_changed.emit(emit_path)

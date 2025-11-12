@@ -16,6 +16,7 @@ extends Node2D
 var graph = null
 var node_views := {}
 var edge_views := []
+var layout_component: GraphLayout = null
 
 
 ## Display a Graph instance (model) on screen with automatic layout
@@ -44,9 +45,7 @@ func display_graph(g) -> void:
 			_spawn_edge(e)
 	
 	# Step 4: Emit graph displayed signal
-	if Engine.has_singleton("EventBus"):
-		var eb = Engine.get_singleton("EventBus")
-		eb.graph_displayed.emit(graph)
+	EventBus.graph_displayed.emit(graph)
 
 
 ## Update the visual state of a specific node by key
@@ -130,21 +129,26 @@ func _apply_layout(node_keys: Array) -> void:
 	if node_keys.size() == 0:
 		return
 	var positions := {}
+
+	# ensure we have a layout component instance (composed component)
+	if layout_component == null:
+		# instantiate and attach so it will appear in the scene tree (optional)
+		layout_component = GraphLayout.new()
 	
 	match layout_type:
 		"circular":
-			var pos_array = GraphLayout.circular_layout(node_keys.size(), layout_radius, global_position)
+			var pos_array = layout_component.circular_layout(node_keys.size(), layout_radius, global_position)
 			for i in range(node_keys.size()):
 				positions[node_keys[i]] = pos_array[i]
 		
 		"grid":
-			var pos_array = GraphLayout.grid_layout(node_keys.size(), 4, layout_spacing, global_position)
+			var pos_array = layout_component.grid_layout(node_keys.size(), 4, layout_spacing, global_position)
 			for i in range(node_keys.size()):
 				positions[node_keys[i]] = pos_array[i]
 		
 		"force_directed":
 			var edges = graph.get_edges() if graph.has_method("get_edges") else []
-			positions = GraphLayout.force_directed_layout(
+			positions = layout_component.force_directed_layout(
 				node_keys, edges, 50, 5000.0, 0.1, 0.9, global_position
 			)
 		
@@ -152,7 +156,7 @@ func _apply_layout(node_keys: Array) -> void:
 			var root_key = node_keys[0] if node_keys.size() > 0 else null
 			if root_key:
 				var edges = graph.get_edges() if graph.has_method("get_edges") else []
-				positions = GraphLayout.hierarchical_layout(
+				positions = layout_component.hierarchical_layout(
 					node_keys, edges, root_key, 120.0, 100.0, global_position
 				)
 	

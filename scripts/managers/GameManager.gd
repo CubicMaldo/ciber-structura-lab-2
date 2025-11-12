@@ -15,8 +15,8 @@ func start_mission(mission_id: String) -> void:
 	EventBus.mission_started.emit(mission_id)
 
 func finish_mission(result: Dictionary) -> void:
-	# placeholder: record result, show summary, return to mission select
+	# Record result and emit signal, but don't auto-transition
+	# Let the mission scene handle the victory screen and transition
 	print("Mission finished:", result)
-	SceneManager.change_to("res://scenes/MissionSelect.tscn")
 	# Emit mission finished signal with typed parameters
 	EventBus.mission_finished.emit(current_mission, result)
