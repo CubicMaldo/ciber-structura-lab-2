@@ -212,6 +212,156 @@ static func dfs(graph: Graph, start_key, respect_direction: bool = true) -> Dict
 	return result
 
 
+static func minimum_spanning_tree(graph: Graph, method: String = "kruskal", start_key = null) -> Dictionary:
+	var result := {
+		"edges": [],
+		"cost": 0.0,
+		"components": 0
+	}
+	if graph == null:
+		return result
+	var nodes_dict: Dictionary = graph.get_nodes()
+	var node_keys: Array = nodes_dict.keys()
+	if node_keys.is_empty():
+		return result
+	var normalized_method = method.to_lower()
+	if normalized_method == "prim":
+		return _mst_prim(graph, start_key)
+	return _mst_kruskal(graph)
+
+
+static func _mst_kruskal(graph: Graph) -> Dictionary:
+	var nodes_dict: Dictionary = graph.get_nodes()
+	var parent := {}
+	var rank := {}
+	for key in nodes_dict.keys():
+		parent[key] = key
+		rank[key] = 0
+	var edges: Array = graph.get_edges()
+	var compare = func(a, b):
+		return float(a.get("weight", 0.0)) < float(b.get("weight", 0.0))
+	edges.sort_custom(compare)
+	var mst_edges: Array = []
+	var total_cost := 0.0
+	var components := nodes_dict.size()
+	for edge in edges:
+		var a = edge.get("source")
+		var b = edge.get("target")
+		if a == null or b == null:
+			continue
+		var set_a = _find_set(a, parent)
+		var set_b = _find_set(b, parent)
+		if set_a == set_b:
+			continue
+		mst_edges.append(edge)
+		total_cost += float(edge.get("weight", 0.0))
+		_union_sets(set_a, set_b, parent, rank)
+		components -= 1
+	var result := {
+		"edges": mst_edges,
+		"cost": total_cost,
+		"components": max(components, 0)
+	}
+	return result
+
+
+static func _mst_prim(graph: Graph, start_key) -> Dictionary:
+	var nodes_dict: Dictionary = graph.get_nodes()
+	var node_keys: Array = nodes_dict.keys()
+	if node_keys.is_empty():
+		return {"edges": [], "cost": 0.0, "components": 0}
+	var visited := {}
+	var pending_edges: Array = []
+	var mst_edges: Array = []
+	var total_cost := 0.0
+	var components := 0
+	var compare = func(a, b):
+		return float(a.get("weight", 0.0)) < float(b.get("weight", 0.0))
+
+	var enqueue_edges = func(from_key):
+		if from_key == null:
+			return
+		var neighbor_weights: Dictionary = graph.get_neighbor_weights(from_key)
+		for neighbor in neighbor_weights.keys():
+			if visited.has(neighbor):
+				continue
+			pending_edges.append({
+				"source": from_key,
+				"target": neighbor,
+				"weight": float(neighbor_weights[neighbor])
+			})
+		pending_edges.sort_custom(compare)
+
+	var initial_start = start_key if start_key != null and graph.has_vertex(start_key) else null
+	var node_queue: Array = node_keys.duplicate()
+	while visited.size() < node_keys.size():
+		var current_start = initial_start
+		initial_start = null
+		if current_start == null or visited.has(current_start):
+			current_start = _next_unvisited(node_queue, visited)
+		if current_start == null:
+			break
+		if visited.has(current_start):
+			continue
+		components += 1
+		visited[current_start] = true
+		enqueue_edges.call(current_start)
+		while not pending_edges.is_empty():
+			var edge = pending_edges.pop_front()
+			var a = edge.get("source")
+			var b = edge.get("target")
+			var a_visited = visited.has(a)
+			var b_visited = visited.has(b)
+			if a_visited and b_visited:
+				continue
+			var next_node = b if not b_visited else a
+			mst_edges.append(edge)
+			total_cost += float(edge.get("weight", 0.0))
+			visited[next_node] = true
+			enqueue_edges.call(next_node)
+		# Cuando no queden aristas, el bucle principal buscará un nuevo componente
+	return {
+		"edges": mst_edges,
+		"cost": total_cost,
+		"components": components
+	}
+
+
+static func _next_unvisited(nodes: Array, visited: Dictionary):
+	for key in nodes:
+		if not visited.has(key):
+			return key
+	return null
+
+
+static func _find_set(key, parent: Dictionary):
+	var root = key
+	while parent.get(root, root) != root:
+		root = parent[root]
+	var current = key
+	while parent.get(current, current) != root:
+		var next_key = parent[current]
+		parent[current] = root
+		current = next_key
+	return root
+
+
+static func _union_sets(a, b, parent: Dictionary, rank: Dictionary) -> void:
+	var root_a = _find_set(a, parent)
+	var root_b = _find_set(b, parent)
+	if root_a == root_b:
+		return
+	var rank_a: int = rank.get(root_a, 0)
+	var rank_b: int = rank.get(root_b, 0)
+	if rank_a < rank_b:
+		parent[root_a] = root_b
+	elif rank_b < rank_a:
+		parent[root_b] = root_a
+	else:
+		parent[root_b] = root_a
+		rank[root_a] = rank_a + 1
+
+
 static func _pop_lowest(queue: Array, distances: Dictionary):
 	var best_index := 0
 	var best_key = queue[0]

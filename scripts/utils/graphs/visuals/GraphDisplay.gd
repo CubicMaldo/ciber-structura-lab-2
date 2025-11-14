@@ -18,6 +18,7 @@ extends Node2D
 var graph = null
 var node_views := {}
 var edge_views := []
+var edge_view_map := {}
 var layout_component: GraphLayout = null
 
 signal node_selected(node_key)
@@ -82,6 +83,7 @@ func _clear() -> void:
 		if is_instance_valid(ev):
 			ev.queue_free()
 	edge_views.clear()
+	edge_view_map.clear()
 
 
 func _spawn_node(v_data) -> Node:
@@ -135,6 +137,14 @@ func _spawn_edge(e_data) -> Node:
 		inst = Node2D.new()
 		add_child(inst)
 	
+	var edge_source = e_data.get("source", e_data.get("from"))
+	var edge_target = e_data.get("target", e_data.get("to"))
+	var key = _edge_key(edge_source, edge_target)
+	if key != "":
+		edge_view_map[key] = inst
+		var reverse_key = _edge_key(edge_target, edge_source)
+		if reverse_key != key:
+			edge_view_map[reverse_key] = inst
 	edge_views.append(inst)
 	return inst
 
@@ -178,6 +188,23 @@ func _apply_layout(node_keys: Array) -> void:
 	for key in positions.keys():
 		if node_views.has(key):
 			node_views[key].global_position = positions[key]
+
+
+func set_edge_state(a, b, state: String) -> void:
+	var view = _get_edge_view(a, b)
+	if view and view.has_method("set_state"):
+		view.set_state(state)
+
+
+func _get_edge_view(a, b):
+	var key = _edge_key(a, b)
+	return edge_view_map.get(key)
+
+
+func _edge_key(a, b) -> String:
+	if a == null or b == null:
+		return ""
+	return "%s|%s" % [str(a), str(b)]
 
 
 func _on_node_view_selected(node_key) -> void:

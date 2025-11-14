@@ -10,14 +10,25 @@ extends Node
 ## Lista de conexiones entre nodos
 @export var connections: Array[GraphConnectionData] = []
 
+## Si está activo, ignora las conexiones configuradas y genera aristas aleatorias
+@export var use_random_connections: bool = false
+
+## Si está activo, asigna pesos aleatorios a las aristas (tanto configuradas como aleatorias)
+@export var randomize_edge_weights: bool = false
+
+## Límite para la cantidad de aristas aleatorias y el rango máximo de pesos aleatorios
+@export_range(0, 128, 1, "or_greater") var random_generation_limit: int = 5
+
 ## Grafo construido (solo lectura, generado automáticamente)
 var graph: Graph = null
+var _rng := RandomNumberGenerator.new()
 
 ## Señal emitida cuando el grafo es reconstruido
 signal graph_built(graph: Graph)
 
 
 func _ready() -> void:
+	_rng.randomize()
 	if not Engine.is_editor_hint():
 		# En runtime, construir el grafo automáticamente
 		build_graph()
@@ -33,17 +44,54 @@ func build_graph() -> Graph:
 			var meta = node_data.get_metadata()
 			graph.add_node(node_data.node_key, meta)
 	
-	# Agregar todas las conexiones con su metadata
-		for conn in connections:
-			if conn and conn.from_node != "" and conn.to_node != "":
-				if not conn.directed:
-					push_warning("GraphBuilder: Non-directed connection %s -> %s detected; graph operates in directed mode." % [conn.from_node, conn.to_node])
-				var edge_meta = conn.get_edge_metadata()
-				# Graph.connect_vertices acepta edge_metadata y initial_flux como parámetros
-				graph.connect_vertices(conn.from_node, conn.to_node, conn.weight, null, null, edge_meta, conn.flux, conn.directed)
+	var weight_limit: int = max(1, random_generation_limit)
+	if use_random_connections:
+		_build_random_connections(weight_limit)
+	else:
+		_build_configured_connections(weight_limit)
 	
 	graph_built.emit(graph)
 	return graph
+
+
+func _build_configured_connections(weight_limit: int) -> void:
+	for conn in connections:
+		if conn == null or conn.from_node == "" or conn.to_node == "":
+			continue
+		if not conn.directed:
+			push_warning("GraphBuilder: Non-directed connection %s -> %s detected; graph operates in directed mode." % [conn.from_node, conn.to_node])
+		var edge_meta = conn.get_edge_metadata()
+		var weight = _pick_weight(conn.weight, weight_limit)
+		graph.connect_vertices(conn.from_node, conn.to_node, weight, null, null, edge_meta, conn.flux, conn.directed)
+
+
+func _build_random_connections(weight_limit: int) -> void:
+	var node_keys: Array = graph.get_nodes().keys()
+	if node_keys.size() < 2:
+		return
+	var possible_pairs: Array = []
+	for i in range(node_keys.size()):
+		for j in range(i + 1, node_keys.size()):
+			possible_pairs.append([node_keys[i], node_keys[j]])
+	possible_pairs.shuffle()
+	var edge_cap: int = max(0, random_generation_limit)
+	var edges_to_create: int = min(edge_cap, possible_pairs.size())
+	for idx in range(edges_to_create):
+		var pair = possible_pairs[idx]
+		var from_key = pair[0]
+		var to_key = pair[1]
+		if _rng.randi_range(0, 1) == 0:
+			var temp = from_key
+			from_key = to_key
+			to_key = temp
+		var weight = _pick_weight(1.0, weight_limit)
+		graph.connect_vertices(from_key, to_key, weight, null, null, null, 0, true)
+
+
+func _pick_weight(original_weight: float, weight_limit: int) -> float:
+	if not randomize_edge_weights:
+		return original_weight
+	return _rng.randf_range(1.0, float(max(1, weight_limit)))
 
 
 ## Obtiene el grafo construido (construye si es necesario)
