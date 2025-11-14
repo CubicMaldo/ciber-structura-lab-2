@@ -34,11 +34,13 @@ func build_graph() -> Graph:
 			graph.add_node(node_data.node_key, meta)
 	
 	# Agregar todas las conexiones con su metadata
-	for conn in connections:
-		if conn and conn.from_node != "" and conn.to_node != "":
-			var edge_meta = conn.get_edge_metadata()
-			# Graph.connect_vertices acepta edge_metadata y initial_flux como parámetros
-			graph.connect_vertices(conn.from_node, conn.to_node, conn.weight, null, null, edge_meta, conn.flux)
+		for conn in connections:
+			if conn and conn.from_node != "" and conn.to_node != "":
+				if not conn.directed:
+					push_warning("GraphBuilder: Non-directed connection %s -> %s detected; graph operates in directed mode." % [conn.from_node, conn.to_node])
+				var edge_meta = conn.get_edge_metadata()
+				# Graph.connect_vertices acepta edge_metadata y initial_flux como parámetros
+				graph.connect_vertices(conn.from_node, conn.to_node, conn.weight, null, null, edge_meta, conn.flux, conn.directed)
 	
 	graph_built.emit(graph)
 	return graph

@@ -12,6 +12,8 @@ extends Node2D
 @export_enum("circular", "grid", "force_directed", "hierarchical") var layout_type: String = "hierarchical"
 @export var layout_radius: float = 250.0
 @export var layout_spacing: float = 150.0
+@export_enum("none", "weight", "flux", "both") var edge_label_mode: String = "none"
+@export var show_edge_direction: bool = false
 
 var graph = null
 var node_views := {}
@@ -121,6 +123,14 @@ func _spawn_edge(e_data) -> Node:
 			var target_node = node_views[target_key]
 			if inst.has_method("set_node_references"):
 				inst.set_node_references(source_node, target_node)
+		
+		# Configure edge label display mode
+		if inst.has_method("set_label_mode"):
+			inst.set_label_mode(edge_label_mode)
+		
+		# Configure edge direction display
+		if inst.has_method("set_show_direction"):
+			inst.set_show_direction(show_edge_direction)
 	else:
 		inst = Node2D.new()
 		add_child(inst)

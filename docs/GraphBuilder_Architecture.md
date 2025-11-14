@@ -7,6 +7,8 @@ Separar la **lógica de la misión** de la **definición del grafo**, permitiend
 ---
 
 ## 📐 Arquitectura Anterior vs Nueva
+### 🔁 Grafos dirigidos por defecto
+Todos los grafos construidos mediante `GraphBuilder` son tratados como dirigidos. Cada `GraphConnectionData` exporta un flag `directed` (ahora default `true`) y el sistema emite advertencias si se intenta construir una conexión sin dirección explícita. Esta decisión mantiene la coherencia con las flechas renderizadas en `GraphDisplay` y con los algoritmos (BFS/DFS) que, a nivel global, respetan la dirección. Si en el futuro se requieren grafos no dirigidos, se podrían reutilizar las APIs (`get_neighbors` vs `get_outgoing_neighbor_weights` y `respect_direction=false`) para mapearlos a este modelo dirigido.
 
 ### ❌ **ANTES**: Acoplamiento fuerte
 

@@ -94,6 +94,8 @@ func rekey_vertex(old_key, new_key) -> bool:
 	vertices.erase(old_key)
 	vertices[new_key] = vertex
 	vertex.key = new_key
+	for edge in vertex.edges.values():
+		edge.rekey_direction(old_key, new_key)
 	for neighbor_key in vertex.edges.keys():
 		var neighbor_vertex: Vertex = vertices.get(neighbor_key)
 		if neighbor_vertex and neighbor_vertex.edges.has(old_key):
@@ -146,7 +148,7 @@ func get_node_count() -> int:
 ## - `weight`: Peso de la conexión / capacidad (debe ser positivo).
 ## - `edge_metadata`: Resource opcional con metadata de la arista.
 ## - `initial_flux`: Flujo inicial de la arista (por defecto 0).
-func add_connection(a, b, weight: float, edge_metadata: Resource = null, initial_flux: int = 0) -> void:
+func add_connection(a, b, weight: float, edge_metadata: Resource = null, initial_flux: int = 0, directed: bool = false) -> void:
 	if a == b:
 		push_error("Graph.add_connection: cannot connect node to itself")
 		return
@@ -172,6 +174,7 @@ func add_connection(a, b, weight: float, edge_metadata: Resource = null, initial
 		edge.flux = initial_flux
 		if edge_metadata != null:
 			edge.metadata = edge_metadata
+	edge.configure_direction(directed)
 
 
 ## Conecta dos nodos, creando ambos si no existen.
@@ -184,10 +187,10 @@ func add_connection(a, b, weight: float, edge_metadata: Resource = null, initial
 ## - `meta_b`: Resource opcional para metadata del nodo B.
 ## - `edge_metadata`: Resource opcional con metadata de la arista.
 ## - `initial_flux`: Flujo inicial (por defecto 0).
-func connect_vertices(a, b, weight := 1.0, meta_a: Resource = null, meta_b: Resource = null, edge_metadata: Resource = null, initial_flux: int = 0) -> void:
+func connect_vertices(a, b, weight := 1.0, meta_a: Resource = null, meta_b: Resource = null, edge_metadata: Resource = null, initial_flux: int = 0, directed: bool = false) -> void:
 	ensure_node(a, meta_a)
 	ensure_node(b, meta_b)
-	add_connection(a, b, weight, edge_metadata, initial_flux)
+	add_connection(a, b, weight, edge_metadata, initial_flux, directed)
 
 
 ## Elimina la arista entre dos nodos si existe.
@@ -257,9 +260,14 @@ func get_edges() -> Array:
 		for b_key in va.edges:
 			if _is_primary_endpoint(a_key, b_key):
 				var e: Edge = va.edges[b_key]
+				var source_key = e.endpoint_a.key if e.endpoint_a else null
+				var target_key = e.endpoint_b.key if e.endpoint_b else null
+				if e.directed:
+					source_key = e.endpoint_a.key if e.endpoint_a else source_key
+					target_key = e.endpoint_b.key if e.endpoint_b else target_key
 				out.append({
-					"source": e.endpoint_a.key,
-					"target": e.endpoint_b.key,
+					"source": source_key,
+					"target": target_key,
 					"weight": e.weight,
 					"flux": e.flux
 				})
@@ -278,9 +286,23 @@ func get_edge_count() -> int:
 # ============================================================================
 
 ## Devuelve los pesos de las conexiones del nodo especificado.
+## Esta consulta no respeta la dirección y se mantiene para análisis o grafos conceptualmente no dirigidos.
 func get_neighbor_weights(key) -> Dictionary:
 	var v: Vertex = vertices.get(key)
 	return v.get_neighbor_weights() if v else {}
+
+
+## Devuelve los pesos de las conexiones salientes (respetando dirección).
+func get_outgoing_neighbor_weights(key) -> Dictionary:
+	var result: Dictionary = {}
+	var v: Vertex = vertices.get(key)
+	if not v:
+		return result
+	for neighbor_key in v.edges.keys():
+		var edge: Edge = v.edges[neighbor_key]
+		if edge and edge.allows_traversal(key, neighbor_key):
+			result[neighbor_key] = edge.weight
+	return result
 
 
 ## Devuelve una lista de nodos vecinos conectados al nodo dado.
@@ -387,9 +409,14 @@ func get_flow_edges() -> Array:
 		for b_key in va.edges:
 			if _is_primary_endpoint(a_key, b_key):
 				var e: Edge = va.edges[b_key]
+				var source_key = e.endpoint_a.key
+				var target_key = e.endpoint_b.key
+				if e.directed and e.directed_source_key != null and e.directed_target_key != null:
+					source_key = e.directed_source_key
+					target_key = e.directed_target_key
 				out.append({
-					"source": e.endpoint_a.key,
-					"target": e.endpoint_b.key,
+					"source": source_key,
+					"target": target_key,
 					"capacity": e.weight,
 					"flux": e.flux,
 					"residual": e.residual_capacity()

@@ -74,9 +74,9 @@ func start() -> void:
 	# Compute traversal order using GraphAlgorithms
 	var traversal_result: Dictionary = {}
 	if algorithm == "DFS":
-		traversal_result = GraphAlgorithms.dfs(graph, start_key)
+		traversal_result = GraphAlgorithms.dfs(graph, start_key, true)
 	else:
-		traversal_result = GraphAlgorithms.bfs(graph, start_key)
+		traversal_result = GraphAlgorithms.bfs(graph, start_key, true)
 	traversal_order = traversal_result.get("visited", [])
 	traversal_index = 0
 	if traversal_order.is_empty():

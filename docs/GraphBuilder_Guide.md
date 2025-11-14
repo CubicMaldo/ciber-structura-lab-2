@@ -56,6 +56,7 @@ El sistema **GraphBuilder** permite crear grafos visualmente desde el Inspector 
      - **"New EdgeMeta"** - Crea metadata básica para la arista
      - **"Load"** - Carga EdgeMeta existente
      - Dejar vacío - Se creará EdgeMeta por defecto automáticamente
+   - **Directed**: Debe dejarse activado (`true`). El sistema asume grafos dirigidos y te alertará si lo desactivas.
 
 4. Repite para cada conexión del grafo
 

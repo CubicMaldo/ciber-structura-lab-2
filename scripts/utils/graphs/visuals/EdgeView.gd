@@ -6,11 +6,15 @@ extends Node2D
 var source_id = null
 var target_id = null
 var weight: float = 1.0
+var flux: int = 0
 var source_node: Node2D = null
 var target_node: Node2D = null
+var label_mode: String = "none"
+var show_direction: bool = false
 
 const BASE_WIDTH := 3.0
 const MAX_WIDTH := 10.0
+const ARROW_DISTANCE_FROM_TARGET := 25.0  # Distance from target node to place arrow
 
 
 func setup(data) -> void:
@@ -18,15 +22,19 @@ func setup(data) -> void:
 		source_id = data.get("source", data.get("from", data.get("from_id", null)))
 		target_id = data.get("target", data.get("to", data.get("to_id", null)))
 		weight = float(data.get("weight", 1.0))
+		flux = int(data.get("flux", 0))
 	elif typeof(data) == TYPE_ARRAY and data.size() >= 2:
 		source_id = data[0]
 		target_id = data[1]
 		weight = float(data[2]) if data.size() > 2 else 1.0
+		flux = int(data[3]) if data.size() > 3 else 0
 	
 	# Adjust line width based on weight
 	if has_node("Line2D"):
 		var line: Line2D = $Line2D
 		line.width = BASE_WIDTH + min(weight * 0.5, MAX_WIDTH - BASE_WIDTH)
+	
+	_update_label()
 
 
 func set_node_references(source: Node2D, target: Node2D) -> void:
@@ -58,18 +66,103 @@ func set_state(new_state: String) -> void:
 		return
 	
 	var line: Line2D = $Line2D
+	var new_color: Color
 	match new_state:
 		"visited":
-			line.default_color = Color(0.4, 0.8, 0.4, 0.9)
+			new_color = Color(0.4, 0.8, 0.4, 0.9)
 		"active":
-			line.default_color = Color(1.0, 0.8, 0.0, 1.0)
+			new_color = Color(1.0, 0.8, 0.0, 1.0)
 		"highlighted":
-			line.default_color = Color(1.0, 0.5, 0.0, 1.0)
+			new_color = Color(1.0, 0.5, 0.0, 1.0)
 		_:
-			line.default_color = Color(0.5, 0.5, 0.5, 0.8)
+			new_color = Color(0.5, 0.5, 0.5, 0.8)
+	
+	line.default_color = new_color
+	
+	# Update arrow color to match
+	if has_node("Arrow"):
+		$Arrow.color = new_color
+
+
+func set_label_mode(mode: String) -> void:
+	label_mode = mode
+	_update_label()
+
+
+func set_show_direction(enabled: bool) -> void:
+	show_direction = enabled
+	if has_node("Arrow"):
+		$Arrow.visible = enabled
+	_update_arrow()
+
+
+func _update_label() -> void:
+	if not has_node("Label"):
+		return
+	
+	var label: Label = $Label
+	match label_mode:
+		"none":
+			label.visible = false
+		"weight":
+			label.visible = true
+			label.text = "%.1f" % weight
+		"flux":
+			label.visible = true
+			label.text = "%d" % flux
+		"both":
+			label.visible = true
+			label.text = "%d/%.1f" % [flux, weight]
+		_:
+			label.visible = false
+	
+	_update_label_position()
+
+
+func _update_label_position() -> void:
+	if not has_node("Label") or not source_node or not target_node:
+		return
+	
+	var label: Label = $Label
+	var start_pos = source_node.global_position
+	var end_pos = target_node.global_position
+	
+	# Position label at midpoint of the edge
+	var midpoint = (start_pos + end_pos) / 2.0
+	label.global_position = midpoint - Vector2(label.size.x / 2.0, label.size.y / 2.0)
+
+
+func _update_arrow() -> void:
+	if not has_node("Arrow") or not show_direction:
+		return
+	
+	if not source_node or not target_node:
+		return
+	
+	var arrow: Polygon2D = $Arrow
+	var start_pos = source_node.global_position
+	var end_pos = target_node.global_position
+	
+	# Calculate direction vector
+	var direction = (end_pos - start_pos).normalized()
+	
+	# Position arrow near the target node
+	var arrow_pos = end_pos - direction * ARROW_DISTANCE_FROM_TARGET
+	arrow.global_position = arrow_pos
+	
+	# Rotate arrow to point in the direction of the edge
+	arrow.rotation = direction.angle()
+	
+	# Match arrow color with line color
+	if has_node("Line2D"):
+		arrow.color = $Line2D.default_color
 
 
 func _process(_delta: float) -> void:
 	# Update line position each frame if nodes exist
 	if source_node and target_node:
 		update_line()
+		if label_mode != "none":
+			_update_label_position()
+		if show_direction:
+			_update_arrow()

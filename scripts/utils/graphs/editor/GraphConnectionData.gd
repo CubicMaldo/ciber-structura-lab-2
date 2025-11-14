@@ -16,6 +16,9 @@ extends Resource
 ## Flujo inicial de la arista (para modelado de redes)
 @export var flux: int = 0
 
+## Indica si la conexión debe tratarse como dirigida. El sistema asume que todas son dirigidas.
+@export var directed: bool = true
+
 ## Metadata de la arista (EdgeMeta o cualquier subclase)
 ## Opcional - si no se proporciona, se crea EdgeMeta básico
 @export var edge_meta: EdgeMeta = null

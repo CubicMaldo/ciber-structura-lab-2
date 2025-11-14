@@ -13,6 +13,9 @@ var endpoint_b: Vertex = null
 var weight: float = 0.0
 ## Flujo actual en la arista (debe ser <= weight).
 var flux: int = 0
+var directed: bool = false
+var directed_source_key: Variant = null
+var directed_target_key: Variant = null
 
 ## Metadata asociada a la arista (puede ser Resource o null).
 var metadata: Resource = null
@@ -39,6 +42,9 @@ func _init(
 	weight = _weight
 	flux = _flux
 	metadata = _metadata
+	directed = false
+	directed_source_key = null
+	directed_target_key = null
 
 
 ## Devuelve un Array con los dos vértices extremos: [endpoint_a, endpoint_b].
@@ -77,6 +83,34 @@ func has_endpoint(endpoint) -> bool:
 	if endpoint is Vertex:
 		q = endpoint.key
 	return (endpoint_a and endpoint_a.key == q) or (endpoint_b and endpoint_b.key == q)
+
+
+## Configura si la arista es dirigida y qué extremos definen la dirección.
+func configure_direction(is_directed: bool, source_key: Variant = null, target_key: Variant = null) -> void:
+	directed = is_directed
+	if directed:
+		directed_source_key = source_key if source_key != null else endpoint_a.key if endpoint_a else null
+		directed_target_key = target_key if target_key != null else endpoint_b.key if endpoint_b else null
+	else:
+		directed_source_key = null
+		directed_target_key = null
+
+
+## Devuelve `true` si el viaje desde `from_key` hacia `neighbor_key` está permitido por la dirección.
+func allows_traversal(from_key, neighbor_key) -> bool:
+	if not directed:
+		return true
+	if from_key == directed_source_key and neighbor_key == directed_target_key:
+		return true
+	return false
+
+
+## Actualiza referencias de dirección si cambia la clave de un nodo.
+func rekey_direction(old_key, new_key) -> void:
+	if directed_source_key == old_key:
+		directed_source_key = new_key
+	if directed_target_key == old_key:
+		directed_target_key = new_key
 
 
 ## Devuelve la capacidad residual disponible (capacity - flux).

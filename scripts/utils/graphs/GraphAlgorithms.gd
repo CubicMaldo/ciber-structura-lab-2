@@ -115,11 +115,12 @@ static func mutual_metrics(graph: Graph, a, b, min_weight: float = 0.0) -> Dicti
 
 
 ## Realiza un recorrido BFS (Breadth-First Search) desde un nodo inicial.
+## Por defecto respeta la dirección de las aristas; pasa `respect_direction=false` solo si el grafo fuera no dirigido.
 ## Retorna un diccionario con información del recorrido:
 ## - visited: Array de claves visitadas en orden BFS
 ## - levels: Dictionary { clave: nivel } indicando la distancia desde el origen
 ## - parent: Dictionary { clave: padre } para reconstruir caminos
-static func bfs(graph: Graph, start_key) -> Dictionary:
+static func bfs(graph: Graph, start_key, respect_direction: bool = true) -> Dictionary:
 	var result := {
 		"visited": [],
 		"levels": {},
@@ -139,7 +140,11 @@ static func bfs(graph: Graph, start_key) -> Dictionary:
 		result["visited"].append(current)
 		
 		var current_level: int = result["levels"][current]
-		var neighbor_weights: Dictionary = graph.get_neighbor_weights(current)
+		var neighbor_weights: Dictionary
+		if respect_direction:
+			neighbor_weights = graph.get_outgoing_neighbor_weights(current)
+		else:
+			neighbor_weights = graph.get_neighbor_weights(current)
 		
 		for neighbor in neighbor_weights.keys():
 			if visited.has(neighbor):
@@ -154,11 +159,12 @@ static func bfs(graph: Graph, start_key) -> Dictionary:
 
 
 ## Realiza un recorrido DFS (Depth-First Search) iterativo desde un nodo inicial.
+## Por defecto respeta la dirección de las aristas; establece `respect_direction=false` únicamente para grafos no dirigidos.
 ## Retorna un diccionario con información del recorrido similar a BFS:
 ## - visited: Array con el orden de visitas (preorder)
 ## - levels: Dictionary { clave: nivel }
 ## - parent: Dictionary { clave: padre }
-static func dfs(graph: Graph, start_key) -> Dictionary:
+static func dfs(graph: Graph, start_key, respect_direction: bool = true) -> Dictionary:
 	var result := {
 		"visited": [],
 		"levels": {},
@@ -183,7 +189,11 @@ static func dfs(graph: Graph, start_key) -> Dictionary:
 		result["visited"].append(current)
 		
 		var current_level: int = result["levels"][current]
-		var neighbor_weights: Dictionary = graph.get_neighbor_weights(current)
+		var neighbor_weights: Dictionary
+		if respect_direction:
+			neighbor_weights = graph.get_outgoing_neighbor_weights(current)
+		else:
+			neighbor_weights = graph.get_neighbor_weights(current)
 		
 		# Convertir a array y procesar en orden inverso para mantener
 		# el orden de exploración consistente con DFS recursivo
