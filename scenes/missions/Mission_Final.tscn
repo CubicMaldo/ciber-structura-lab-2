@@ -1,0 +1,261 @@
+[gd_scene load_steps=26 format=3 uid="uid://bj4pvaxj8x3j4"]
+
+[ext_resource type="Script" uid="uid://bqrslvoaus44x" path="res://scripts/missions/mission_final/MissionFinal.gd" id="1"]
+[ext_resource type="Script" uid="uid://f3rodujd6g18" path="res://scripts/utils/graphs/visuals/GraphDisplay.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://b7qv5xk8p3nt1" path="res://scenes/views/NodeView.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://c5h8lam2n4p6q" path="res://scenes/views/EdgeView.tscn" id="4"]
+[ext_resource type="Script" uid="uid://fgm4ahof83xw" path="res://scripts/utils/graphs/editor/GraphBuilder.gd" id="5"]
+[ext_resource type="Script" uid="uid://5x1d3j1l85ra" path="res://scripts/utils/graphs/editor/GraphNodeData.gd" id="6"]
+[ext_resource type="Script" uid="uid://dkmqha3s6mcs" path="res://scripts/missions/mission_1/NetworkNodeMeta.gd" id="7"]
+
+[sub_resource type="Resource" id="NetworkNodeMeta_core"]
+script = ExtResource("7")
+hidden_message = "El núcleo revela la ruta hacia el registro maestro."
+threat_level = 3
+device_type = "Kernel"
+display_name = "Núcleo Central"
+
+[sub_resource type="Resource" id="GraphNodeData_core"]
+script = ExtResource("6")
+node_key = "Núcleo Central"
+vertex_meta = SubResource("NetworkNodeMeta_core")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_aegis"]
+script = ExtResource("7")
+hidden_message = "Anillo Aegis estabiliza el perímetro."
+threat_level = 2
+device_type = "Shield"
+display_name = "Anillo Aegis"
+
+[sub_resource type="Resource" id="GraphNodeData_aegis"]
+script = ExtResource("6")
+node_key = "Anillo Aegis"
+vertex_meta = SubResource("NetworkNodeMeta_aegis")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_canal_a"]
+script = ExtResource("7")
+hidden_message = "Canal Alfa redirige paquetes confiables."
+threat_level = 1
+device_type = "Canal"
+display_name = "Canal Alfa"
+
+[sub_resource type="Resource" id="GraphNodeData_canal_a"]
+script = ExtResource("6")
+node_key = "Canal Alfa"
+vertex_meta = SubResource("NetworkNodeMeta_canal_a")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_canal_b"]
+script = ExtResource("7")
+hidden_message = "Canal Beta absorbe ruido externo."
+threat_level = 1
+device_type = "Canal"
+display_name = "Canal Beta"
+
+[sub_resource type="Resource" id="GraphNodeData_canal_b"]
+script = ExtResource("6")
+node_key = "Canal Beta"
+vertex_meta = SubResource("NetworkNodeMeta_canal_b")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_cuantico"]
+script = ExtResource("7")
+hidden_message = "Puente Cuántico sincroniza relojes distribuidos."
+threat_level = 2
+device_type = "Bridge"
+display_name = "Puente Cuántico"
+
+[sub_resource type="Resource" id="GraphNodeData_cuantico"]
+script = ExtResource("6")
+node_key = "Puente Cuántico"
+vertex_meta = SubResource("NetworkNodeMeta_cuantico")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_archivo"]
+script = ExtResource("7")
+hidden_message = "Archivo Delta protege firmas históricas."
+threat_level = 2
+device_type = "Archive"
+display_name = "Archivo Delta"
+
+[sub_resource type="Resource" id="GraphNodeData_archivo"]
+script = ExtResource("6")
+node_key = "Archivo Delta"
+vertex_meta = SubResource("NetworkNodeMeta_archivo")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_sigma"]
+script = ExtResource("7")
+hidden_message = "Terminal Sigma analiza patrones residuales."
+threat_level = 2
+device_type = "Terminal"
+display_name = "Terminal Sigma"
+
+[sub_resource type="Resource" id="GraphNodeData_sigma"]
+script = ExtResource("6")
+node_key = "Terminal Sigma"
+vertex_meta = SubResource("NetworkNodeMeta_sigma")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_bastion"]
+script = ExtResource("7")
+hidden_message = "Bastión Sur contiene pulsos hostiles."
+threat_level = 2
+device_type = "Bastión"
+display_name = "Bastión Sur"
+
+[sub_resource type="Resource" id="GraphNodeData_bastion"]
+script = ExtResource("6")
+node_key = "Bastión Sur"
+vertex_meta = SubResource("NetworkNodeMeta_bastion")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_respaldo"]
+script = ExtResource("7")
+hidden_message = "Cámara de Respaldo lista para sincronía final."
+threat_level = 3
+device_type = "Backup"
+display_name = "Cámara de Respaldo"
+
+[sub_resource type="Resource" id="GraphNodeData_respaldo"]
+script = ExtResource("6")
+node_key = "Cámara de Respaldo"
+vertex_meta = SubResource("NetworkNodeMeta_respaldo")
+
+[node name="Mission_Final" type="Node2D"]
+script = ExtResource("1")
+
+[node name="GraphDisplay" type="Node2D" parent="."]
+position = Vector2(520, 420)
+script = ExtResource("2")
+node_scene = ExtResource("3")
+edge_scene = ExtResource("4")
+layout_type = "circular"
+edge_label_mode = "weight"
+show_edge_direction = true
+
+[node name="GraphBuilder" type="Node" parent="."]
+script = ExtResource("5")
+nodes = Array[ExtResource("6")]([SubResource("GraphNodeData_core"), SubResource("GraphNodeData_aegis"), SubResource("GraphNodeData_canal_a"), SubResource("GraphNodeData_canal_b"), SubResource("GraphNodeData_cuantico"), SubResource("GraphNodeData_archivo"), SubResource("GraphNodeData_sigma"), SubResource("GraphNodeData_bastion"), SubResource("GraphNodeData_respaldo")])
+use_random_connections = true
+randomize_edge_weights = true
+random_generation_limit = 18
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="PanelContainer" type="PanelContainer" parent="HUD"]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -260.0
+offset_bottom = 260.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TitleLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Misión Final: The Core"
+
+[node name="StoryLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "NEMESIS saboteó el núcleo. Aplica cada algoritmo aprendido para reconstruir el escudo: recorrido, camino mínimo, MST y flujo máximo."
+autowrap_mode = 2
+
+[node name="StageTitleLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "1. Reconocimiento"
+
+[node name="StageList" type="VBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StageRow1" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer/StageList"]
+layout_mode = 2
+
+[node name="StageRow1Label" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Recorrido"
+
+[node name="TraversalStatus" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow1"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Pendiente"
+
+[node name="StageRow2" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer/StageList"]
+layout_mode = 2
+
+[node name="StageRow2Label" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Camino mínimo"
+
+[node name="PathStatus" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Pendiente"
+
+[node name="StageRow3" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer/StageList"]
+layout_mode = 2
+
+[node name="StageRow3Label" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reconstrucción"
+
+[node name="MSTStatus" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Pendiente"
+
+[node name="StageRow4" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer/StageList"]
+layout_mode = 2
+
+[node name="StageRow4Label" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Flujo máximo"
+
+[node name="FlowStatus" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow4"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Pendiente"
+
+[node name="DetailLabel" type="RichTextLabel" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[b]Briefing:[/b]
+Selecciona 'Resolver etapa' para iniciar la primera fase."
+
+[node name="StatusLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Estado: Red inicializada"
+
+[node name="ButtonRow" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SolveStageButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ButtonRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Resolver etapa"
+
+[node name="RegenerateButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ButtonRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Regenerar red"
+
+[node name="ContinueButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ButtonRow"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Finalizar"

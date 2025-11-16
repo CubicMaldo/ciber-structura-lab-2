@@ -34,66 +34,88 @@ func grid_layout(node_count: int, cols: int, spacing: float, center: Vector2) ->
 
 
 func force_directed_layout(node_keys: Array, edges: Array, iterations: int, area: float, repulsion: float, damping: float, center: Vector2) -> Dictionary:
-	# Basic Fruchterman-Reingold style layout. Returns Dictionary key->Vector2
-	var n = node_keys.size()
+	# Fruchterman-Reingold layout with cooling and boundary clamping.
 	var positions := {}
-	var width = sqrt(max(area, 1.0))
-	var height = width
+	var n := node_keys.size()
+	if n == 0:
+		return positions
+
+	var effective_area: float = max(area, float(n) * 400.0)
+	var width: float = sqrt(effective_area)
+	var height: float = width
+	var half_width: float = width * 0.5
+	var half_height: float = height * 0.5
 	var rnd = RandomNumberGenerator.new()
 	rnd.randomize()
 
-	# init positions randomly around center
 	for key in node_keys:
-		positions[key] = center + Vector2(rnd.randf_range(-width * 0.5, width * 0.5), rnd.randf_range(-height * 0.5, height * 0.5))
+		var offset = Vector2(
+			rnd.randf_range(-half_width, half_width),
+			rnd.randf_range(-half_height, half_height)
+		)
+		positions[key] = center + offset
 
-	# helper to get neighbors from edges
-	var edge_pairs := []
+	var edge_pairs: Array = []
 	for e in edges:
 		var a = e.get("from", e.get("source", null))
 		var b = e.get("to", e.get("target", null))
-		if a != null and b != null:
-			edge_pairs.append([a, b])
+		if a == null or b == null:
+			continue
+		if a == b:
+			continue
+		edge_pairs.append([a, b])
 
-	var k = sqrt((width * height) / max(1, n))
-	for _i in range(max(1, iterations)):
-		var disp := {}
+	var k := sqrt((width * height) / max(1, n))
+	var max_iterations: int = max(1, iterations)
+	var cooling: float = clamp(damping, 0.01, 0.99)
+	var temperature: float = max(half_width, half_height)
+	var repulsion_scale: float = max(0.01, repulsion)
+
+	for _step in range(max_iterations):
+		var displacements := {}
 		for v in node_keys:
-			disp[v] = Vector2.ZERO
+			displacements[v] = Vector2.ZERO
 
-		# repulsive forces
+		# Repulsive forces
 		for i in range(n):
 			var v = node_keys[i]
 			for j in range(i + 1, n):
 				var u = node_keys[j]
 				var delta = positions[v] - positions[u]
-				var dist = max(0.01, delta.length())
-				var force = (k * k) / dist * repulsion
+				var dist = max(0.001, delta.length())
+				var force = ((k * k) / dist) * repulsion_scale
 				var dir = delta / dist
-				disp[v] += dir * force
-				disp[u] -= dir * force
+				displacements[v] += dir * force
+				displacements[u] -= dir * force
 
-		# attractive forces (edges)
+		# Attractive forces
 		for pair in edge_pairs:
 			var a = pair[0]
 			var b = pair[1]
 			if not positions.has(a) or not positions.has(b):
 				continue
 			var delta = positions[a] - positions[b]
-			var dist = max(0.01, delta.length())
+			var dist = max(0.001, delta.length())
 			var force = (dist * dist) / k
 			var dir = delta / dist
-			disp[a] -= dir * force
-			disp[b] += dir * force
+			displacements[a] -= dir * force
+			displacements[b] += dir * force
 
-		# apply displacements with damping
+		# Apply displacements with temperature limit
 		for v in node_keys:
-			var d = disp[v]
-			var dlen = d.length()
-			if dlen > 0.0:
-				var limited = d * min(dlen, damping) / dlen
-				positions[v] += limited
+			var disp: Vector2 = displacements[v]
+			if disp == Vector2.ZERO:
+				continue
+			var disp_len = disp.length()
+			var limited = disp / disp_len * min(disp_len, temperature)
+			positions[v] += limited
+			positions[v].x = clamp(positions[v].x, center.x - half_width, center.x + half_width)
+			positions[v].y = clamp(positions[v].y, center.y - half_height, center.y + half_height)
 
-	# Return as a dictionary keyed by node key
+		temperature *= cooling
+		if temperature < 0.5:
+			break
+
 	return positions
 
 

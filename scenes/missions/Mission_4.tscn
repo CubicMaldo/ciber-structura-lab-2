@@ -1,0 +1,340 @@
+[gd_scene load_steps=41 format=3 uid="uid://cp87uhixfbggl"]
+
+[ext_resource type="Script" uid="uid://bsaytaywmslcf" path="res://scripts/missions/mission_4/Mission4.gd" id="1"]
+[ext_resource type="Script" uid="uid://f3rodujd6g18" path="res://scripts/utils/graphs/visuals/GraphDisplay.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://b7qv5xk8p3nt1" path="res://scenes/views/NodeView.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://c5h8lam2n4p6q" path="res://scenes/views/EdgeView.tscn" id="4"]
+[ext_resource type="Script" uid="uid://fgm4ahof83xw" path="res://scripts/utils/graphs/editor/GraphBuilder.gd" id="5"]
+[ext_resource type="Script" uid="uid://5x1d3j1l85ra" path="res://scripts/utils/graphs/editor/GraphNodeData.gd" id="6"]
+[ext_resource type="Script" uid="uid://2whcwiw6slu" path="res://scripts/utils/graphs/editor/GraphConnectionData.gd" id="7"]
+[ext_resource type="Script" uid="uid://dkmqha3s6mcs" path="res://scripts/missions/mission_1/NetworkNodeMeta.gd" id="8"]
+
+[sub_resource type="Resource" id="NetworkNodeMeta_control"]
+script = ExtResource("8")
+hidden_message = "Centro de Control sincronizado."
+device_type = "Control Hub"
+display_name = "Centro de Control"
+
+[sub_resource type="Resource" id="GraphNodeData_control"]
+script = ExtResource("6")
+node_key = "Centro de Control"
+vertex_meta = SubResource("NetworkNodeMeta_control")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_firewall_n"]
+script = ExtResource("8")
+hidden_message = "Firewall norte estabilizado."
+threat_level = 1
+device_type = "Firewall"
+display_name = "Firewall Norte"
+
+[sub_resource type="Resource" id="GraphNodeData_firewall_n"]
+script = ExtResource("6")
+node_key = "Firewall Norte"
+vertex_meta = SubResource("NetworkNodeMeta_firewall_n")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_firewall_s"]
+script = ExtResource("8")
+hidden_message = "Firewall sur intercepta tráfico sospechoso."
+threat_level = 1
+device_type = "Firewall"
+display_name = "Firewall Sur"
+
+[sub_resource type="Resource" id="GraphNodeData_firewall_s"]
+script = ExtResource("6")
+node_key = "Firewall Sur"
+vertex_meta = SubResource("NetworkNodeMeta_firewall_s")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_ids"]
+script = ExtResource("8")
+hidden_message = "IDS detecta paquetes corruptos."
+threat_level = 2
+device_type = "IDS"
+display_name = "IDS Centinela"
+
+[sub_resource type="Resource" id="GraphNodeData_ids"]
+script = ExtResource("6")
+node_key = "IDS Centinela"
+vertex_meta = SubResource("NetworkNodeMeta_ids")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_switch"]
+script = ExtResource("8")
+hidden_message = "Switch operativo balancea el tráfico."
+threat_level = 1
+device_type = "Switch"
+display_name = "Switch Operativo"
+
+[sub_resource type="Resource" id="GraphNodeData_switch"]
+script = ExtResource("6")
+node_key = "Switch Operativo"
+vertex_meta = SubResource("NetworkNodeMeta_switch")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_logistica"]
+script = ExtResource("8")
+hidden_message = "Canal logístico disponible para redundancia."
+threat_level = 1
+device_type = "Nodo"
+display_name = "Nodo Logístico"
+
+[sub_resource type="Resource" id="GraphNodeData_logistica"]
+script = ExtResource("6")
+node_key = "Nodo Logístico"
+vertex_meta = SubResource("NetworkNodeMeta_logistica")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_analitica"]
+script = ExtResource("8")
+hidden_message = "Motor analítico sana tramas duplicadas."
+threat_level = 1
+device_type = "Nodo"
+display_name = "Nodo Analítico"
+
+[sub_resource type="Resource" id="GraphNodeData_analitica"]
+script = ExtResource("6")
+node_key = "Nodo Analítico"
+vertex_meta = SubResource("NetworkNodeMeta_analitica")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_dmz"]
+script = ExtResource("8")
+hidden_message = "Relé DMZ contiene el ruido externo."
+threat_level = 2
+device_type = "Relay"
+display_name = "DMZ Relay"
+
+[sub_resource type="Resource" id="GraphNodeData_dmz"]
+script = ExtResource("6")
+node_key = "DMZ Relay"
+vertex_meta = SubResource("NetworkNodeMeta_dmz")
+
+[sub_resource type="Resource" id="NetworkNodeMeta_backup"]
+script = ExtResource("8")
+hidden_message = "Servidor de respaldo listo para sincronizar."
+threat_level = 2
+device_type = "Backup"
+display_name = "Servidor de Respaldo"
+
+[sub_resource type="Resource" id="GraphNodeData_backup"]
+script = ExtResource("6")
+node_key = "Servidor de Respaldo"
+vertex_meta = SubResource("NetworkNodeMeta_backup")
+
+[sub_resource type="Resource" id="GraphConnectionData_control_fw_n"]
+script = ExtResource("7")
+from_node = "Centro de Control"
+to_node = "Firewall Norte"
+weight = 12.0
+
+[sub_resource type="Resource" id="GraphConnectionData_control_ids"]
+script = ExtResource("7")
+from_node = "Centro de Control"
+to_node = "IDS Centinela"
+weight = 8.0
+
+[sub_resource type="Resource" id="GraphConnectionData_control_fw_s"]
+script = ExtResource("7")
+from_node = "Centro de Control"
+to_node = "Firewall Sur"
+weight = 6.0
+
+[sub_resource type="Resource" id="GraphConnectionData_fw_n_switch"]
+script = ExtResource("7")
+from_node = "Firewall Norte"
+to_node = "Switch Operativo"
+weight = 10.0
+
+[sub_resource type="Resource" id="GraphConnectionData_fw_s_switch"]
+script = ExtResource("7")
+from_node = "Firewall Sur"
+to_node = "Switch Operativo"
+weight = 5.0
+
+[sub_resource type="Resource" id="GraphConnectionData_fw_n_analitica"]
+script = ExtResource("7")
+from_node = "Firewall Norte"
+to_node = "Nodo Analítico"
+weight = 6.0
+
+[sub_resource type="Resource" id="GraphConnectionData_ids_switch"]
+script = ExtResource("7")
+from_node = "IDS Centinela"
+to_node = "Switch Operativo"
+weight = 4.0
+
+[sub_resource type="Resource" id="GraphConnectionData_ids_analitica"]
+script = ExtResource("7")
+from_node = "IDS Centinela"
+to_node = "Nodo Analítico"
+weight = 3.0
+
+[sub_resource type="Resource" id="GraphConnectionData_switch_logistica"]
+script = ExtResource("7")
+from_node = "Switch Operativo"
+to_node = "Nodo Logístico"
+weight = 9.0
+
+[sub_resource type="Resource" id="GraphConnectionData_switch_analitica"]
+script = ExtResource("7")
+from_node = "Switch Operativo"
+to_node = "Nodo Analítico"
+weight = 7.0
+
+[sub_resource type="Resource" id="GraphConnectionData_fw_s_dmz"]
+script = ExtResource("7")
+from_node = "Firewall Sur"
+to_node = "DMZ Relay"
+weight = 4.0
+
+[sub_resource type="Resource" id="GraphConnectionData_dmz_backup"]
+script = ExtResource("7")
+from_node = "DMZ Relay"
+to_node = "Servidor de Respaldo"
+weight = 4.0
+
+[sub_resource type="Resource" id="GraphConnectionData_analitica_backup"]
+script = ExtResource("7")
+from_node = "Nodo Analítico"
+to_node = "Servidor de Respaldo"
+weight = 5.0
+
+[sub_resource type="Resource" id="GraphConnectionData_logistica_backup"]
+script = ExtResource("7")
+from_node = "Nodo Logístico"
+to_node = "Servidor de Respaldo"
+weight = 8.0
+
+[node name="Mission_4" type="Node2D"]
+script = ExtResource("1")
+
+[node name="GraphDisplay" type="Node2D" parent="."]
+position = Vector2(520, 450)
+script = ExtResource("2")
+node_scene = ExtResource("3")
+edge_scene = ExtResource("4")
+layout_type = "circular"
+edge_label_mode = "both"
+show_edge_direction = true
+
+[node name="GraphBuilder" type="Node" parent="."]
+script = ExtResource("5")
+nodes = Array[ExtResource("6")]([SubResource("GraphNodeData_control"), SubResource("GraphNodeData_firewall_n"), SubResource("GraphNodeData_firewall_s"), SubResource("GraphNodeData_ids"), SubResource("GraphNodeData_switch"), SubResource("GraphNodeData_logistica"), SubResource("GraphNodeData_analitica"), SubResource("GraphNodeData_dmz"), SubResource("GraphNodeData_backup")])
+connections = Array[ExtResource("7")]([SubResource("GraphConnectionData_control_fw_n"), SubResource("GraphConnectionData_control_ids"), SubResource("GraphConnectionData_control_fw_s"), SubResource("GraphConnectionData_fw_n_switch"), SubResource("GraphConnectionData_fw_s_switch"), SubResource("GraphConnectionData_fw_n_analitica"), SubResource("GraphConnectionData_ids_switch"), SubResource("GraphConnectionData_ids_analitica"), SubResource("GraphConnectionData_switch_logistica"), SubResource("GraphConnectionData_switch_analitica"), SubResource("GraphConnectionData_fw_s_dmz"), SubResource("GraphConnectionData_dmz_backup"), SubResource("GraphConnectionData_analitica_backup"), SubResource("GraphConnectionData_logistica_backup")])
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="PanelContainer" type="PanelContainer" parent="HUD"]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -210.0
+offset_bottom = 210.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TitleLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Misión 4: FlowGuard"
+
+[node name="StoryLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Con la red reconstruida, NEMESIS intenta saturarla con paquetes corruptos. Maximiza el flujo seguro desde el Centro de Control hasta el Servidor de Respaldo."
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AlgorithmLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Selecciona algoritmo de flujo:"
+
+[node name="AlgorithmButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EdmondsButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/AlgorithmButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Edmonds-Karp"
+
+[node name="FordButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/AlgorithmButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ford-Fulkerson"
+
+[node name="HSeparator2" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SourceLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Fuente: --"
+
+[node name="SinkLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sumidero: --"
+
+[node name="SelectionButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SelectSourceButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/SelectionButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Definir fuente"
+
+[node name="SelectSinkButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/SelectionButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Definir sumidero"
+
+[node name="HSeparator3" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ControlButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ComputeButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ControlButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Calcular flujo"
+
+[node name="ResetButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ControlButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reiniciar"
+
+[node name="ContinueButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ControlButtons"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Continuar"
+
+[node name="FlowLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Flujo calculado: 0"
+
+[node name="StatusLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Estado: Configura la misión"
+
+[node name="ResultLabel" type="RichTextLabel" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center][b]Selección requerida[/b][/center]
+Haz clic en 'Definir fuente' y elige el Centro de Control, luego asigna el Servidor de Respaldo como sumidero para contener a NEMESIS."

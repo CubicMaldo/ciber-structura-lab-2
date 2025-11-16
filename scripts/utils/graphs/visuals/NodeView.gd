@@ -17,7 +17,11 @@ const STATE_COLORS := {
 	"root": Color(0.9, 0.2, 0.2, 1.0),          # Rojo
 	"candidate": Color(0.45, 0.55, 1.0, 1.0),   # Azul brillante (nodo sugerido)
 	"candidate_secondary": Color(0.45, 0.55, 1.0, 1.0), # Igual que candidate para mantener la intriga
-	"highlighted": Color(1.0, 0.5, 0.0, 1.0)    # Naranja
+	"highlighted": Color(1.0, 0.5, 0.0, 1.0),   # Naranja
+	"source": Color(0.75, 0.35, 1.0, 1.0),      # Lila para nodo fuente
+	"sink": Color(0.25, 1.0, 0.7, 1.0),         # Verde aqua para sumidero
+	"flow": Color(0.2, 0.9, 0.95, 1.0),         # Cian para nodos en rutas de flujo
+	"saturated": Color(1.0, 0.3, 0.3, 1.0)      # Rojo saturado para nodos en corte
 }
 
 

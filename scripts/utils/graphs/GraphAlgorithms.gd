@@ -413,61 +413,68 @@ static func _jaccard_index(keys_a: Array, keys_b: Array) -> float:
 ## - sink: Nodo sumidero
 ## - reset_flux: Si true, resetea todos los flujos antes de calcular (por defecto true)
 static func max_flow_edmonds_karp(graph: Graph, source, sink, reset_flux: bool = true) -> Dictionary:
-	var result := {
-		"max_flow": 0,
-		"flow_paths": [],
-		"saturated_edges": []
-	}
-	
 	if graph == null or source == null or sink == null:
-		return result
-	
+		return {"max_flow": 0, "flow_paths": [], "saturated_edges": []}
 	if not graph.has_vertex(source) or not graph.has_vertex(sink):
-		return result
-	
+		return {"max_flow": 0, "flow_paths": [], "saturated_edges": []}
 	if source == sink:
-		return result
-	
-	# Resetear flujos si se solicita
+		return {"max_flow": 0, "flow_paths": [], "saturated_edges": []}
 	if reset_flux:
 		graph.reset_all_flux()
-	
 	var max_flow := 0
-	
-	# Mientras exista un camino aumentante
+	var augmentations: Array = []
 	while true:
 		var path_info = _find_augmenting_path_bfs(graph, source, sink)
-		if not path_info.has("path") or path_info["path"].is_empty():
+		var path: Array = path_info.get("path", [])
+		if path.is_empty():
 			break
-		
-		var path: Array = path_info["path"]
-		var bottleneck: int = path_info["bottleneck"]
-		
-		# Aumentar flujo en el camino
+		var bottleneck_value: int = int(round(path_info.get("bottleneck", 0)))
+		if bottleneck_value <= 0:
+			break
 		for i in range(path.size() - 1):
 			var u = path[i]
 			var v = path[i + 1]
-			graph.add_edge_flux(u, v, bottleneck)
-		
-		max_flow += bottleneck
-		result["flow_paths"].append({
-			"path": path,
-			"flow": bottleneck
+			graph.add_edge_flux(u, v, bottleneck_value)
+		max_flow += bottleneck_value
+		augmentations.append({
+			"path": path.duplicate(),
+			"flow": bottleneck_value,
+			"method": "edmonds_karp"
 		})
-	
-	result["max_flow"] = max_flow
-	
-	# Recopilar aristas saturadas
-	var flow_edges = graph.get_flow_edges()
-	for edge_info in flow_edges:
-		if edge_info["residual"] <= 0.0:
-			result["saturated_edges"].append({
-				"source": edge_info["source"],
-				"target": edge_info["target"],
-				"capacity": edge_info["capacity"]
-			})
-	
-	return result
+	return _compose_flow_result(graph, max_flow, augmentations)
+
+
+static func max_flow_ford_fulkerson(graph: Graph, source, sink, reset_flux: bool = true) -> Dictionary:
+	if graph == null or source == null or sink == null:
+		return {"max_flow": 0, "flow_paths": [], "saturated_edges": []}
+	if not graph.has_vertex(source) or not graph.has_vertex(sink):
+		return {"max_flow": 0, "flow_paths": [], "saturated_edges": []}
+	if source == sink:
+		return {"max_flow": 0, "flow_paths": [], "saturated_edges": []}
+	if reset_flux:
+		graph.reset_all_flux()
+	var max_flow := 0
+	var augmentations: Array = []
+	while true:
+		var visited := {}
+		var path_info = _find_augmenting_path_dfs(graph, source, sink, visited)
+		var path: Array = path_info.get("path", [])
+		if path.is_empty():
+			break
+		var bottleneck_value: int = int(round(path_info.get("bottleneck", 0)))
+		if bottleneck_value <= 0:
+			break
+		for i in range(path.size() - 1):
+			var u = path[i]
+			var v = path[i + 1]
+			graph.add_edge_flux(u, v, bottleneck_value)
+		max_flow += bottleneck_value
+		augmentations.append({
+			"path": path.duplicate(),
+			"flow": bottleneck_value,
+			"method": "ford_fulkerson"
+		})
+	return _compose_flow_result(graph, max_flow, augmentations)
 
 
 ## Encuentra un camino aumentante usando BFS (para Edmonds-Karp).
@@ -527,6 +534,54 @@ static func _find_augmenting_path_bfs(graph: Graph, source, sink) -> Dictionary:
 	result["path"] = path
 	result["bottleneck"] = int(bottleneck)
 	return result
+
+
+static func _find_augmenting_path_dfs(graph: Graph, current, sink, visited: Dictionary) -> Dictionary:
+	var result := {
+		"path": [],
+		"bottleneck": 0
+	}
+	if current == null or sink == null:
+		return result
+	if current == sink:
+		result["path"] = [sink]
+		result["bottleneck"] = INF
+		return result
+	visited[current] = true
+	var neighbor_weights = graph.get_neighbor_weights(current)
+	for neighbor in neighbor_weights.keys():
+		if visited.has(neighbor):
+			continue
+		var residual = graph.get_edge_residual_capacity(current, neighbor)
+		if residual <= 0.0:
+			continue
+		var sub = _find_augmenting_path_dfs(graph, neighbor, sink, visited)
+		var sub_path: Array = sub.get("path", [])
+		if sub_path.is_empty():
+			continue
+		var bottleneck = min(residual, float(sub.get("bottleneck", 0)))
+		sub_path.insert(0, current)
+		result["path"] = sub_path
+		result["bottleneck"] = bottleneck
+		return result
+	return result
+
+
+static func _compose_flow_result(graph: Graph, max_flow: int, augmentations: Array) -> Dictionary:
+	var saturated: Array = []
+	var flow_edges = graph.get_flow_edges()
+	for edge_info in flow_edges:
+		if edge_info.get("residual", 0.0) <= 0.0:
+			saturated.append({
+				"source": edge_info.get("source"),
+				"target": edge_info.get("target"),
+				"capacity": edge_info.get("capacity", 0.0)
+			})
+	return {
+		"max_flow": max_flow,
+		"flow_paths": augmentations,
+		"saturated_edges": saturated
+	}
 
 
 ## Calcula el corte mínimo después de ejecutar un algoritmo de flujo máximo.
