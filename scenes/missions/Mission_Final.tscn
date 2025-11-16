@@ -230,8 +230,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
-text = "[b]Briefing:[/b]
-Selecciona 'Resolver etapa' para iniciar la primera fase."
+text = "Pulsa 'Resolver etapa' para iniciar la fase actual."
 
 [node name="StatusLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true

@@ -1,8 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b7qv5xk8p3nt1"]
+
 [ext_resource type="Script" uid="uid://usrtjlab7yac" path="res://scripts/utils/graphs/visuals/NodeView.gd" id="1"]
-
-
-
 
 [node name="NodeView" type="Node2D"]
 script = ExtResource("1")
@@ -11,15 +9,30 @@ script = ExtResource("1")
 color = Color(0.2, 0.6, 0.8, 1)
 polygon = PackedVector2Array(-30, 0, -21.213, 21.213, 0, 30, 21.213, 21.213, 30, 0, 21.213, -21.213, 0, -30, -21.213, -21.213)
 
-[node name="Label" type="Label" parent="."]
-offset_left = -40.0
-offset_top = -50.0
-offset_right = 40.0
-offset_bottom = -30.0
+[node name="PanelContainer" type="PanelContainer" parent="."]
+clip_contents = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -51.75
+offset_right = 16.0
+offset_bottom = -35.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="Label" type="Label" parent="PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 12
 text = "Node"
 horizontal_alignment = 1
+vertical_alignment = 2
 
 [node name="ClueLabel" type="Label" parent="."]
 offset_left = -60.0
@@ -28,7 +41,5 @@ offset_right = 60.0
 offset_bottom = 65.0
 theme_override_colors/font_color = Color(1, 1, 0, 1)
 theme_override_font_sizes/font_size = 10
-s/font_size = 10
-text = ""
 horizontal_alignment = 1
 autowrap_mode = 2

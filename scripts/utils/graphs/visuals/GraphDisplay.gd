@@ -21,6 +21,10 @@ var edge_views := []
 var edge_view_map := {}
 var layout_component: GraphLayout = null
 
+# Containers for organization in the scene tree
+var _nodes_container: Node2D = null
+var _edges_container: Node2D = null
+
 signal node_selected(node_key)
 
 
@@ -28,6 +32,7 @@ signal node_selected(node_key)
 func display_graph(g) -> void:
 	graph = g
 	_clear()
+	_ensure_containers()
 	if not graph:
 		return
 	
@@ -75,27 +80,52 @@ func highlight_node(node_key) -> void:
 
 
 func _clear() -> void:
-	for nv in node_views.values():
-		if is_instance_valid(nv):
-			nv.queue_free()
-	node_views.clear()
-	for ev in edge_views:
-		if is_instance_valid(ev):
-			ev.queue_free()
-	edge_views.clear()
-	edge_view_map.clear()
+	# Clear node view instances under the nodes container (if present)
+	if _nodes_container and is_instance_valid(_nodes_container):
+		for child in _nodes_container.get_children():
+			if is_instance_valid(child):
+				child.queue_free()
+		node_views.clear()
+	# Clear edge view instances under the edges container (if present)
+	if _edges_container and is_instance_valid(_edges_container):
+		for child in _edges_container.get_children():
+			if is_instance_valid(child):
+				child.queue_free()
+		edge_views.clear()
+		edge_view_map.clear()
+	# Keep containers in place for reuse
+	return
+
+
+func _ensure_containers() -> void:
+	# Create or find dedicated containers for nodes and edges to keep the scene tree organized
+	if not _edges_container or not is_instance_valid(_edges_container):
+		_edges_container = get_node_or_null("Edges")
+		if not _edges_container:
+			_edges_container = Node2D.new()
+			_edges_container.name = "Edges"
+			add_child(_edges_container)
+	if not _nodes_container or not is_instance_valid(_nodes_container):
+		_nodes_container = get_node_or_null("Nodes")
+		if not _nodes_container:
+			_nodes_container = Node2D.new()
+			_nodes_container.name = "Nodes"
+			add_child(_nodes_container)
 
 
 func _spawn_node(v_data) -> Node:
 	var inst: Node = null
 	if node_scene:
 		inst = node_scene.instantiate()
-		add_child(inst)
+		# add under Nodes container for organization
+		_ensure_containers()
+		_nodes_container.add_child(inst)
 		if inst.has_method("setup"):
 			inst.setup(v_data)
 	else:
 		inst = Node2D.new()
-		add_child(inst)
+		_ensure_containers()
+		_nodes_container.add_child(inst)
 	
 	var key = ""
 	if typeof(v_data) == TYPE_DICTIONARY and v_data.has("id"):
@@ -112,7 +142,8 @@ func _spawn_edge(e_data) -> Node:
 	var inst: Node = null
 	if edge_scene:
 		inst = edge_scene.instantiate()
-		add_child(inst)
+		_ensure_containers()
+		_edges_container.add_child(inst)
 		if inst.has_method("setup"):
 			inst.setup(e_data)
 		
@@ -135,7 +166,8 @@ func _spawn_edge(e_data) -> Node:
 			inst.set_show_direction(show_edge_direction)
 	else:
 		inst = Node2D.new()
-		add_child(inst)
+		_ensure_containers()
+		_edges_container.add_child(inst)
 	
 	var edge_source = e_data.get("source", e_data.get("from"))
 	var edge_target = e_data.get("target", e_data.get("to"))
@@ -173,7 +205,7 @@ func _apply_layout(node_keys: Array) -> void:
 		"force_directed":
 			var edges = graph.get_edges() if graph.has_method("get_edges") else []
 			positions = layout_component.force_directed_layout(
-				node_keys, edges, 50, 5000.0, 0.1, 0.9, global_position
+				node_keys, edges, 150, 280000, 0.6, 0.9, global_position
 			)
 		
 		"hierarchical":

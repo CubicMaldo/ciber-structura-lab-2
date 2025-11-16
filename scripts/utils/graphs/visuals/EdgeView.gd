@@ -12,9 +12,42 @@ var target_node: Node2D = null
 var label_mode: String = "none"
 var show_direction: bool = false
 
+# Estimated visual radius for NodeView hit/visual area (matches NodeView._unhandled_input)
+const NODE_VISUAL_RADIUS := 36.0
 const BASE_WIDTH := 3.0
 const MAX_WIDTH := 10.0
 const ARROW_DISTANCE_FROM_TARGET := 25.0  # Distance from target node to place arrow
+
+
+func _compute_clipped_endpoints() -> Dictionary:
+	# Returns world-space positions {"start":Vector2, "end":Vector2, "dir":Vector2, "dist":float}
+	var out := {}
+	if not source_node or not target_node:
+		return out
+
+	var start_pos = source_node.global_position
+	var end_pos = target_node.global_position
+	var dir = end_pos - start_pos
+	var dist = max(0.001, dir.length())
+	var ndir = dir / dist
+
+	var r_start = NODE_VISUAL_RADIUS
+	var r_end = NODE_VISUAL_RADIUS
+
+	if dist <= (r_start + r_end + 4.0):
+		var p1 = start_pos + ndir * (dist * 0.25)
+		var p2 = start_pos + ndir * (dist * 0.75)
+		out.start = p1
+		out.end = p2
+		out.dir = ndir
+		out.dist = dist
+		return out
+
+	out.start = start_pos + ndir * r_start
+	out.end = end_pos - ndir * r_end
+	out.dir = ndir
+	out.dist = dist
+	return out
 
 
 func setup(data) -> void:
@@ -51,13 +84,12 @@ func update_line() -> void:
 		return
 	
 	var line: Line2D = $Line2D
-	var start_pos = source_node.global_position
-	var end_pos = target_node.global_position
-	
-	# Convert to local coordinates
-	var local_start = to_local(start_pos)
-	var local_end = to_local(end_pos)
-	
+
+	var pts = _compute_clipped_endpoints()
+	if not pts.has("start"):
+		return
+	var local_start = to_local(pts.start)
+	var local_end = to_local(pts.end)
 	line.points = PackedVector2Array([local_start, local_end])
 
 
@@ -124,11 +156,11 @@ func _update_label_position() -> void:
 		return
 	
 	var label: Label = $Label
-	var start_pos = source_node.global_position
-	var end_pos = target_node.global_position
-	
-	# Position label at midpoint of the edge
-	var midpoint = (start_pos + end_pos) / 2.0
+	var pts = _compute_clipped_endpoints()
+	if not pts.has("start"):
+		return
+
+	var midpoint = (pts.start + pts.end) / 2.0
 	label.global_position = midpoint - Vector2(label.size.x / 2.0, label.size.y / 2.0)
 
 
@@ -140,16 +172,15 @@ func _update_arrow() -> void:
 		return
 	
 	var arrow: Polygon2D = $Arrow
-	var start_pos = source_node.global_position
-	var end_pos = target_node.global_position
-	
-	# Calculate direction vector
-	var direction = (end_pos - start_pos).normalized()
-	
-	# Position arrow near the target node
-	var arrow_pos = end_pos - direction * ARROW_DISTANCE_FROM_TARGET
+	var pts = _compute_clipped_endpoints()
+	if not pts.has("start"):
+		return
+
+	var direction = pts.dir
+	# Position arrow slightly before the target border
+	var arrow_pos = pts.end - direction * min(12.0, pts.dist * 0.1)
 	arrow.global_position = arrow_pos
-	
+
 	# Rotate arrow to point in the direction of the edge
 	arrow.rotation = direction.angle()
 	

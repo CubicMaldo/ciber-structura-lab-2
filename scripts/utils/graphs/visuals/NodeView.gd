@@ -34,17 +34,16 @@ func setup(data) -> void:
 		node_id = data
 	
 	# Set label text
-	if has_node("Label"):
-		var display_text = str(node_id)
-		if node_meta:
-			if typeof(node_meta) == TYPE_OBJECT:
-				# node_meta is a Resource (VertexMeta) or Object with property display_name
-				if str(node_meta.display_name) != "":
-					display_text = node_meta.display_name
-			elif typeof(node_meta) == TYPE_DICTIONARY and node_meta.has("display_name"):
-				if str(node_meta["display_name"]) != "":
-					display_text = str(node_meta["display_name"])
-		$Label.text = display_text
+	var display_text = str(node_id)
+	if node_meta:
+		if typeof(node_meta) == TYPE_OBJECT:
+			# node_meta is a Resource (VertexMeta) or Object with property display_name
+			if str(node_meta.display_name) != "":
+				display_text = node_meta.display_name
+		elif typeof(node_meta) == TYPE_DICTIONARY and node_meta.has("display_name"):
+			if str(node_meta["display_name"]) != "":
+				display_text = str(node_meta["display_name"])
+		%Label.text = display_text
 	
 	# Initialize visual state
 	set_state("unvisited")

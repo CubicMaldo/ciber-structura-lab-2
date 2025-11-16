@@ -6,12 +6,19 @@ extends "res://scripts/missions/MissionController.gd"
 const RESTORATION_CODE := "RC-42-ALPHA"
 const DEFAULT_STATUS_PROMPT := "Selecciona BFS o DFS y presiona 'Iniciar rastreo'."
 const SUCCESS_STATUS_TEMPLATE := "Rastreo completado. Has encontrado el nodo raíz del virus: %s."
+const THREAT_PENALTY_MISCLICK := 6
+const THREAT_REWARD_CORRECT := 2
+
+@export var turn_limit: int = 18
 
 @export var algorithm: String = "BFS" # "BFS" or "DFS"
 var visited := {}
 var found_clues: Array = []
 var is_running := false
 var last_current = null
+var threat_manager = null
+var turns_remaining: int = 0
+var rng := RandomNumberGenerator.new()
 
 var traversal_order: Array = []
 var traversal_index: int = 0
@@ -27,21 +34,29 @@ var candidate_nodes: Dictionary = {}
 @onready var status_label: Label = %StatusLabel
 @onready var clues_label: Label = %CluesLabel
 @onready var result_label: RichTextLabel = %ResultLabel
+@onready var threat_label: Label = %ThreatLabel
+@onready var turns_label: Label = %TurnsLabel
+@onready var resources_label: Label = %ResourcesLabel
+@onready var scan_button: Button = %ScanButton
+@onready var firewall_button: Button = %FirewallButton
 
 func _ready() -> void:
 	_connect_ui_signals()
 	_subscribe_to_events()
 	mission_id = "Mission_1"
+	rng.randomize()
 	
 	# Obtener el grafo desde el GraphBuilder hijo (desacoplado)
 	var graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
 	if graph_builder:
 		graph = graph_builder.get_graph()
+		_mutate_graph()
 		print("Mission_1: Grafo cargado desde GraphBuilder con %d nodos" % graph.get_nodes().size())
 	else:
 		push_error("Mission_1: No se encontró nodo GraphBuilder.")
 		# Crear grafo vacío para evitar crashes
 		graph = Graph.new()
+		_initialize_dynamic_systems()
 		return
 	
 	# Hook display if present in scene
@@ -53,6 +68,8 @@ func _ready() -> void:
 			display.node_selected.connect(_on_graph_node_selected)
 	else:
 		push_warning("Mission_1: No se encontró GraphDisplay para visualización")
+
+	_initialize_dynamic_systems()
 	
 	_reset_before_traversal()
 	_update_status(DEFAULT_STATUS_PROMPT)
@@ -62,6 +79,11 @@ func set_algorithm(alg: String) -> void:
 
 func start() -> void:
 	_reset_before_traversal()
+	if threat_manager:
+		threat_manager.reset_turns(turn_limit)
+		turns_remaining = threat_manager.get_turns_remaining()
+		_update_turns_display()
+		_sync_resource_display(threat_manager.get_resources())
 	_update_status("Preparando rastreo %s..." % algorithm)
 	var keys: Array = []
 	if graph and graph.has_method("get_nodes"):
@@ -121,7 +143,7 @@ func _reset_before_traversal() -> void:
 	is_running = false
 	awaiting_selection = false
 	if clues_label:
-		clues_label.text = "Pistas encontradas: 0"
+		clues_label.text = "Pistas: 0"
 	if result_label:
 		result_label.text = ""
 	if continue_button:
@@ -130,8 +152,16 @@ func _reset_before_traversal() -> void:
 		step_button.disabled = true
 	if start_button:
 		start_button.disabled = false
+	if scan_button:
+		scan_button.disabled = true
 	_clear_candidate_highlights()
 	_reset_node_visuals()
+	if threat_manager:
+		turns_remaining = threat_manager.get_turns_remaining()
+		_sync_resource_display(threat_manager.get_resources())
+	else:
+		turns_remaining = turn_limit
+	_update_turns_display()
 
 
 func _reset_node_visuals() -> void:
@@ -202,6 +232,148 @@ func _apply_candidate_states(primary_key, secondary: Array) -> void:
 			candidate_nodes[node_key] = "candidate"
 
 
+# ============================================================================
+# SISTEMAS DINÁMICOS (AMENAZA, RECURSOS Y VARIACIÓN DE GRAFO)
+# ============================================================================
+
+func _initialize_dynamic_systems() -> void:
+	if threat_manager != null:
+		return
+	if Engine.has_singleton("ThreatManager"):
+		threat_manager = Engine.get_singleton("ThreatManager")
+		threat_manager.begin_mission_session(mission_id, turn_limit)
+		threat_manager.threat_level_changed.connect(_on_threat_level_changed)
+		threat_manager.resources_changed.connect(_on_resources_changed)
+		threat_manager.turns_changed.connect(_on_turns_changed)
+		turns_remaining = threat_manager.get_turns_remaining()
+		_on_threat_level_changed(threat_manager.get_threat_level_value(), threat_manager.get_threat_state())
+		_sync_resource_display(threat_manager.get_resources())
+	else:
+		turns_remaining = turn_limit
+	_update_turns_display()
+
+
+func _on_threat_level_changed(level: int, state: String) -> void:
+	if threat_label:
+		var nice_state := state.capitalize()
+		threat_label.text = "Amenaza: %d (%s)" % [level, nice_state]
+	if state == "critical":
+		_update_status("Nivel de amenaza CRÍTICO. Evita errores o usa firewalls.")
+
+
+func _on_turns_changed(remaining: int) -> void:
+	turns_remaining = remaining
+	_update_turns_display()
+
+
+func _update_turns_display() -> void:
+	if not turns_label:
+		return
+	var display_value := "--" if turns_remaining < 0 else str(turns_remaining)
+	turns_label.text = "Turnos restantes: %s" % display_value
+
+
+func _on_resources_changed(resources: Dictionary) -> void:
+	_sync_resource_display(resources)
+
+
+func _sync_resource_display(resources: Dictionary) -> void:
+	if resources_label:
+		var scans = int(resources.get("scans", 0))
+		var firewalls = int(resources.get("firewalls", 0))
+		resources_label.text = "Recursos - Escaneos: %d | Firewalls: %d" % [scans, firewalls]
+	if scan_button:
+		var can_scan = is_running and awaiting_selection and int(resources.get("scans", 0)) > 0
+		scan_button.disabled = not can_scan
+	if firewall_button:
+		firewall_button.disabled = int(resources.get("firewalls", 0)) <= 0
+
+
+func _consume_turn_for_action(skip_turn: bool) -> void:
+	if skip_turn or threat_manager == null:
+		return
+	turns_remaining = threat_manager.consume_turn()
+	_update_turns_display()
+	if threat_manager.get_threat_state() == "critical":
+		_update_status("Amenaza crítica: cada fallo suma más riesgo.")
+
+
+func _apply_threat_penalty(amount: int) -> void:
+	if threat_manager:
+		threat_manager.apply_penalty(amount)
+
+
+func _reward_micro_progress() -> void:
+	if threat_manager:
+		threat_manager.apply_relief(THREAT_REWARD_CORRECT)
+
+
+func _reward_mission_victory() -> void:
+	if threat_manager:
+		threat_manager.apply_relief(15)
+		threat_manager.add_resource("scans", 1)
+
+
+func _on_scan_pressed() -> void:
+	if not is_running or not awaiting_selection:
+		_update_status("No hay nodos pendientes para escanear.")
+		return
+	if not threat_manager or not threat_manager.spend_resource("scans", 1):
+		_update_status("Sin escaneos disponibles.")
+		return
+	var expected = _get_expected_key()
+	if expected == null:
+		_update_status("No hay objetivo para revelar.")
+		return
+	_update_status("Escaneo identifica el siguiente servidor crítico.")
+	_process_player_selection(expected, true)
+
+
+func _on_firewall_pressed() -> void:
+	if not threat_manager or not threat_manager.spend_resource("firewalls", 1):
+		_update_status("Sin firewalls para desplegar.")
+		return
+	threat_manager.apply_relief(12)
+	_update_status("Firewall reforzado. Amenaza reducida.")
+
+
+func _mutate_graph() -> void:
+	if graph == null:
+		return
+	var nodes_dict: Dictionary = graph.get_nodes()
+	if nodes_dict.is_empty():
+		return
+	var keys: Array = nodes_dict.keys()
+	_assign_dynamic_root(keys)
+	_inject_shortcuts(keys)
+
+
+func _assign_dynamic_root(keys: Array) -> void:
+	if keys.is_empty():
+		return
+	var chosen_key = keys[rng.randi_range(0, keys.size() - 1)]
+	for key in keys:
+		var vertex = graph.get_vertex(key)
+		if vertex and vertex.meta is NetworkNodeMeta:
+			vertex.meta.is_root = key == chosen_key
+
+
+func _inject_shortcuts(keys: Array) -> void:
+	if keys.size() < 3:
+		return
+	var added := 0
+	var attempts := 0
+	while added < 2 and attempts < 10:
+		attempts += 1
+		var a = keys[rng.randi_range(0, keys.size() - 1)]
+		var b = keys[rng.randi_range(0, keys.size() - 1)]
+		if a == b or graph.has_edge(a, b):
+			continue
+		var weight = rng.randf_range(1.0, 4.0)
+		graph.add_connection(a, b, weight)
+		added += 1
+
+
 func _format_node_label(node_meta: NetworkNodeMeta, node_key) -> String:
 	if node_meta:
 		if node_meta.display_name != "":
@@ -227,6 +399,7 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 	if not is_running:
 		_update_status("Inicia la misión antes de interactuar con el grafo.")
 		return
+	_consume_turn_for_action(_is_auto)
 	var expected_key = _get_expected_key()
 	if expected_key == null:
 		awaiting_selection = false
@@ -245,6 +418,7 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 	_set_current(node_key)
 	var vertex = graph.get_vertex(node_key)
 	visited[node_key] = true
+	_reward_micro_progress()
 	if vertex:
 		var node_meta: NetworkNodeMeta = vertex.meta as NetworkNodeMeta
 		var node_label = _format_node_label(node_meta, node_key)
@@ -269,6 +443,7 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 			"order": traversal_order.duplicate(),
 			"algorithm": algorithm
 		}
+		_apply_threat_penalty(8)
 		complete(exhausted_result)
 		return
 
@@ -276,6 +451,8 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 	awaiting_selection = true
 	_update_status("Nodo asegurado. Determina el siguiente servidor usando %s (%d restantes)." % [algorithm, remaining])
 	_show_candidate_hints()
+	if threat_manager:
+		_sync_resource_display(threat_manager.get_resources())
 
 
 func _handle_incorrect_selection(node_key) -> void:
@@ -283,6 +460,7 @@ func _handle_incorrect_selection(node_key) -> void:
 		ui.set_node_state(node_key, "highlighted")
 		call_deferred("_reset_highlighted_node", node_key)
 		_update_status("Ese nodo no corresponde al recorrido %s. Revisa la lógica de %s." % [algorithm, algorithm])
+	_apply_threat_penalty(THREAT_PENALTY_MISCLICK)
 
 
 func _reset_highlighted_node(node_key) -> void:
@@ -347,6 +525,7 @@ func _handle_vertex_visit(vertex, node_meta: NetworkNodeMeta, node_key, node_lab
 				"algorithm": algorithm,
 				"order": traversal_order.duplicate()
 			}
+			_reward_mission_victory()
 			complete(result)
 			return true
 
@@ -371,6 +550,13 @@ func _connect_ui_signals() -> void:
 	if continue_button:
 		continue_button.pressed.connect(_on_continue_pressed)
 		continue_button.visible = false  # Hidden until mission completes
+
+	if scan_button:
+		scan_button.pressed.connect(_on_scan_pressed)
+		scan_button.disabled = true
+
+	if firewall_button:
+		firewall_button.pressed.connect(_on_firewall_pressed)
 
 
 func _subscribe_to_events() -> void:
@@ -423,6 +609,8 @@ func _on_mission_completed(completed_mission_id: String, success: bool, result: 
 		return
 	
 	is_running = false
+	if threat_manager:
+		_sync_resource_display(threat_manager.get_resources())
 	
 	# Disable all control buttons
 	if step_button:
@@ -468,11 +656,8 @@ func _update_status(message: String) -> void:
 
 
 func _update_clues_display() -> void:
+	# Show only a compact counter in the HUD. The full clue text is
+	# displayed on the node visuals via `show_node_clue`.
 	if clues_label:
 		var clue_count = found_clues.size()
-		if clue_count == 0:
-			clues_label.text = "Pistas encontradas: 0"
-		else:
-			clues_label.text = "Pistas encontradas: %d\n" % clue_count
-			for i in range(clue_count):
-				clues_label.text += "• %s\n" % found_clues[i]
+		clues_label.text = "Pistas: %d" % clue_count

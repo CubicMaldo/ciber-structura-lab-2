@@ -144,83 +144,71 @@ vertex_meta = SubResource("NetworkNodeMeta_backup")
 script = ExtResource("7_n2hvw")
 from_node = "Firewall Central"
 to_node = "Proxy"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_3"]
 script = ExtResource("7_n2hvw")
 from_node = "Proxy"
 to_node = "Servidor de Correo"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_4"]
 script = ExtResource("7_n2hvw")
 from_node = "Servidor de Correo"
 to_node = "Base de Datos"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_5"]
 script = ExtResource("7_n2hvw")
 from_node = "Core Switch"
 to_node = "Router Core"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_6"]
 script = ExtResource("7_n2hvw")
 from_node = "Core Switch"
 to_node = "Firewall Central"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_7"]
 script = ExtResource("7_n2hvw")
 from_node = "Core Switch"
 to_node = "DMZ Server"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_8"]
 script = ExtResource("7_n2hvw")
 from_node = "DMZ Server"
 to_node = "Workstation A"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_9"]
 script = ExtResource("7_n2hvw")
 from_node = "Workstation A"
 to_node = "Workstation B"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_10"]
 script = ExtResource("7_n2hvw")
 from_node = "Workstation B"
 to_node = "Servidor de Correo"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_11"]
 script = ExtResource("7_n2hvw")
 from_node = "Backup Server"
 to_node = "Base de Datos"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_12"]
 script = ExtResource("7_n2hvw")
 from_node = "Backup Server"
 to_node = "Core Switch"
-directed = true
 
 [sub_resource type="Resource" id="GraphConnectionData_2"]
 script = ExtResource("7_n2hvw")
 from_node = "Router Core"
 to_node = "IDS"
-directed = true
 
 [node name="Mission_1" type="Node2D"]
 script = ExtResource("1")
 
 [node name="GraphDisplay" type="Node2D" parent="."]
-position = Vector2(500, 446)
+position = Vector2(360, 330)
 script = ExtResource("2")
 node_scene = ExtResource("3")
 edge_scene = ExtResource("4")
-layout_type = "circular"
+layout_type = "force_directed"
 show_edge_direction = true
 
 [node name="GraphBuilder" type="Node" parent="."]
@@ -230,35 +218,49 @@ connections = Array[ExtResource("7_n2hvw")]([SubResource("GraphConnectionData_1"
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
+[node name="StatusLabel" type="Label" parent="HUD"]
+unique_name_in_owner = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -22.333374
+offset_right = 180.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Estado: Listo"
+horizontal_alignment = 1
+autowrap_mode = 2
+
 [node name="PanelContainer" type="PanelContainer" parent="HUD"]
-anchors_preset = 6
+custom_minimum_size = Vector2(320, 0)
+anchors_preset = 11
 anchor_left = 1.0
-anchor_top = 0.5
 anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -243.0
-offset_top = -127.0
-offset_bottom = 127.0
+anchor_bottom = 1.0
+offset_left = -360.0
+offset_top = 32.0
+offset_bottom = -32.0
 grow_horizontal = 0
 grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HUD/PanelContainer"]
 layout_mode = 2
+theme_override_constants/separation = 10
 
 [node name="TitleLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Misión 1: Network Tracer"
+horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
-layout_mode = 2
 
-[node name="AlgorithmLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
-layout_mode = 2
-text = "Algoritmo de Búsqueda:"
 
 [node name="AlgorithmButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 8
 
 [node name="BFSButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/AlgorithmButtons"]
 unique_name_in_owner = true
@@ -277,6 +279,7 @@ layout_mode = 2
 
 [node name="ControlButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 8
 
 [node name="StartButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ControlButtons"]
 unique_name_in_owner = true
@@ -296,23 +299,58 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Continuar"
 
-[node name="HSeparator3" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="StatusHeader" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Estado de la red"
 
-[node name="StatusLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="ThreatTurnsGrid" type="GridContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/v_separation = 4
+
+[node name="ThreatLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer/ThreatTurnsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Estado: Listo"
+text = "Amenaza: 0 (estable)"
+
+[node name="TurnsLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer/ThreatTurnsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Turnos restantes: --"
+
+[node name="ResourcesLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Recursos - Escaneos: 0 | Firewalls: 0"
+autowrap_mode = 2
+
+[node name="ResourceButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ScanButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ResourceButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Usar escaneo"
+
+[node name="FirewallButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ResourceButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reforzar firewall"
+
+[node name="HSeparator3" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
 
 [node name="CluesLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Pistas encontradas: 0"
+text = "Pistas: 0"
 
 [node name="ResultLabel" type="RichTextLabel" parent="HUD/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
-text = "[center][b]Resultado:[/b][/center]
-Encuentra el nodo raíz infectado."
+text = "[center][b]Objetivo:[/b][/center]\nEncuentra el nodo raíz infectado."

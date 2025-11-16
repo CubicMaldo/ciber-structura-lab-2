@@ -44,7 +44,7 @@ func add_node(key, meta: Resource = null) -> Vertex:
 	
 	vertex = Vertex.new(key, _id_as_int(key), meta)
 	vertices[key] = vertex
-	emit_signal("node_added", key)
+	node_added.emit(key)
 	return vertex
 
 
@@ -73,7 +73,7 @@ func remove_node(key) -> void:
 		return
 	v.dispose()
 	vertices.erase(key)
-	emit_signal("node_removed", key)
+	node_removed.emit(key)
 
 
 ## Cambia la clave utilizada para un vértice existente.
@@ -168,7 +168,7 @@ func add_connection(a, b, weight: float, edge_metadata: Resource = null, initial
 		edge = Edge.new(va, vb, weight, initial_flux, edge_metadata)
 		va.edges[b] = edge
 		vb.edges[a] = edge
-		emit_signal("edge_added", a, b)
+		edge_added.emit(a, b)
 	else:
 		edge.weight = weight
 		edge.flux = initial_flux
@@ -213,7 +213,7 @@ func remove_connection(a, b) -> void:
 	if dst:
 		dst.edges.erase(a)
 
-	emit_signal("edge_removed", a, b)
+	edge_removed.emit(a, b)
 
 
 ## Elimina todos los nodos y aristas del grafo.

@@ -185,16 +185,10 @@ layout_mode = 2
 
 [node name="InstructionLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
-text = "Traza la ruta más segura desde
-el Centro de Control hasta el
-Servidor Infectado."
+text = "Traza la ruta más segura desde el Centro de Control hasta el Servidor Infectado."
 horizontal_alignment = 1
 
-[node name="HSeparator2" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
-layout_mode = 2
 
-[node name="ControlButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
-layout_mode = 2
 
 [node name="CalculateButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ControlButtons"]
 unique_name_in_owner = true
@@ -225,6 +219,39 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Estado: Listo"
 autowrap_mode = 2
+
+[node name="ThreatLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+text = "Amenaza: 0 (estable)"
+
+[node name="TurnsLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+text = "Turnos restantes: --"
+
+[node name="ResourcesLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+text = "Recursos - Escaneos: 0 | Firewalls: 0"
+
+[node name="ResourceButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScanButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ResourceButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Escanear"
+
+[node name="FirewallButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ResourceButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Firewall"
 
 [node name="HSeparator5" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2

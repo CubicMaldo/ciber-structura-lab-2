@@ -7,9 +7,7 @@ func _ready() -> void:
 	_populate()
 
 func _populate() -> void:
-	if not has_node("UI/MissionList"):
-		return
-	var list = $"UI/MissionList"
+	var list = %MissionList
 	for m in missions:
 		var btn = Button.new()
 		btn.text = m

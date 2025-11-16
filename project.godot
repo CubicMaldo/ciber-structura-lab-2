@@ -23,6 +23,11 @@ SceneManager="*res://scripts/managers/SceneManager.gd"
 GameManager="*res://scripts/managers/GameManager.gd"
 EventBus="*res://scripts/managers/EventBus.gd"
 
+[display]
+
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_height"
+
 [dotnet]
 
 project/assembly_name="Ciber Structura Lab 2"

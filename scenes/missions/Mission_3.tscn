@@ -212,11 +212,11 @@ script = ExtResource("1_i4ig7")
 algorithm = "BFS"
 
 [node name="GraphDisplay" type="Node2D" parent="."]
-position = Vector2(500, 446)
+position = Vector2(360, 330)
 script = ExtResource("2")
 node_scene = ExtResource("3")
 edge_scene = ExtResource("4")
-layout_type = "circular"
+layout_type = "force_directed"
 edge_label_mode = "weight"
 
 [node name="GraphBuilder" type="Node" parent="."]
@@ -224,9 +224,23 @@ script = ExtResource("5_h74cb")
 nodes = Array[ExtResource("6_t440f")]([SubResource("GraphNodeData_firewall"), SubResource("GraphNodeData_database"), SubResource("GraphNodeData_mail"), SubResource("GraphNodeData_proxy"), SubResource("GraphNodeData_router"), SubResource("GraphNodeData_ids"), SubResource("GraphNodeData_switch"), SubResource("GraphNodeData_dmz"), SubResource("GraphNodeData_ws_a"), SubResource("GraphNodeData_ws_b"), SubResource("GraphNodeData_backup")])
 connections = Array[ExtResource("7_n2hvw")]([SubResource("GraphConnectionData_1"), SubResource("GraphConnectionData_3"), SubResource("GraphConnectionData_4"), SubResource("GraphConnectionData_5"), SubResource("GraphConnectionData_6"), SubResource("GraphConnectionData_7"), SubResource("GraphConnectionData_8"), SubResource("GraphConnectionData_9"), SubResource("GraphConnectionData_10"), SubResource("GraphConnectionData_11"), SubResource("GraphConnectionData_12"), SubResource("GraphConnectionData_2")])
 randomize_edge_weights = true
-random_generation_limit = null
 
 [node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="StatusLabel" type="Label" parent="HUD"]
+unique_name_in_owner = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -137.5
+offset_top = -22.333374
+offset_right = 137.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Estado: Listo"
+horizontal_alignment = 1
 
 [node name="PanelContainer" type="PanelContainer" parent="HUD"]
 anchors_preset = 6
@@ -253,7 +267,7 @@ layout_mode = 2
 
 [node name="AlgorithmLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
-text = "Algoritmo MST:"
+text = "Algoritmo:"
 
 [node name="AlgorithmButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -269,9 +283,6 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Prim"
-
-[node name="HSeparator2" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
-layout_mode = 2
 
 [node name="ControlButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -294,13 +305,37 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Continuar"
 
-[node name="HSeparator3" type="HSeparator" parent="HUD/PanelContainer/VBoxContainer"]
-layout_mode = 2
 
-[node name="StatusLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+
+[node name="ThreatLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Estado: Listo"
+text = "Amenaza: 0 (estable)"
+
+[node name="TurnsLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Turnos restantes: --"
+
+[node name="ResourcesLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Recursos - Escaneos: 0 | Firewalls: 0"
+
+[node name="ResourceButtons" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScanButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ResourceButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Escaneo"
+
+[node name="FirewallButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ResourceButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Refuerzo"
 
 [node name="CostLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
@@ -312,5 +347,4 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
-text = "[center][b]Reconstrucción[/b][/center]
-Selecciona los enlaces indicados para restaurar la red."
+text = "Selecciona los enlaces indicados para restaurar la red."
