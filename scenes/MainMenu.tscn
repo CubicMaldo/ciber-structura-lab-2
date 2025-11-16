@@ -13,71 +13,142 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.039216, 0.066667, 0.109804, 0.92549)
+color = Color(0.02, 0.035, 0.065, 1)
 
-[node name="LayoutRoot" type="MarginContainer" parent="UI"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -317.0
-offset_top = -220.0
-offset_right = 317.0
-offset_bottom = 220.0
+[node name="GradientOverlay" type="ColorRect" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.2, 0.35, 0.3)
 
-[node name="Panel" type="PanelContainer" parent="UI/LayoutRoot"]
-custom_minimum_size = Vector2(520, 440)
+[node name="LayoutRoot" type="MarginContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 80
+theme_override_constants/margin_top = 60
+theme_override_constants/margin_right = 80
+theme_override_constants/margin_bottom = 60
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/LayoutRoot"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/LayoutRoot/Panel"]
+[node name="Panel" type="PanelContainer" parent="UI/LayoutRoot/CenterContainer"]
+custom_minimum_size = Vector2(680, 500)
 layout_mode = 2
-theme_override_constants/separation = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/LayoutRoot/CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
 alignment = 1
 
-[node name="Title" type="Label" parent="UI/LayoutRoot/Panel/VBoxContainer"]
+[node name="LogoArea" type="VBoxContainer" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconPlaceholder" type="ColorRect" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/LogoArea"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 32
-text = "CyberQuest: Guardianes de la Red Global"
+color = Color(0.2, 0.5, 0.8, 0.3)
+
+[node name="Title" type="Label" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/LogoArea"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 36
+text = "CyberQuest"
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="UI/LayoutRoot/Panel/VBoxContainer"]
+[node name="TitleSubtitle" type="Label" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/LogoArea"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.75, 0.9, 1)
 theme_override_font_sizes/font_size = 18
-text = "Defiende la red aplicando tus algoritmos."
+text = "Guardianes de la Red Global"
 horizontal_alignment = 1
 
-[node name="Divider" type="HSeparator" parent="UI/LayoutRoot/Panel/VBoxContainer"]
+[node name="Spacer1" type="Control" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
-[node name="StoryLabel" type="Label" parent="UI/LayoutRoot/Panel/VBoxContainer"]
+[node name="Subtitle" type="Label" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 16
-text = "Cada misión representa un incidente real. Analiza el grafo, toma decisiones tácticas y estabiliza los nodos críticos."
-autowrap_mode = 2
+text = " Defiende la red aplicando tus algoritmos"
+horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="UI/LayoutRoot/Panel/VBoxContainer"]
+[node name="Divider" type="HSeparator" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StoryPanel" type="PanelContainer" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StoryMargin" type="MarginContainer" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/StoryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
+
+[node name="StoryLabel" type="Label" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/StoryPanel/StoryMargin"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "Cada misión representa un incidente real de seguridad. 
+Analiza grafos de red, aplica algoritmos de búsqueda y pathfinding, 
+y estabiliza los nodos críticos antes de que la amenaza se propague."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Spacer2" type="Control" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 5)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ButtonRow" type="HBoxContainer" parent="UI/LayoutRoot/Panel/VBoxContainer"]
+[node name="ButtonContainer" type="VBoxContainer" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 12
+alignment = 1
 
-[node name="StartButton" type="Button" parent="UI/LayoutRoot/Panel/VBoxContainer/ButtonRow"]
+[node name="StartButton" type="Button" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 54)
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "Comenzar Operación"
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.95, 1, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "▶ Comenzar Operación"
 
-[node name="VersionLabel" type="Label" parent="UI/LayoutRoot/Panel/VBoxContainer"]
+[node name="InfoText" type="Label" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "v0.2 - Prototipo educativo"
+theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "Aprende BFS, DFS, Dijkstra y algoritmos de flujo de red"
 horizontal_alignment = 1
 
-[connection signal="pressed" from="UI/LayoutRoot/Panel/VBoxContainer/ButtonRow/StartButton" to="." method="_on_start_pressed"]
+[node name="Spacer3" type="Control" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+
+[node name="VersionLabel" type="Label" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+text = "v0.2 - Prototipo educativo | Godot 4.5"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer/StartButton" to="." method="_on_start_pressed"]

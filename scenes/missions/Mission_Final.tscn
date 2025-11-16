@@ -137,124 +137,219 @@ random_generation_limit = 18
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="PanelContainer" type="PanelContainer" parent="HUD"]
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
+[node name="StatusBar" type="PanelContainer" parent="HUD"]
+anchors_preset = 10
 anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -360.0
-offset_top = -260.0
-offset_bottom = 260.0
+offset_bottom = 48.0
+grow_horizontal = 2
+
+[node name="StatusMargin" type="MarginContainer" parent="HUD/StatusBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 8
+
+[node name="StatusHBox" type="HBoxContainer" parent="HUD/StatusBar/StatusMargin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="MissionTitle" type="Label" parent="HUD/StatusBar/StatusMargin/StatusHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "Misión Final: The Core"
+
+[node name="StatusLabel" type="Label" parent="HUD/StatusBar/StatusMargin/StatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7, 0.8, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "Estado: Red inicializada"
+horizontal_alignment = 1
+
+[node name="SidePanel" type="PanelContainer" parent="HUD"]
+custom_minimum_size = Vector2(360, 0)
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -380.0
+offset_top = 60.0
+offset_right = -20.0
+offset_bottom = -20.0
 grow_horizontal = 0
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/PanelContainer"]
+[node name="PanelMargin" type="MarginContainer" parent="HUD/SidePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HUD/SidePanel/PanelMargin"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
+theme_override_constants/separation = 20
 
-[node name="TitleLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="ObjectiveSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "Misión Final: The Core"
+theme_override_constants/separation = 10
 
-[node name="StoryLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="ObjectiveHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ObjectiveSection"]
 layout_mode = 2
-text = "NEMESIS saboteó el núcleo. Aplica cada algoritmo aprendido para reconstruir el escudo: recorrido, camino mínimo, MST y flujo máximo."
-autowrap_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 15
+text = "OBJETIVO"
 
-[node name="StageTitleLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="DetailLabel" type="RichTextLabel" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ObjectiveSection"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "1. Reconocimiento"
-
-[node name="StageList" type="VBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="StageRow1" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer/StageList"]
-layout_mode = 2
-
-[node name="StageRow1Label" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow1"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Recorrido"
-
-[node name="TraversalStatus" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow1"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Pendiente"
-
-[node name="StageRow2" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer/StageList"]
-layout_mode = 2
-
-[node name="StageRow2Label" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Camino mínimo"
-
-[node name="PathStatus" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow2"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Pendiente"
-
-[node name="StageRow3" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer/StageList"]
-layout_mode = 2
-
-[node name="StageRow3Label" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow3"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Reconstrucción"
-
-[node name="MSTStatus" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow3"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Pendiente"
-
-[node name="StageRow4" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer/StageList"]
-layout_mode = 2
-
-[node name="StageRow4Label" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow4"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Flujo máximo"
-
-[node name="FlowStatus" type="Label" parent="HUD/PanelContainer/VBoxContainer/StageList/StageRow4"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Pendiente"
-
-[node name="DetailLabel" type="RichTextLabel" parent="HUD/PanelContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 12
 bbcode_enabled = true
-text = "Pulsa 'Resolver etapa' para iniciar la fase actual."
+text = "[color=#aabbdd]NEMESIS saboteó el núcleo. Debes completar 4 fases aplicando todos los algoritmos aprendidos para reconstruir el sistema.[/color]"
+fit_content = true
+scroll_active = false
 
-[node name="StatusLabel" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Estado: Red inicializada"
-
-[node name="ButtonRow" type="HBoxContainer" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="Divider1" type="HSeparator" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="SolveStageButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ButtonRow"]
+[node name="PhaseSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PhaseHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "FASES"
+
+[node name="StageTitleLabel" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection"]
 unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Fase 1: Reconocimiento"
+
+[node name="StageList" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StageRow1" type="HBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StageRow1Label" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList/StageRow1"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Resolver etapa"
+theme_override_font_sizes/font_size = 12
+text = "1. Recorrido"
 
-[node name="RegenerateButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ButtonRow"]
+[node name="TraversalStatus" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList/StageRow1"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-text = "Regenerar red"
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Pendiente"
 
-[node name="ContinueButton" type="Button" parent="HUD/PanelContainer/VBoxContainer/ButtonRow"]
+[node name="StageRow2" type="HBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StageRow2Label" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList/StageRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "2. Camino mínimo"
+
+[node name="PathStatus" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList/StageRow2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Pendiente"
+
+[node name="StageRow3" type="HBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StageRow3Label" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList/StageRow3"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "3. Reconstrucción (MST)"
+
+[node name="MSTStatus" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList/StageRow3"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Pendiente"
+
+[node name="StageRow4" type="HBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StageRow4Label" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList/StageRow4"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "4. Flujo máximo"
+
+[node name="FlowStatus" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/PhaseSection/StageList/StageRow4"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Pendiente"
+
+[node name="Divider2" type="HSeparator" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ControlSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ControlHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.95, 0.7, 1)
+theme_override_font_sizes/font_size = 15
+text = "CONTROLES"
+
+[node name="ButtonRow" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SolveStageButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection/ButtonRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Resolver Fase Actual"
+
+[node name="RegenerateButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection/ButtonRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Regenerar Red"
+
+[node name="Spacer" type="Control" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContinueButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 unique_name_in_owner = true
 visible = false
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "Finalizar"
+theme_override_font_sizes/font_size = 14
+text = "Finalizar Misión"
+

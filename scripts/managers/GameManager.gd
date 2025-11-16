@@ -47,3 +47,6 @@ func is_mission_unlocked(mission_id: String) -> bool:
 	if completed_missions.has(prev_id):
 		return true
 	return false
+
+func is_mission_completed(mission_id: String) -> bool:
+	return completed_missions.has(mission_id)
