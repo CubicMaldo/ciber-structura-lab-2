@@ -44,6 +44,7 @@ func _ready() -> void:
 	_connect_ui_signals()
 	_subscribe_to_events()
 	mission_id = "Mission_1"
+	ensure_mission_achievement_panel()
 	rng.randomize()
 	
 	# Obtener el grafo desde el GraphBuilder hijo (desacoplado)

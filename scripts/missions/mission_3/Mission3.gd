@@ -46,6 +46,7 @@ func _ready() -> void:
 	_connect_ui_signals()
 	_subscribe_to_events()
 	mission_id = "Mission_3"
+	ensure_mission_achievement_panel()
 	rng.randomize()
 	var graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
 	if graph_builder:

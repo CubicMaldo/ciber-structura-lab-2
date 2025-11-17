@@ -51,6 +51,11 @@ var flow_sink = null
 var flow_attempts := 0
 var flow_last_result: Dictionary = {}
 
+var total_moves := 0
+var mistake_count := 0
+var stage_move_counters := {}
+var stage_mistake_counters := {}
+
 @onready var run_button: Button = %SolveStageButton
 @onready var regenerate_button: Button = %RegenerateButton
 @onready var continue_button: Button = %ContinueButton
@@ -66,6 +71,7 @@ var flow_last_result: Dictionary = {}
 func _ready() -> void:
 	rng.randomize()
 	mission_id = "Mission_Final"
+	ensure_mission_achievement_panel()
 	graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
 	stage_labels = {
 		"recon": traversal_status_label,
@@ -114,6 +120,10 @@ func _reset_progress(reset_graph: bool = false) -> void:
 	stage_index = 0
 	stage_results.clear()
 	active_stage_id = ""
+	total_moves = 0
+	mistake_count = 0
+	stage_move_counters.clear()
+	stage_mistake_counters.clear()
 	recon_sequence.clear()
 	recon_player_order.clear()
 	path_sequence.clear()
@@ -122,6 +132,9 @@ func _reset_progress(reset_graph: bool = false) -> void:
 	mst_player_edges.clear()
 	mst_confirmed_nodes.clear()
 	flow_last_result.clear()
+	for spec in STAGE_SPECS:
+		stage_move_counters[spec.id] = 0
+		stage_mistake_counters[spec.id] = 0
 	_set_stage_controls_locked(false)
 	if continue_button:
 		continue_button.visible = false
@@ -303,6 +316,7 @@ func _handle_recon_selection(node_key) -> void:
 		_flag_node_error(node_key, "Ese nodo no corresponde al BFS actual.")
 		return
 	recon_player_order.append(node_key)
+	_increment_stage_move("recon")
 	var state = "source" if recon_progress == 0 else "visited"
 	ui.set_node_state(node_key, state)
 	recon_progress += 1
@@ -326,6 +340,7 @@ func _handle_path_selection(node_key) -> void:
 		_flag_node_error(node_key, "Ese nodo no pertenece al camino óptimo.")
 		return
 	path_player_order.append(node_key)
+	_increment_stage_move("path")
 	var state = "source" if path_progress == 0 else ("sink" if path_progress == path_sequence.size() - 1 else "visited")
 	ui.set_node_state(node_key, state)
 	if path_progress > 0:
@@ -355,6 +370,7 @@ func _handle_mst_selection(node_key) -> void:
 			_flag_node_error(node_key, "Ese nodo no participa en el enlace actual.")
 			return
 		mst_pending_node = node_key
+		_increment_stage_move("mst")
 		ui.set_node_state(node_key, "current")
 		_update_status("Buen inicio. Selecciona el otro extremo del enlace.")
 		return
@@ -365,6 +381,7 @@ func _handle_mst_selection(node_key) -> void:
 	if node_key != expected:
 		_flag_node_error(node_key, "Ese no es el extremo correcto del enlace.")
 		return
+	_increment_stage_move("mst")
 	ui.set_node_state(mst_pending_node, "visited")
 	ui.set_node_state(node_key, "visited")
 	ui.set_edge_state(a, b, "visited")
@@ -394,6 +411,7 @@ func _handle_flow_selection(node_key) -> void:
 		flow_source = node_key
 		ui.set_node_state(node_key, "source")
 		_update_status("Fuente establecida en %s. Selecciona el sumidero." % str(node_key))
+		_increment_stage_move("flow")
 		return
 	if flow_sink == null:
 		if node_key == flow_source:
@@ -401,6 +419,7 @@ func _handle_flow_selection(node_key) -> void:
 			return
 		flow_sink = node_key
 		ui.set_node_state(node_key, "sink")
+		_increment_stage_move("flow")
 		_evaluate_flow_choice()
 		return
 	_update_status("Ya tienes fuente y sumidero. Regenera o reinicia la selección si necesitas otra pareja.")
@@ -477,6 +496,7 @@ func _highlight_current_mst_edge() -> void:
 
 
 func _flag_node_error(node_key, message: String) -> void:
+	_register_stage_mistake(active_stage_id)
 	_update_status(message)
 	if ui == null:
 		return
@@ -504,6 +524,8 @@ func _flag_node_error(node_key, message: String) -> void:
 func _complete_current_stage(result: Dictionary) -> void:
 	var stage_id = active_stage_id
 	result["success"] = true
+	result["moves_used"] = stage_move_counters.get(stage_id, 0)
+	result["mistakes"] = stage_mistake_counters.get(stage_id, 0)
 	stage_results.append(result)
 	_update_stage_label(stage_id, "Completada", COLOR_DONE)
 	active_stage_id = ""
@@ -562,9 +584,29 @@ func _handle_victory() -> void:
 		"status": "done",
 		"stages": stage_results.duplicate(true),
 		"node_count": graph.get_node_count() if graph else 0,
-		"edge_count": graph.get_edges().size() if graph else 0
+		"edge_count": graph.get_edges().size() if graph else 0,
+		"moves": total_moves,
+		"mistakes": mistake_count,
+		"stage_moves": stage_move_counters.duplicate(true),
+		"stage_mistakes": stage_mistake_counters.duplicate(true)
 	}
 	complete(payload)
+
+
+func _increment_stage_move(stage_id: String, amount: int = 1) -> void:
+	if stage_id == "":
+		return
+	total_moves += amount
+	var current_value: int = int(stage_move_counters.get(stage_id, 0))
+	stage_move_counters[stage_id] = current_value + amount
+
+
+func _register_stage_mistake(stage_id: String) -> void:
+	if stage_id == "":
+		return
+	mistake_count += 1
+	var current_value: int = int(stage_mistake_counters.get(stage_id, 0))
+	stage_mistake_counters[stage_id] = current_value + 1
 
 
 func _on_regenerate_pressed() -> void:

@@ -43,15 +43,21 @@ var missions = ["Mission_1", "Mission_2", "Mission_3", "Mission_4", "Mission_Fin
 
 func _ready() -> void:
 	_populate()
-	_connect_back_button()
+	_connect_navigation_buttons()
 
-func _connect_back_button() -> void:
+func _connect_navigation_buttons() -> void:
 	var back_btn = get_node_or_null("%BackButton")
 	if back_btn:
 		back_btn.pressed.connect(_on_back_pressed)
+	var achievements_btn = get_node_or_null("%AchievementsButton")
+	if achievements_btn:
+		achievements_btn.pressed.connect(_on_achievements_pressed)
 
 func _on_back_pressed() -> void:
 	SceneManager.change_to("res://scenes/MainMenu.tscn")
+
+func _on_achievements_pressed() -> void:
+	SceneManager.change_to("res://scenes/AchievementsHub.tscn")
 
 func _populate() -> void:
 	var list = %MissionList

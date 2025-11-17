@@ -5,3 +5,7 @@ extends Node2D
 
 func _on_start_pressed() -> void:
 	SceneManager.change_to("res://scenes/MissionSelect.tscn")
+
+
+func _on_achievements_pressed() -> void:
+	SceneManager.change_to("res://scenes/AchievementsHub.tscn")

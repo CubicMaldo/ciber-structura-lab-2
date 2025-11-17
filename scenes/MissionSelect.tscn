@@ -109,6 +109,12 @@ theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
 theme_override_font_sizes/font_size = 13
 text = "Consejo: Repite misiones para mejorar tu puntuación y dominar los algoritmos"
 
+[node name="AchievementsButton" type="Button" parent="UI/LayoutRoot/VBoxContainer/Footer/FooterMargin/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 36)
+layout_mode = 2
+text = "Logros"
+
 [node name="BackButton" type="Button" parent="UI/LayoutRoot/VBoxContainer/Footer/FooterMargin/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 36)

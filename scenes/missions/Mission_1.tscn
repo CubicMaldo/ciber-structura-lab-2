@@ -270,21 +270,25 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin"]
+[node name="ScrollContainer" type="ScrollContainer" parent="HUD/SidePanel/PanelMargin"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer"]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="ObjectiveSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="ObjectiveSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ObjectiveHeader" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ObjectiveSection"]
+[node name="ObjectiveHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ObjectiveSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.5, 1)
 theme_override_font_sizes/font_size = 14
 text = "OBJETIVO"
 
-[node name="ResultLabel" type="RichTextLabel" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ObjectiveSection"]
+[node name="ResultLabel" type="RichTextLabel" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ObjectiveSection"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
@@ -294,24 +298,24 @@ text = "[color=#aabbdd]Encuentra el nodo ra√≠z infectado usando algoritmos de b√
 fit_content = true
 scroll_active = false
 
-[node name="Divider1" type="HSeparator" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="Divider1" type="HSeparator" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="AlgorithmSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="AlgorithmSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="AlgorithmHeader" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/AlgorithmSection"]
+[node name="AlgorithmHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/AlgorithmSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "ALGORITMO"
 
-[node name="AlgorithmButtons" type="HBoxContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer/AlgorithmSection"]
+[node name="AlgorithmButtons" type="HBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/AlgorithmSection"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="BFSButton" type="Button" parent="HUD/SidePanel/PanelMargin/VBoxContainer/AlgorithmSection/AlgorithmButtons"]
+[node name="BFSButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/AlgorithmSection/AlgorithmButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -319,7 +323,7 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "BFS"
 
-[node name="DFSButton" type="Button" parent="HUD/SidePanel/PanelMargin/VBoxContainer/AlgorithmSection/AlgorithmButtons"]
+[node name="DFSButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/AlgorithmSection/AlgorithmButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -327,122 +331,119 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "DFS"
 
-[node name="Divider2" type="HSeparator" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="Divider2" type="HSeparator" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ControlSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="ControlSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ControlHeader" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ControlSection"]
+[node name="ControlHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.95, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "CONTROLES"
 
-[node name="ControlGrid" type="GridContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ControlSection"]
+[node name="ControlGrid" type="GridContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection"]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 3
 
-[node name="StartButton" type="Button" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ControlSection/ControlGrid"]
+[node name="StartButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection/ControlGrid"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Iniciar"
 
-[node name="StepButton" type="Button" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ControlSection/ControlGrid"]
+[node name="StepButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection/ControlGrid"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Paso"
 
-[node name="ContinueButton" type="Button" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ControlSection/ControlGrid"]
+[node name="ContinueButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ControlSection/ControlGrid"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
-text = "Auto"
+text = "Continuar"
 
-[node name="Divider3" type="HSeparator" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="Divider3" type="HSeparator" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="StatusSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="StatusSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="StatusHeader" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/StatusSection"]
+[node name="StatusHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/StatusSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.75, 0.5, 1)
 theme_override_font_sizes/font_size = 14
 text = "ESTADO"
 
-[node name="StatusGrid" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer/StatusSection"]
+[node name="StatusGrid" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/StatusSection"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ThreatLabel" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/StatusSection/StatusGrid"]
+[node name="ThreatLabel" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/StatusSection/StatusGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Amenaza: 0 (estable)"
 
-[node name="TurnsLabel" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/StatusSection/StatusGrid"]
+[node name="TurnsLabel" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/StatusSection/StatusGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Turnos: --"
 
-[node name="CluesLabel" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/StatusSection/StatusGrid"]
+[node name="CluesLabel" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/StatusSection/StatusGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Pistas: 0"
 
-[node name="Divider4" type="HSeparator" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="Divider4" type="HSeparator" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ResourceSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="ResourceSection" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ResourceHeader" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ResourceSection"]
+[node name="ResourceHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ResourceSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "RECURSOS"
 
-[node name="ResourcesLabel" type="Label" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ResourceSection"]
+[node name="ResourcesLabel" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ResourceSection"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "Escaneos: 0 | Firewalls: 0"
 
-[node name="ResourceButtons" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ResourceSection"]
+[node name="ResourceButtons" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ResourceSection"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="ScanButton" type="Button" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ResourceSection/ResourceButtons"]
+[node name="ScanButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ResourceSection/ResourceButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Escaneo"
 
-[node name="FirewallButton" type="Button" parent="HUD/SidePanel/PanelMargin/VBoxContainer/ResourceSection/ResourceButtons"]
+[node name="FirewallButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ResourceSection/ResourceButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Firewall"
 
-[node name="Spacer" type="Control" parent="HUD/SidePanel/PanelMargin/VBoxContainer"]
+[node name="Spacer" type="Control" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HUD/SidePanel/PanelMargin"]
-layout_mode = 2
-horizontal_scroll_mode = 0

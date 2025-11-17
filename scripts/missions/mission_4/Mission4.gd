@@ -31,6 +31,7 @@ var last_result: Dictionary = {}
 
 func _ready() -> void:
 	mission_id = "Mission_4"
+	ensure_mission_achievement_panel()
 	_connect_ui_signals()
 	_subscribe_to_events()
 	var graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
