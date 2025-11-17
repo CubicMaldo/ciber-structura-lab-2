@@ -208,8 +208,8 @@ position = Vector2(520, 450)
 script = ExtResource("2")
 node_scene = ExtResource("3")
 edge_scene = ExtResource("4")
-layout_type = "circular"
-edge_label_mode = "both"
+layout_type = "force_directed"
+edge_label_mode = "flux"
 show_edge_direction = true
 
 [node name="GraphBuilder" type="Node" parent="."]
@@ -443,4 +443,3 @@ custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "Continuar"
-

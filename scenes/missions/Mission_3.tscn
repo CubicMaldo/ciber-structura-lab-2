@@ -212,7 +212,7 @@ script = ExtResource("1_i4ig7")
 algorithm = "BFS"
 
 [node name="GraphDisplay" type="Node2D" parent="."]
-position = Vector2(360, 330)
+position = Vector2(360, 370)
 script = ExtResource("2")
 node_scene = ExtResource("3")
 edge_scene = ExtResource("4")
@@ -469,4 +469,3 @@ text = "Firewall"
 [node name="Spacer" type="Control" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-

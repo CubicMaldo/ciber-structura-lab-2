@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Ciber Structura Lab 2"
-run/main_scene="uid://dmkecp3qqc6qo"
+run/main_scene="uid://p21y43lbom6x"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
@@ -30,7 +30,7 @@ AchievementManager="*res://scripts/managers/AchievementManager.gd"
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep_height"
+window/stretch/aspect="ignore"
 
 [dotnet]
 

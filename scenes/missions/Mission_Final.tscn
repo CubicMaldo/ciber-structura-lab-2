@@ -124,7 +124,7 @@ position = Vector2(520, 420)
 script = ExtResource("2")
 node_scene = ExtResource("3")
 edge_scene = ExtResource("4")
-layout_type = "circular"
+layout_type = "grid"
 edge_label_mode = "weight"
 show_edge_direction = true
 
@@ -352,4 +352,3 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Finalizar Misión"
-
