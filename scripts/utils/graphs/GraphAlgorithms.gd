@@ -115,7 +115,7 @@ static func mutual_metrics(graph: Graph, a, b, min_weight: float = 0.0) -> Dicti
 
 
 ## Realiza un recorrido BFS (Breadth-First Search) desde un nodo inicial.
-## Por defecto respeta la dirección de las aristas; pasa `respect_direction=false` solo si el grafo fuera no dirigido.
+## Por defecto respeta la dirección de las aristas; pasa `respect_direction=false`  envisolo si el grafo fuera no dirigido.
 ## Retorna un diccionario con información del recorrido:
 ## - visited: Array de claves visitadas en orden BFS
 ## - levels: Dictionary { clave: nivel } indicando la distancia desde el origen

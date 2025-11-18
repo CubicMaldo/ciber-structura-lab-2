@@ -30,26 +30,10 @@ var last_result: Dictionary = {}
 
 
 func _ready() -> void:
-	mission_id = "Mission_4"
-	ensure_mission_achievement_panel()
 	_connect_ui_signals()
 	_subscribe_to_events()
-	var graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
-	if graph_builder:
-		graph = graph_builder.get_graph()
-	else:
-		push_error("Mission_4: No se encontró GraphBuilder, se creará grafo vacío.")
-		graph = Graph.new()
-	var display = get_node_or_null("GraphDisplay")
-	if display:
-		setup(graph, display)
-		display.display_graph(graph)
-		if display.has_signal("node_selected"):
-			display.node_selected.connect(_on_graph_node_selected)
-	else:
-		push_warning("Mission_4: No se encontró GraphDisplay para visualización.")
+	init_mission_common("Mission_4", DEFAULT_STATUS_PROMPT)
 	_reset_mission()
-	_update_status(DEFAULT_STATUS_PROMPT)
 
 
 func start() -> void:

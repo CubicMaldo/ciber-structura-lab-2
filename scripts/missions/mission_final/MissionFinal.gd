@@ -70,9 +70,6 @@ var stage_mistake_counters := {}
 
 func _ready() -> void:
 	rng.randomize()
-	mission_id = "Mission_Final"
-	ensure_mission_achievement_panel()
-	graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
 	stage_labels = {
 		"recon": traversal_status_label,
 		"path": path_status_label,
@@ -81,7 +78,8 @@ func _ready() -> void:
 	}
 	_connect_ui()
 	_subscribe_to_events()
-	_setup_graph()
+	graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
+	init_mission_common("Mission_Final", "Red lista. Inicia con %s." % STAGE_SPECS[0].title)
 	_reset_progress(true)
 
 

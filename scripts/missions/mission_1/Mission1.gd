@@ -43,37 +43,8 @@ var candidate_nodes: Dictionary = {}
 func _ready() -> void:
 	_connect_ui_signals()
 	_subscribe_to_events()
-	mission_id = "Mission_1"
-	ensure_mission_achievement_panel()
 	rng.randomize()
-	
-	# Obtener el grafo desde el GraphBuilder hijo (desacoplado)
-	var graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
-	if graph_builder:
-		graph = graph_builder.get_graph()
-		_mutate_graph()
-		print("Mission_1: Grafo cargado desde GraphBuilder con %d nodos" % graph.get_nodes().size())
-	else:
-		push_error("Mission_1: No se encontró nodo GraphBuilder.")
-		# Crear grafo vacío para evitar crashes
-		graph = Graph.new()
-		_initialize_dynamic_systems()
-		return
-	
-	# Enlazar display si existe en la escena
-	var display = get_node_or_null("GraphDisplay")
-	if display:
-		setup(graph, display)
-		display.display_graph(graph)
-		if display.has_signal("node_selected"):
-			display.node_selected.connect(_on_graph_node_selected)
-	else:
-		push_warning("Mission_1: No se encontró GraphDisplay para visualización")
-
-	_initialize_dynamic_systems()
-	
-	_reset_before_traversal()
-	_update_status(DEFAULT_STATUS_PROMPT)
+	init_mission_common("Mission_1", DEFAULT_STATUS_PROMPT)
 
 func set_algorithm(alg: String) -> void:
 	algorithm = alg

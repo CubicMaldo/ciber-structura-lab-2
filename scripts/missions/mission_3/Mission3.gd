@@ -45,33 +45,8 @@ var rng := RandomNumberGenerator.new()
 func _ready() -> void:
 	_connect_ui_signals()
 	_subscribe_to_events()
-	mission_id = "Mission_3"
-	ensure_mission_achievement_panel()
 	rng.randomize()
-	var graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
-	if graph_builder:
-		graph = graph_builder.get_graph()
-		_mutate_graph_structure()
-		print("Mission_3: Grafo cargado desde GraphBuilder con %d nodos" % graph.get_nodes().size())
-	else:
-		push_error("Mission_3: No se encontró nodo GraphBuilder.")
-		graph = Graph.new()
-		_initialize_dynamic_systems()
-		return
-
-	var display = get_node_or_null("GraphDisplay")
-	if display:
-		setup(graph, display)
-		display.display_graph(graph)
-		if display.has_signal("node_selected"):
-			display.node_selected.connect(_on_graph_node_selected)
-	else:
-		push_warning("Mission_3: No se encontró GraphDisplay para visualización")
-
-	_initialize_dynamic_systems()
-
-	_reset_mission()
-	_update_status(DEFAULT_STATUS_PROMPT)
+	init_mission_common("Mission_3", DEFAULT_STATUS_PROMPT)
 
 
 func set_algorithm(mode: String) -> void:
