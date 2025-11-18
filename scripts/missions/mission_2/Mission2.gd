@@ -1,7 +1,7 @@
 extends "res://scripts/missions/MissionController.gd"
 ## Mission 2 - Shortest Path (Dijkstra)
-## El jugador debe trazar la ruta más segura entre el Centro de Control y el Servidor Infectado.
-## NOTA: El grafo se construye desde el nodo hijo "GraphBuilder" en la escena.
+## Jugador debe trazar la ruta mas segura entre el Centro de Control y el Servidor Infectado
+## Nota: grafo provisto por el nodo hijo GraphBuilder
 
 const VICTORY_MESSAGE := "Camino óptimo establecido. Los paquetes maliciosos han sido contenidos."
 const DEFAULT_STATUS_PROMPT := "Presiona 'Calcular Ruta' para encontrar el camino más seguro."
@@ -23,7 +23,7 @@ var threat_manager = null
 var turns_remaining: int = 0
 var rng := RandomNumberGenerator.new()
 
-# UI references
+# Referencias UI
 @onready var calculate_button: Button = %CalculateButton
 @onready var step_button: Button = %StepButton
 @onready var continue_button: Button = %ContinueButton
@@ -401,18 +401,30 @@ func _update_distance_display() -> void:
 func _initialize_dynamic_systems() -> void:
 	if threat_manager != null:
 		return
-	if Engine.has_singleton("ThreatManager"):
-		threat_manager = Engine.get_singleton("ThreatManager")
+	threat_manager = _resolve_threat_manager()
+	if threat_manager:
 		threat_manager.begin_mission_session(mission_id, turn_limit)
 		threat_manager.threat_level_changed.connect(_on_threat_level_changed)
 		threat_manager.turns_changed.connect(_on_turns_changed)
 		threat_manager.resources_changed.connect(_on_resources_changed)
 		turns_remaining = threat_manager.get_turns_remaining()
-		_on_threat_level_changed(threat_manager.get_threat_level_value(), threat_manager.get_threat_state())
+		var current_level = threat_manager.get_threat_level_value()
+		var current_state = threat_manager.get_threat_state()
+		_on_threat_level_changed(current_level, current_state)
 		_sync_resource_display(threat_manager.get_resources())
 	else:
 		turns_remaining = turn_limit
 	_update_turns_display()
+
+
+func _resolve_threat_manager() -> Node:
+	if has_node("/root/ThreatManager"):
+		return get_node("/root/ThreatManager")
+	if typeof(ThreatManager) == TYPE_OBJECT:
+		var candidate: Variant = ThreatManager
+		if candidate is Node:
+			return candidate
+	return null
 
 
 func _on_threat_level_changed(level: int, state: String) -> void:
@@ -514,7 +526,7 @@ func _mutate_graph_weights() -> void:
 # ============================================================================
 
 func _connect_ui_signals() -> void:
-	"""Conecta las señales de los botones UI"""
+	# Conecta las señales de los botones UI
 	if calculate_button:
 		calculate_button.pressed.connect(_on_calculate_pressed)
 	
@@ -535,33 +547,37 @@ func _connect_ui_signals() -> void:
 
 
 func _subscribe_to_events() -> void:
-	"""Suscribe a eventos del EventBus"""
+	# Suscribe a eventos del EventBus
 	EventBus.node_visited.connect(_on_node_visited)
 	EventBus.mission_completed.connect(_on_mission_completed)
 
 
 func _on_calculate_pressed() -> void:
-	"""Maneja el evento del botón Calcular Ruta"""
+	# Maneja el evento del botón Calcular Ruta
 	start()
 
 
 func _on_step_pressed() -> void:
-	"""Maneja el evento del botón Paso"""
+	# Maneja el evento del botón Paso
 	step()
 
 
 func _on_continue_pressed() -> void:
-	"""Maneja el evento del botón Continuar (volver al menú)"""
+	# Maneja el evento del botón Continuar (volver al menú)
 	SceneManager.change_to("res://scenes/MissionSelect.tscn")
 
 
 func _on_node_visited(_vertex) -> void:
-	"""Maneja el evento de nodo visitado (para listeners externos)"""
-	pass  # Ya manejado en _mark_node_in_path
+	# Maneja el evento de nodo visitado (para listeners externos)
+	return  # Ya manejado en _mark_node_in_path
 
 
-func _on_mission_completed(completed_mission_id: String, success: bool, _result: Dictionary) -> void:
-	"""Maneja el evento de misión completada"""
+func _on_mission_completed(
+	completed_mission_id: String,
+	success: bool,
+	_result: Dictionary
+) -> void:
+	# Maneja el evento de misión completada
 	if completed_mission_id != mission_id:
 		return
 	

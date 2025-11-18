@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://achievement_overlay_min"]
+
+[node name="AchievementOverlay" type="CanvasLayer"]
+
+[node name="Panel" type="PanelContainer" parent="AchievementOverlay"]
+custom_minimum_size = Vector2(300, 120)
+
+[node name="VBox" type="VBoxContainer" parent="AchievementOverlay/Panel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="AchievementOverlay/Panel/VBox"]
+text = "¡Logro desbloqueado!"
+theme_override_font_sizes/font_size = 18
+
+[node name="Description" type="Label" parent="AchievementOverlay/Panel/VBox"]
+text = "Descripción del logro..."
+autowrap_mode = 1

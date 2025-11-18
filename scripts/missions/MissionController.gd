@@ -1,6 +1,5 @@
 extends Node
-## Base mission controller
-## Scenes representing missions should instance and extend this controller.
+## Controlador base de misión — las escenas de misión deben instanciar y extender este controlador.
 
 signal mission_completed(result)
 
@@ -47,17 +46,19 @@ func ensure_mission_achievement_panel(container_path: NodePath = DEFAULT_PANEL_P
 		if panel.get_parent() == container:
 			container.move_child(panel, continue_index)
 
+
 func start() -> void:
-	## Override in derived mission scripts to kick off the algorithm
+	# Implementado por misiones derivadas para iniciar la lógica
 	pass
 
 func step() -> void:
-	## Override to advance algorithm one step
+	# Avanza la ejecución un paso; override en misiones que lo requieran
 	pass
 
 func complete(result := {}) -> void:
 	emit_signal("mission_completed", result)
-	GameManager.finish_mission(result)
-	
+	# Enviar mission_id para que GameManager registre correctamente la finalización
+	GameManager.finish_mission(result, mission_id)
+
 	var success = result.get("status", "") == "done"
 	EventBus.mission_completed.emit(mission_id, success, result)

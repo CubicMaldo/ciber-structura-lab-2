@@ -1,8 +1,8 @@
-## Representa una arista no dirigida entre dos `Vertex`.
-## Nombres neutrales (`endpoint_a`/`endpoint_b`) evitan implicar dirección.
-## En el contexto de redes de flujo:
-## - `weight` representa la capacidad máxima de la arista
-## - `flux` representa el flujo actual que pasa por la arista (debe ser <= weight)
+## Representa una arista no dirigida entre dos Vertex
+## Nombres neutrales (endpoint_a/endpoint_b) evitan implicar direccion
+## En redes de flujo:
+## - weight: capacidad maxima de la arista
+## - flux: flujo actual que pasa por la arista (debe ser <= weight)
 class_name Edge
 
 ## Vértice extremo A.

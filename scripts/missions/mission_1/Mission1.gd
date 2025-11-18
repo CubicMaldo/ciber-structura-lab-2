@@ -1,7 +1,7 @@
 extends "res://scripts/missions/MissionController.gd"
 ## Mission 1 - Network Tracer (BFS / DFS)
-## El jugador recorre un grafo para encontrar el nodo raíz infectado.
-## NOTA: El grafo se construye desde el nodo hijo "GraphBuilder" en la escena.
+## Jugador recorre un grafo para encontrar el nodo raiz infectado
+## Nota: grafo provisto por el nodo hijo GraphBuilder
 
 const RESTORATION_CODE := "RC-42-ALPHA"
 const DEFAULT_STATUS_PROMPT := "Selecciona BFS o DFS y presiona 'Iniciar rastreo'."
@@ -25,7 +25,7 @@ var traversal_index: int = 0
 var awaiting_selection: bool = false
 var candidate_nodes: Dictionary = {}
 
-# UI references
+# Referencias UI
 @onready var bfs_button: Button = %BFSButton
 @onready var dfs_button: Button = %DFSButton
 @onready var start_button: Button = %StartButton
@@ -60,7 +60,7 @@ func _ready() -> void:
 		_initialize_dynamic_systems()
 		return
 	
-	# Hook display if present in scene
+	# Enlazar display si existe en la escena
 	var display = get_node_or_null("GraphDisplay")
 	if display:
 		setup(graph, display)
@@ -145,8 +145,6 @@ func _reset_before_traversal() -> void:
 	awaiting_selection = false
 	if clues_label:
 		clues_label.text = "Pistas: 0"
-	if result_label:
-		result_label.text = ""
 	if continue_button:
 		continue_button.visible = false
 	if step_button:
@@ -240,18 +238,30 @@ func _apply_candidate_states(primary_key, secondary: Array) -> void:
 func _initialize_dynamic_systems() -> void:
 	if threat_manager != null:
 		return
-	if Engine.has_singleton("ThreatManager"):
-		threat_manager = Engine.get_singleton("ThreatManager")
+	threat_manager = _resolve_threat_manager()
+	if threat_manager:
 		threat_manager.begin_mission_session(mission_id, turn_limit)
 		threat_manager.threat_level_changed.connect(_on_threat_level_changed)
 		threat_manager.resources_changed.connect(_on_resources_changed)
 		threat_manager.turns_changed.connect(_on_turns_changed)
 		turns_remaining = threat_manager.get_turns_remaining()
-		_on_threat_level_changed(threat_manager.get_threat_level_value(), threat_manager.get_threat_state())
+		var current_level = threat_manager.get_threat_level_value()
+		var current_state = threat_manager.get_threat_state()
+		_on_threat_level_changed(current_level, current_state)
 		_sync_resource_display(threat_manager.get_resources())
 	else:
 		turns_remaining = turn_limit
 	_update_turns_display()
+
+
+func _resolve_threat_manager() -> Node:
+	if has_node("/root/ThreatManager"):
+		return get_node("/root/ThreatManager")
+	if typeof(ThreatManager) == TYPE_OBJECT:
+		var candidate: Variant = ThreatManager
+		if candidate is Node:
+			return candidate
+	return null
 
 
 func _on_threat_level_changed(level: int, state: String) -> void:
@@ -437,7 +447,9 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 		_clear_candidate_highlights()
 		awaiting_selection = false
 		is_running = false
-		_update_status("El rastreo terminó sin detectar el nodo raíz. Revisa las pistas recopiladas.")
+		var exhausted_msg = "El rastreo terminó sin detectar el nodo raíz. " \
+			+ "Revisa las pistas recopiladas."
+		_update_status(exhausted_msg)
 		var exhausted_result := {
 			"status": "exhausted",
 			"clues": found_clues.duplicate(),
@@ -450,7 +462,9 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 
 	var remaining = traversal_order.size() - traversal_index
 	awaiting_selection = true
-	_update_status("Nodo asegurado. Determina el siguiente servidor usando %s (%d restantes)." % [algorithm, remaining])
+	var next_msg = "Nodo asegurado. Determina el siguiente servidor usando %s " % algorithm
+	next_msg += "(%d restantes)." % remaining
+	_update_status(next_msg)
 	_show_candidate_hints()
 	if threat_manager:
 		_sync_resource_display(threat_manager.get_resources())
@@ -460,7 +474,9 @@ func _handle_incorrect_selection(node_key) -> void:
 	if ui and ui.has_method("set_node_state"):
 		ui.set_node_state(node_key, "highlighted")
 		call_deferred("_reset_highlighted_node", node_key)
-		_update_status("Ese nodo no corresponde al recorrido %s. Revisa la lógica de %s." % [algorithm, algorithm])
+		var wrong_msg = "Ese nodo no corresponde al recorrido %s. " % algorithm
+		wrong_msg += "Revisa la lógica de %s." % algorithm
+		_update_status(wrong_msg)
 	_apply_threat_penalty(THREAT_PENALTY_MISCLICK)
 
 
@@ -636,19 +652,26 @@ func _on_mission_completed(completed_mission_id: String, success: bool, result: 
 		var root_label = str(root)
 		_update_status(SUCCESS_STATUS_TEMPLATE % root_label)
 		if result_label:
-			result_label.text = "[center][b][color=green]Rastreo completado[/color][/b][/center]\n\n"
+			result_label.text = "[center][b][color=green]Rastreo completado" \
+				+ "[/color][/b][/center]\n\n"
 			result_label.text += "Has encontrado el nodo raíz del virus: %s\n" % root_label
 			result_label.text += "Código de restauración desbloqueado: %s\n" % code
 			result_label.text += "Algoritmo utilizado: %s\n\n" % algorithm_used
 			result_label.text += "[b]Pistas recopiladas:[/b]\n"
 			for i in range(clues.size()):
 				result_label.text += "%d. %s\n" % [i + 1, clues[i]]
-			result_label.text += "\n[center][color=yellow]Presiona 'Continuar' para volver al menú[/color][/center]"
+			result_label.text += "\n[center][color=yellow]Presiona 'Continuar' "
+			result_label.text += "para volver al menú[/color][/center]"
 	else:
-		_update_status("El rastro del virus sigue activo. Reintenta el análisis o revisa las pistas.")
+		var active_msg = "El rastro del virus sigue activo. "
+		active_msg += "Reintenta el análisis o revisa las pistas."
+		_update_status(active_msg)
 		if result_label:
-			result_label.text = "[center][b][color=orange]Rastreo inconcluso[/color][/b][/center]\n\n"
-			result_label.text += "El virus NEMESIS continúa oculto. Analiza las pistas y reinicia el rastreo desde el menú."
+			result_label.text = "[center][b][color=orange]Rastreo inconcluso" \
+				+ "[/color][/b][/center]\n\n"
+			var inconclusive_msg = "El virus NEMESIS continúa oculto. Analiza las pistas "
+			inconclusive_msg += "y reinicia el rastreo desde el menú."
+			result_label.text += inconclusive_msg
 
 
 func _update_status(message: String) -> void:

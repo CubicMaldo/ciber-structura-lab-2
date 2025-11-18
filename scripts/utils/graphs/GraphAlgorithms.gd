@@ -1,7 +1,7 @@
 class_name GraphAlgorithms
 const INF := 1.0e18
 
-## Devuelve el peso promedio de todas las aristas del grafo.
+## Utilidades sobre grafos: medidas y algoritmos (Dijkstra, BFS, DFS, MST, MaxFlow)
 static func average_weight(graph: Graph) -> float:
 	if graph == null:
 		return 0.0

@@ -1,6 +1,6 @@
 extends "res://scripts/missions/MissionController.gd"
 ## Mission Final - Interactividad total
-## Cada etapa exige que el jugador ejecute manualmente la lógica solicitada.
+## Cada etapa exige que el jugador ejecute manualmente la logica solicitada
 
 const VICTORY_MESSAGE := "¡Has derrotado a NEMESIS! El núcleo vuelve a estar en control."
 const FAILURE_HINT := "Si una etapa no produce un resultado válido, regenera la red para generar otra topología."

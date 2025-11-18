@@ -1,10 +1,8 @@
-## Clase que representa un grafo no dirigido y ponderado. 
-## Permite agregar, eliminar y consultar nodos y aristas, con soporte para metadata.
+## Clase que representa un grafo no dirigido y ponderado
+## Permite agregar, eliminar y consultar nodos y aristas; soporta metadata
 class_name Graph
 
-# ============================================================================
-# SEÑALES
-# ============================================================================
+# region SENALES
 
 ## Emitida cuando se agrega un nuevo nodo.
 signal node_added(key)
@@ -15,16 +13,16 @@ signal edge_added(a, b)
 ## Emitida cuando se elimina una arista entre dos nodos.
 signal edge_removed(a, b)
 
-# ============================================================================
-# ATRIBUTOS
-# ============================================================================
+# endregion
+
+# region ATRIBUTOS
 
 ## Diccionario de vértices en el grafo: `{key: Vertex}`.
 var vertices: Dictionary[Variant, Vertex] = {}
 
-# ============================================================================
-# GESTIÓN DE NODOS
-# ============================================================================
+# endregion
+
+# region GESTION_NODOS
 
 ## Añade un nodo al grafo o actualiza su metadata.
 ## [br]
@@ -136,9 +134,9 @@ func get_nodes() -> Dictionary:
 func get_node_count() -> int:
 	return vertices.size()
 
-# ============================================================================
-# GESTIÓN DE ARISTAS
-# ============================================================================
+# endregion
+
+# region GESTION_ARISTAS
 
 ## Crea o actualiza una conexión bidireccional entre dos nodos.
 ## [br]
@@ -226,9 +224,9 @@ func clear() -> void:
 			v.dispose()
 	vertices.clear()
 
-# ============================================================================
-# CONSULTAS DE ARISTAS
-# ============================================================================
+# endregion
+
+# region CONSULTAS_ARISTAS
 
 ## Devuelve el peso de la arista entre `a` y `b`, o `null` si no existe.
 func get_edge_weight(a, b):
@@ -281,9 +279,9 @@ func get_edge_count() -> int:
 		deg_sum += (vertices[k] as Vertex).edges.size()
 	return deg_sum >> 1
 
-# ============================================================================
-# CONSULTAS DE VECINDAD
-# ============================================================================
+# endregion
+
+# region CONSULTAS_VECINDAD
 
 ## Devuelve los pesos de las conexiones del nodo especificado.
 ## Esta consulta no respeta la dirección y se mantiene para análisis o grafos conceptualmente no dirigidos.
@@ -316,9 +314,9 @@ func get_degree(key) -> int:
 	var v: Vertex = vertices.get(key)
 	return v.degree() if v else 0
 
-# ============================================================================
-# METADATA DIRECTA
-# ============================================================================
+# endregion
+
+# region METADATA_DIRECTA
 
 ## Asigna un valor a un campo de metadata de un nodo.
 func set_vertex_meta(key, field, value):
@@ -334,9 +332,9 @@ func get_vertex_meta(key, field, default = null):
 	var v = vertices.get(key)
 	return v.meta.get(field, default) if v else default
 
-# ============================================================================
-# OPERACIONES DE FLUJO (NETWORK FLOW)
-# ============================================================================
+# endregion
+
+# region OPERACIONES_FLUJO
 
 ## Establece el flujo de una arista entre dos nodos.
 ## Devuelve `true` si el flujo es válido y se estableció correctamente.
@@ -423,9 +421,9 @@ func get_flow_edges() -> Array:
 				})
 	return out
 
-# ============================================================================
-# DEPURACIÓN
-# ============================================================================
+# endregion
+
+# region DEPURACION
 
 ## Imprime en consola todos los nodos y sus conexiones.
 ## Si `show_flux` es true, muestra información de flujo (flux/capacity).
@@ -441,9 +439,9 @@ func debug_print(show_flux: bool = false):
 		else:
 			print("%s -> %s" % [str(k), str(v.get_neighbor_weights())])
 
-# ============================================================================
-# INTERNOS
-# ============================================================================
+# endregion
+
+# region INTERNOS
 
 ## Convierte la clave a entero si aplica, o devuelve -1.
 func _id_as_int(k) -> int:
@@ -469,3 +467,5 @@ func _is_primary_endpoint(a, b) -> bool:
 			return (a as Object).get_instance_id() < (b as Object).get_instance_id()
 		_:
 			return hash(a) < hash(b)
+
+# endregion

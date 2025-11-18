@@ -1,6 +1,6 @@
 extends "res://scripts/missions/MissionController.gd"
 ## Mission 4 - FlowGuard (Maximum Flow)
-## Calcula flujo seguro entre un origen y un sumidero utilizando Ford-Fulkerson o Edmonds-Karp.
+## Calcula flujo entre origen y sumidero usando Ford-Fulkerson o Edmonds-Karp
 
 const VICTORY_MESSAGE := "Flujo seguro establecido. El ataque ha sido contenido. NEMESIS ha sido aislado."
 const DEFAULT_STATUS_PROMPT := "Selecciona fuente y sumidero para iniciar el análisis de flujo."
@@ -58,7 +58,7 @@ func start() -> void:
 
 
 func step() -> void:
-	# No hay pasos discretos en esta misión
+	# No hay pasos discretos en esta mision
 	pass
 
 

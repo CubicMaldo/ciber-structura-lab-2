@@ -1,6 +1,6 @@
 extends "res://scripts/missions/MissionController.gd"
 ## Mission 3 - RebuildNet (Minimum Spanning Tree)
-## El jugador reconstruye la red aplicando Kruskal o Prim para asegurar la conectividad al menor costo.
+## Jugador reconstruye la red aplicando Kruskal o Prim para asegurar conectividad al menor costo
 
 const VICTORY_MESSAGE := "Reconstrucción completada. Todos los servidores vuelven a estar sincronizados."
 const DEFAULT_STATUS_PROMPT := "Selecciona Kruskal o Prim y presiona 'Reconstruir red'."
@@ -26,7 +26,7 @@ var threat_manager = null
 var turns_remaining: int = 0
 var rng := RandomNumberGenerator.new()
 
-# UI references
+# Referencias UI
 @onready var kruskal_button: Button = %KruskalButton
 @onready var prim_button: Button = %PrimButton
 @onready var start_button: Button = %StartButton

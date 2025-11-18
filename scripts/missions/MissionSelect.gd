@@ -1,5 +1,5 @@
 extends Node2D
-## MissionSelect controller - populates mission list and starts missions
+## Controlador de selección de misión — popula la lista y lanza misiones.
 
 var mission_data = {
 	"Mission_1": {
@@ -72,11 +72,9 @@ func _create_mission_card(mission_id: String, _index: int) -> PanelContainer:
 	var data = mission_data.get(mission_id, {})
 	var is_unlocked = _is_mission_unlocked(mission_id)
 	
-	# Main card container
 	var card = PanelContainer.new()
 	card.custom_minimum_size = Vector2(0, 110)
 	
-	# Margin
 	var margin = MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 20)
 	margin.add_theme_constant_override("margin_top", 16)
@@ -84,12 +82,10 @@ func _create_mission_card(mission_id: String, _index: int) -> PanelContainer:
 	margin.add_theme_constant_override("margin_bottom", 16)
 	card.add_child(margin)
 	
-	# Main horizontal layout
 	var hbox = HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 20)
 	margin.add_child(hbox)
 	
-	# Icon section
 	var icon_panel = PanelContainer.new()
 	icon_panel.custom_minimum_size = Vector2(80, 80)
 	hbox.add_child(icon_panel)
@@ -104,28 +100,26 @@ func _create_mission_card(mission_id: String, _index: int) -> PanelContainer:
 		icon_label.modulate = Color(0.4, 0.4, 0.4, 1.0)
 	icon_center.add_child(icon_label)
 	
-	# Content section
 	var content = VBoxContainer.new()
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 6)
 	hbox.add_child(content)
 	
-	# Title
 	var title = Label.new()
 	title.text = data.get("title", mission_id)
 	title.add_theme_font_size_override("font_size", 18)
-	title.add_theme_color_override("font_color", Color(0.9, 0.95, 1.0, 1.0) if is_unlocked else Color(0.5, 0.5, 0.5, 1.0))
+	var title_color = Color(0.9, 0.95, 1.0, 1.0) if is_unlocked else Color(0.5, 0.5, 0.5, 1.0)
+	title.add_theme_color_override("font_color", title_color)
 	content.add_child(title)
 	
-	# Description
 	var desc = Label.new()
 	desc.text = data.get("description", "")
 	desc.add_theme_font_size_override("font_size", 13)
-	desc.add_theme_color_override("font_color", Color(0.7, 0.8, 0.9, 1.0) if is_unlocked else Color(0.4, 0.4, 0.4, 1.0))
+	var desc_color = Color(0.7, 0.8, 0.9, 1.0) if is_unlocked else Color(0.4, 0.4, 0.4, 1.0)
+	desc.add_theme_color_override("font_color", desc_color)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	content.add_child(desc)
 	
-	# Tags row
 	var tags = HBoxContainer.new()
 	tags.add_theme_constant_override("separation", 10)
 	content.add_child(tags)
@@ -133,16 +127,17 @@ func _create_mission_card(mission_id: String, _index: int) -> PanelContainer:
 	var algo_tag = Label.new()
 	algo_tag.text = "📊 " + data.get("algorithm", "")
 	algo_tag.add_theme_font_size_override("font_size", 12)
-	algo_tag.add_theme_color_override("font_color", Color(0.5, 0.7, 1.0, 1.0) if is_unlocked else Color(0.3, 0.3, 0.3, 1.0))
+	var algo_color = Color(0.5, 0.7, 1.0, 1.0) if is_unlocked else Color(0.3, 0.3, 0.3, 1.0)
+	algo_tag.add_theme_color_override("font_color", algo_color)
 	tags.add_child(algo_tag)
 	
 	var diff_tag = Label.new()
 	diff_tag.text = "⭐ " + data.get("difficulty", "")
 	diff_tag.add_theme_font_size_override("font_size", 12)
-	diff_tag.add_theme_color_override("font_color", Color(1.0, 0.8, 0.4, 1.0) if is_unlocked else Color(0.3, 0.3, 0.3, 1.0))
+	var diff_color = Color(1.0, 0.8, 0.4, 1.0) if is_unlocked else Color(0.3, 0.3, 0.3, 1.0)
+	diff_tag.add_theme_color_override("font_color", diff_color)
 	tags.add_child(diff_tag)
 	
-	# Button section
 	var btn_container = CenterContainer.new()
 	hbox.add_child(btn_container)
 	
@@ -160,7 +155,6 @@ func _create_mission_card(mission_id: String, _index: int) -> PanelContainer:
 	
 	btn_container.add_child(btn)
 	
-	# Status indicator
 	if _is_mission_completed(mission_id):
 		var completed_label = Label.new()
 		completed_label.text = "✓ Completada"
@@ -171,20 +165,24 @@ func _create_mission_card(mission_id: String, _index: int) -> PanelContainer:
 	return card
 
 func _is_mission_unlocked(mission_id: String) -> bool:
-	if not Engine.has_singleton("GameManager"):
-		return mission_id == "Mission_1"
-	var gm = Engine.get_singleton("GameManager")
+	var gm = _get_game_manager()
 	if gm and gm.has_method("is_mission_unlocked"):
 		return gm.is_mission_unlocked(mission_id)
 	return mission_id == "Mission_1"
 
 func _is_mission_completed(mission_id: String) -> bool:
-	if not Engine.has_singleton("GameManager"):
-		return false
-	var gm = Engine.get_singleton("GameManager")
+	var gm = _get_game_manager()
 	if gm and gm.has_method("is_mission_completed"):
 		return gm.is_mission_completed(mission_id)
 	return false
+
+func _get_game_manager() -> Node:
+	# Prefer direct autoload reference, fallback to /root lookup.
+	if typeof(GameManager) != TYPE_NIL:
+		return GameManager
+	if has_node("/root/GameManager"):
+		return get_node("/root/GameManager")
+	return null
 
 func _on_mission_selected(mission_id: String) -> void:
 	# Emit mission selected signal with typed parameter

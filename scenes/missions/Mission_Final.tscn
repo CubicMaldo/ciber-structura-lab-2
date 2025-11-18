@@ -191,7 +191,15 @@ theme_override_constants/margin_bottom = 8
 
 [node name="ScrollContainer" type="ScrollContainer" parent="HUD/SidePanel/PanelMargin"]
 layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
 horizontal_scroll_mode = 0
+size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer"]
 layout_mode = 2
@@ -343,7 +351,7 @@ text = "Regenerar Red"
 
 [node name="Spacer" type="Control" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 0
 
 [node name="ContinueButton" type="Button" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer"]
 unique_name_in_owner = true

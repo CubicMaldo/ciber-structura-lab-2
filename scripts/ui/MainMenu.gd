@@ -1,6 +1,5 @@
 extends Node2D
-## MainMenu controller script - attaches to `scenes/MainMenu.tscn`
-## Responsibilities: wire UI buttons to GameManager/SceneManager
+## Controlador del menú principal; enlaza los botones con GameManager/SceneManager.
 
 
 func _on_start_pressed() -> void:
