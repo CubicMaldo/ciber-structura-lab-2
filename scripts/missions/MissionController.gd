@@ -109,7 +109,7 @@ func step() -> void:
 func complete(result := {}) -> void:
 	emit_signal("mission_completed", result)
 	# Enviar mission_id para que GameManager registre correctamente la finalización
-	GameManager.finish_mission(result, mission_id)
+	GameManager.finish_mission(result)
 
 	var success = result.get("status", "") == "done"
 	EventBus.mission_completed.emit(mission_id, success, result)

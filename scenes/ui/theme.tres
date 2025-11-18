@@ -1,18 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://dmkecp3qqc6qo"]
-
-[ext_resource type="Script" uid="uid://d2y5afctafttb" path="res://scripts/missions/MissionSelect.gd" id="1"]
-[ext_resource type="Shader" uid="uid://c4311yijxvty0" path="res://shaders/scroll.gdshader" id="2_ga7t2"]
-[ext_resource type="Texture2D" uid="uid://b5h6byaftbr5f" path="res://sprites/pattern_11.png" id="3_gtguy"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_dvj5o"]
-shader = ExtResource("2_ga7t2")
-shader_parameter/rotate_degree = 30.000000447036
-shader_parameter/move_degree = 45.000000670554
-shader_parameter/speed = 0.2000000095
-shader_parameter/scale = 0.2
-shader_parameter/gap = Vector2(0, 0)
-shader_parameter/node_scale = Vector2(1, 1)
-shader_parameter/tint = Color(0.42745098, 0.52156866, 0.64705884, 0.20392157)
+[gd_resource type="Theme" load_steps=17 format=3 uid="uid://bx4q87ca62215"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_disabled"]
 bg_color = Color(0.1, 0.12, 0.15, 0.6)
@@ -110,10 +96,6 @@ corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.08, 0.12, 0.18, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
 border_color = Color(0.15, 0.35, 0.55, 0.8)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
@@ -186,7 +168,7 @@ border_color = Color(0.15, 0.25, 0.4, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 
-[sub_resource type="Theme" id="Theme_4cq7j"]
+[resource]
 default_font_size = 14
 Button/colors/font_color = Color(0.85, 0.92, 1, 1)
 Button/colors/font_disabled_color = Color(0.5, 0.55, 0.6, 0.6)
@@ -205,7 +187,6 @@ HSeparator/styles/separator = SubResource("StyleBoxFlat_separator")
 Label/colors/font_color = Color(0.85, 0.92, 1, 1)
 Label/colors/font_shadow_color = Color(0, 0.2, 0.4, 0.5)
 Label/font_sizes/font_size = 14
-Label/styles/normal = null
 LineEdit/colors/caret_color = Color(0.3, 0.7, 1, 1)
 LineEdit/colors/font_color = Color(0.9, 0.95, 1, 1)
 LineEdit/colors/font_placeholder_color = Color(0.5, 0.6, 0.75, 0.6)
@@ -231,132 +212,3 @@ VScrollBar/styles/grabber = SubResource("StyleBoxFlat_scrollbar_grabber")
 VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_scrollbar_grabber_hover")
 VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_scrollbar_grabber_hover")
 VSeparator/styles/separator = SubResource("StyleBoxFlat_separator")
-
-[sub_resource type="Theme" id="Theme_gtguy"]
-
-[node name="MissionSelect" type="Node2D"]
-script = ExtResource("1")
-
-[node name="UI" type="CanvasLayer" parent="."]
-
-[node name="ColorRect" type="ColorRect" parent="UI"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 1)
-
-[node name="Background" type="Node2D" parent="UI"]
-
-[node name="TextureRect" type="TextureRect" parent="UI/Background"]
-material = SubResource("ShaderMaterial_dvj5o")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -0.5
-offset_top = -0.5
-offset_right = 1280.0
-offset_bottom = 720.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("3_gtguy")
-
-[node name="LayoutRoot" type="MarginContainer" parent="UI"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = SubResource("Theme_4cq7j")
-theme_override_constants/margin_left = 60
-theme_override_constants/margin_top = 40
-theme_override_constants/margin_right = 60
-theme_override_constants/margin_bottom = 40
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/LayoutRoot"]
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="Header" type="VBoxContainer" parent="UI/LayoutRoot/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Title" type="Label" parent="UI/LayoutRoot/VBoxContainer/Header"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
-theme_override_font_sizes/font_size = 34
-text = "Selección de Misión"
-horizontal_alignment = 1
-
-[node name="Subtitle" type="Label" parent="UI/LayoutRoot/VBoxContainer/Header"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.8, 0.95, 1)
-theme_override_font_sizes/font_size = 16
-text = "Elige el incidente de seguridad que deseas resolver"
-horizontal_alignment = 1
-
-[node name="Divider" type="HSeparator" parent="UI/LayoutRoot/VBoxContainer/Header"]
-layout_mode = 2
-
-[node name="InstructionPanel" type="PanelContainer" parent="UI/LayoutRoot/VBoxContainer"]
-layout_mode = 2
-
-[node name="InstructionMargin" type="MarginContainer" parent="UI/LayoutRoot/VBoxContainer/InstructionPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 12
-
-[node name="InstructionLabel" type="Label" parent="UI/LayoutRoot/VBoxContainer/InstructionPanel/InstructionMargin"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
-theme_override_font_sizes/font_size = 14
-text = "Las misiones se desbloquean progresivamente. Completa cada una para acceder a la siguiente."
-horizontal_alignment = 1
-
-[node name="MissionScroll" type="ScrollContainer" parent="UI/LayoutRoot/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="MissionList" type="VBoxContainer" parent="UI/LayoutRoot/VBoxContainer/MissionScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme = SubResource("Theme_gtguy")
-theme_override_constants/separation = 16
-
-[node name="Footer" type="PanelContainer" parent="UI/LayoutRoot/VBoxContainer"]
-layout_mode = 2
-
-[node name="FooterMargin" type="MarginContainer" parent="UI/LayoutRoot/VBoxContainer/Footer"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 10
-
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/LayoutRoot/VBoxContainer/Footer/FooterMargin"]
-layout_mode = 2
-
-[node name="HintLabel" type="Label" parent="UI/LayoutRoot/VBoxContainer/Footer/FooterMargin/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
-theme_override_font_sizes/font_size = 13
-text = "Consejo: Repite misiones para mejorar tu puntuación y dominar los algoritmos"
-
-[node name="AchievementsButton" type="Button" parent="UI/LayoutRoot/VBoxContainer/Footer/FooterMargin/HBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(150, 36)
-layout_mode = 2
-text = "Logros"
-
-[node name="BackButton" type="Button" parent="UI/LayoutRoot/VBoxContainer/Footer/FooterMargin/HBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 36)
-layout_mode = 2
-text = "← Volver"

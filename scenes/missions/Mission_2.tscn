@@ -1,13 +1,27 @@
-[gd_scene load_steps=32 format=3 uid="uid://cjm5p2a8x7b1q"]
+[gd_scene load_steps=37 format=3 uid="uid://cjm5p2a8x7b1q"]
 
 [ext_resource type="Script" uid="uid://dsy06xm0r81xn" path="res://scripts/missions/mission_2/Mission2.gd" id="1"]
 [ext_resource type="Script" uid="uid://f3rodujd6g18" path="res://scripts/utils/graphs/visuals/GraphDisplay.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://b6x8i24w71res" path="res://scenes/ui/background.tscn" id="2_dig8q"]
 [ext_resource type="PackedScene" uid="uid://b7qv5xk8p3nt1" path="res://scenes/views/NodeView.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://bopr2huulksrt" path="res://sprites/pattern_21.png" id="3_7v5tk"]
+[ext_resource type="Shader" uid="uid://c4311yijxvty0" path="res://shaders/scroll.gdshader" id="3_84gok"]
 [ext_resource type="PackedScene" uid="uid://c5h8lam2n4p6q" path="res://scenes/views/EdgeView.tscn" id="4"]
 [ext_resource type="Script" uid="uid://fgm4ahof83xw" path="res://scripts/utils/graphs/editor/GraphBuilder.gd" id="5"]
 [ext_resource type="Script" uid="uid://5x1d3j1l85ra" path="res://scripts/utils/graphs/editor/GraphNodeData.gd" id="6"]
 [ext_resource type="Script" uid="uid://2whcwiw6slu" path="res://scripts/utils/graphs/editor/GraphConnectionData.gd" id="7"]
 [ext_resource type="Script" uid="uid://dkmqha3s6mcs" path="res://scripts/missions/mission_1/NetworkNodeMeta.gd" id="8"]
+[ext_resource type="Theme" uid="uid://bx4q87ca62215" path="res://scenes/ui/theme.tres" id="11_mqtt6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_abame"]
+shader = ExtResource("3_84gok")
+shader_parameter/rotate_degree = 30.000000447036
+shader_parameter/move_degree = 45.000000670554
+shader_parameter/speed = 0.2000000095
+shader_parameter/scale = 0.2
+shader_parameter/gap = Vector2(0, 0)
+shader_parameter/node_scale = Vector2(1, 1)
+shader_parameter/tint = Color(0.42745098, 0.52156866, 0.64705884, 0.627451)
 
 [sub_resource type="Resource" id="NetworkNodeMeta_control"]
 script = ExtResource("8")
@@ -143,6 +157,13 @@ weight = 6.0
 [node name="Mission_2" type="Node2D"]
 script = ExtResource("1")
 
+[node name="Background" parent="." instance=ExtResource("2_dig8q")]
+
+[node name="TextureRect" parent="Background" index="0"]
+material = SubResource("ShaderMaterial_abame")
+texture = ExtResource("3_7v5tk")
+flip_h = true
+
 [node name="GraphDisplay" type="Node2D" parent="."]
 position = Vector2(495, 379)
 script = ExtResource("2")
@@ -164,6 +185,7 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 38.0
 grow_horizontal = 2
+theme = ExtResource("11_mqtt6")
 
 [node name="StatusMargin" type="MarginContainer" parent="HUD/StatusBar"]
 layout_mode = 2
@@ -204,6 +226,7 @@ offset_right = -20.0
 offset_bottom = -20.0
 grow_horizontal = 0
 grow_vertical = 2
+theme = ExtResource("11_mqtt6")
 
 [node name="PanelMargin" type="MarginContainer" parent="HUD/SidePanel"]
 layout_mode = 2
@@ -371,3 +394,5 @@ custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "Continuar"
+
+[editable path="Background"]

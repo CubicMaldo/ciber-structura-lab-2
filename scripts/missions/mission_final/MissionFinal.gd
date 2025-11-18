@@ -79,7 +79,12 @@ func _ready() -> void:
 	_connect_ui()
 	_subscribe_to_events()
 	graph_builder = get_node_or_null("GraphBuilder") as GraphBuilder
-	init_mission_common("Mission_Final", "Red lista. Inicia con %s." % STAGE_SPECS[0].title)
+	call_deferred("_init_mission_deferred")
+
+
+func _init_mission_deferred() -> void:
+	call_deferred("init_mission_common", "Mission_Final", "Red lista. Inicia con %s." % STAGE_SPECS[0].title)
+	await get_tree().process_frame
 	_reset_progress(true)
 
 

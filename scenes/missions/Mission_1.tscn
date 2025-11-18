@@ -1,13 +1,15 @@
-[gd_scene load_steps=43 format=3 uid="uid://c0eh55ue0le5q"]
+[gd_scene load_steps=45 format=3 uid="uid://c0eh55ue0le5q"]
 
 [ext_resource type="Script" uid="uid://cgkcu22neyt76" path="res://scripts/missions/mission_1/Mission1.gd" id="1"]
 [ext_resource type="Script" uid="uid://f3rodujd6g18" path="res://scripts/utils/graphs/visuals/GraphDisplay.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://b6x8i24w71res" path="res://scenes/ui/background.tscn" id="2_n2hvw"]
 [ext_resource type="PackedScene" uid="uid://b7qv5xk8p3nt1" path="res://scenes/views/NodeView.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://c5h8lam2n4p6q" path="res://scenes/views/EdgeView.tscn" id="4"]
 [ext_resource type="Script" uid="uid://fgm4ahof83xw" path="res://scripts/utils/graphs/editor/GraphBuilder.gd" id="5_h74cb"]
 [ext_resource type="Script" uid="uid://5x1d3j1l85ra" path="res://scripts/utils/graphs/editor/GraphNodeData.gd" id="6_t440f"]
 [ext_resource type="Script" uid="uid://2whcwiw6slu" path="res://scripts/utils/graphs/editor/GraphConnectionData.gd" id="7_n2hvw"]
 [ext_resource type="Script" uid="uid://dkmqha3s6mcs" path="res://scripts/missions/mission_1/NetworkNodeMeta.gd" id="7_t440f"]
+[ext_resource type="Theme" uid="uid://bx4q87ca62215" path="res://scenes/ui/theme.tres" id="10_bib3p"]
 
 [sub_resource type="Resource" id="NetworkNodeMeta_firewall"]
 script = ExtResource("7_t440f")
@@ -203,6 +205,8 @@ to_node = "IDS"
 [node name="Mission_1" type="Node2D"]
 script = ExtResource("1")
 
+[node name="Background" parent="." instance=ExtResource("2_n2hvw")]
+
 [node name="GraphDisplay" type="Node2D" parent="."]
 position = Vector2(360, 385)
 script = ExtResource("2")
@@ -223,9 +227,11 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 48.0
 grow_horizontal = 2
+theme = ExtResource("10_bib3p")
 
 [node name="StatusMargin" type="MarginContainer" parent="HUD/StatusBar"]
 layout_mode = 2
+theme = ExtResource("10_bib3p")
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 20
@@ -233,6 +239,7 @@ theme_override_constants/margin_bottom = 8
 
 [node name="StatusHBox" type="HBoxContainer" parent="HUD/StatusBar/StatusMargin"]
 layout_mode = 2
+theme = ExtResource("10_bib3p")
 theme_override_constants/separation = 20
 
 [node name="MissionTitle" type="Label" parent="HUD/StatusBar/StatusMargin/StatusHBox"]
@@ -262,9 +269,11 @@ offset_right = -20.0
 offset_bottom = -20.0
 grow_horizontal = 0
 grow_vertical = 2
+theme = ExtResource("10_bib3p")
 
 [node name="PanelMargin" type="MarginContainer" parent="HUD/SidePanel"]
 layout_mode = 2
+theme = ExtResource("10_bib3p")
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
@@ -272,15 +281,8 @@ theme_override_constants/margin_bottom = 8
 
 [node name="ScrollContainer" type="ScrollContainer" parent="HUD/SidePanel/PanelMargin"]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
-horizontal_scroll_mode = 0
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HUD/SidePanel/PanelMargin/ScrollContainer"]
 layout_mode = 2
@@ -293,6 +295,7 @@ theme_override_constants/separation = 8
 
 [node name="ObjectiveHeader" type="Label" parent="HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer/ObjectiveSection"]
 layout_mode = 2
+theme = ExtResource("10_bib3p")
 theme_override_colors/font_color = Color(0.95, 0.85, 0.5, 1)
 theme_override_font_sizes/font_size = 14
 text = "OBJETIVO"

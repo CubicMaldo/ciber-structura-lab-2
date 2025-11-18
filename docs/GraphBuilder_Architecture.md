@@ -14,16 +14,16 @@ Todos los grafos construidos mediante `GraphBuilder` son tratados como dirigidos
 
 ```
 Mission1.gd
-    ├─ _ready()
-    │   ├─ var firewall = NetworkNodeMeta.new(...)
-    │   ├─ graph.add_node("Firewall Central", firewall)
-    │   ├─ var database = NetworkNodeMeta.new(...)
-    │   ├─ graph.add_node("Base de Datos", database)
-    │   ├─ ... (50+ líneas de construcción manual)
-    │   └─ graph.connect_vertices(...)
-    │
-    └─ start() / step() / complete()
-        └─ Lógica del algoritmo BFS/DFS
+	├─ _ready()
+	│   ├─ var firewall = NetworkNodeMeta.new(...)
+	│   ├─ graph.add_node("Firewall Central", firewall)
+	│   ├─ var database = NetworkNodeMeta.new(...)
+	│   ├─ graph.add_node("Base de Datos", database)
+	│   ├─ ... (50+ líneas de construcción manual)
+	│   └─ graph.connect_vertices(...)
+	│
+	└─ start() / step() / complete()
+		└─ Lógica del algoritmo BFS/DFS
 ```
 
 **Problemas:**
@@ -39,25 +39,25 @@ Mission1.gd
 
 ```
 Mission_1.tscn (Scene)
-    ├─ Mission1 (Node2D) [Mission1.gd]
-    │   ├─ _ready()
-    │   │   └─ graph = get_node("GraphBuilder").get_graph()  ← Lee grafo
-    │   │
-    │   └─ start() / step() / complete()
-    │       └─ Lógica del algoritmo BFS/DFS (SOLO LÓGICA)
-    │
-    ├─ GraphBuilder (Node) [GraphBuilder.gd]  ← DATOS DEL GRAFO
-    │   ├─ nodes: Array[GraphNodeData]
-    │   │   ├─ [0] { node_key: "Firewall Central", ... }
-    │   │   ├─ [1] { node_key: "Base de Datos", ... }
-    │   │   └─ [2] { node_key: "Router Core", is_root: true, ... }
-    │   │
-    │   └─ connections: Array[GraphConnectionData]
-    │       ├─ [0] { from_node: "Firewall Central", to_node: "Proxy", weight: 1.0 }
-    │       └─ [1] { from_node: "Proxy", to_node: "Router Core", weight: 1.0 }
-    │
-    ├─ GraphDisplay (Node2D)
-    └─ HUD (CanvasLayer)
+	├─ Mission1 (Node2D) [Mission1.gd]
+	│   ├─ _ready()
+	│   │   └─ graph = get_node("GraphBuilder").get_graph()  ← Lee grafo
+	│   │
+	│   └─ start() / step() / complete()
+	│       └─ Lógica del algoritmo BFS/DFS (SOLO LÓGICA)
+	│
+	├─ GraphBuilder (Node) [GraphBuilder.gd]  ← DATOS DEL GRAFO
+	│   ├─ nodes: Array[GraphNodeData]
+	│   │   ├─ [0] { node_key: "Firewall Central", ... }
+	│   │   ├─ [1] { node_key: "Base de Datos", ... }
+	│   │   └─ [2] { node_key: "Router Core", is_root: true, ... }
+	│   │
+	│   └─ connections: Array[GraphConnectionData]
+	│       ├─ [0] { from_node: "Firewall Central", to_node: "Proxy", weight: 1.0 }
+	│       └─ [1] { from_node: "Proxy", to_node: "Router Core", weight: 1.0 }
+	│
+	├─ GraphDisplay (Node2D)
+	└─ HUD (CanvasLayer)
 ```
 
 **Beneficios:**
@@ -73,19 +73,19 @@ Mission_1.tscn (Scene)
 
 ```
 [Designer configura en Inspector]
-            ↓
-    GraphBuilder.nodes[]
-    GraphBuilder.connections[]
-            ↓
-    build_graph() en _ready()
-            ↓
-        Graph.gd (modelo)
-            ↓
-    Mission1.get_graph()
-            ↓
-    GraphDisplay.display_graph()
-            ↓
-    [Renderizado visual]
+			↓
+	GraphBuilder.nodes[]
+	GraphBuilder.connections[]
+			↓
+	build_graph() en _ready()
+			↓
+		Graph.gd (modelo)
+			↓
+	Mission1.get_graph()
+			↓
+	GraphDisplay.display_graph()
+			↓
+	[Renderizado visual]
 ```
 
 ---
@@ -151,26 +151,26 @@ Mission_1.tscn (Scene)
 extends MissionController
 
 func _ready() -> void:
-    mission_id = "Mission_2"
-    
-    # Leer grafo desde GraphBuilder (desacoplado)
-    var graph_builder = get_node_or_null("GraphBuilder")
-    if graph_builder:
-        graph = graph_builder.get_graph()
-    else:
-        push_warning("No GraphBuilder found")
-        graph = _create_fallback_graph()
-    
-    # Configurar visualización
-    var display = get_node_or_null("GraphDisplay")
-    if display:
-        setup(graph, display)
-        display.display_graph(graph)
+	mission_id = "Mission_2"
+	
+	# Leer grafo desde GraphBuilder (desacoplado)
+	var graph_builder = get_node_or_null("GraphBuilder")
+	if graph_builder:
+		graph = graph_builder.get_graph()
+	else:
+		push_warning("No GraphBuilder found")
+		graph = _create_fallback_graph()
+	
+	# Configurar visualización
+	var display = get_node_or_null("GraphDisplay")
+	if display:
+		setup(graph, display)
+		display.display_graph(graph)
 
 func start() -> void:
-    # SOLO lógica del algoritmo, sin construcción del grafo
-    var result = GraphAlgorithms.shortest_path(graph, start_node, target_node)
-    # ... resto de la lógica
+	# SOLO lógica del algoritmo, sin construcción del grafo
+	var result = GraphAlgorithms.shortest_path(graph, start_node, target_node)
+	# ... resto de la lógica
 ```
 
 ### Crear metadata personalizada para una nueva misión
@@ -185,15 +185,15 @@ extends VertexMeta
 @export var delivery_time: float = 0.0
 
 func _init(
-    _display_name: String = "",
-    _package_count: int = 0,
-    _is_warehouse: bool = false,
-    _delivery_time: float = 0.0
+	_display_name: String = "",
+	_package_count: int = 0,
+	_is_warehouse: bool = false,
+	_delivery_time: float = 0.0
 ) -> void:
-    super._init(-1, _display_name, "DeliveryNode")
-    package_count = _package_count
-    is_warehouse = _is_warehouse
-    delivery_time = _delivery_time
+	super._init(-1, _display_name, "DeliveryNode")
+	package_count = _package_count
+	is_warehouse = _is_warehouse
+	delivery_time = _delivery_time
 ```
 
 **¡No necesitas modificar GraphNodeData!** El sistema usa `VertexMeta` como tipo base, por lo que cualquier subclase (NetworkNodeMeta, DeliveryNodeMeta, etc.) funcionará automáticamente.
@@ -215,8 +215,8 @@ En el Inspector de Godot:
 # En el editor, selecciona GraphBuilder y ejecuta:
 var validation = get_node("GraphBuilder").validate()
 if not validation.valid:
-    for error in validation.errors:
-        print("❌ ", error)
+	for error in validation.errors:
+		print("❌ ", error)
 ```
 
 ### Debug del grafo en runtime

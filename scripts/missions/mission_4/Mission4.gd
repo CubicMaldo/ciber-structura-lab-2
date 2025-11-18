@@ -32,7 +32,12 @@ var last_result: Dictionary = {}
 func _ready() -> void:
 	_connect_ui_signals()
 	_subscribe_to_events()
-	init_mission_common("Mission_4", DEFAULT_STATUS_PROMPT)
+	call_deferred("_init_mission_deferred")
+
+
+func _init_mission_deferred() -> void:
+	call_deferred("init_mission_common", "Mission_4", DEFAULT_STATUS_PROMPT)
+	await get_tree().process_frame
 	_reset_mission()
 
 

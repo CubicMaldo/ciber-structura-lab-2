@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b7qv5xk8p3nt1"]
+[gd_scene load_steps=3 format=3 uid="uid://b7qv5xk8p3nt1"]
 
 [ext_resource type="Script" uid="uid://usrtjlab7yac" path="res://scripts/utils/graphs/visuals/NodeView.gd" id="1"]
+[ext_resource type="Theme" uid="uid://bx4q87ca62215" path="res://scenes/ui/theme.tres" id="2_xuptg"]
 
 [node name="NodeView" type="Node2D"]
 script = ExtResource("1")
@@ -24,6 +25,7 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 6
 size_flags_vertical = 6
+theme = ExtResource("2_xuptg")
 
 [node name="Label" type="Label" parent="PanelContainer"]
 unique_name_in_owner = true

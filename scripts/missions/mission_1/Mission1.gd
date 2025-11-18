@@ -44,7 +44,7 @@ func _ready() -> void:
 	_connect_ui_signals()
 	_subscribe_to_events()
 	rng.randomize()
-	init_mission_common("Mission_1", DEFAULT_STATUS_PROMPT)
+	call_deferred("init_mission_common", "Mission_1", DEFAULT_STATUS_PROMPT)
 
 func set_algorithm(alg: String) -> void:
 	algorithm = alg
