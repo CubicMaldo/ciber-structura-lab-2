@@ -184,11 +184,19 @@ func _show_score_panel(score_dict: Dictionary, is_new_best: bool) -> void:
 	
 	var score_panel = SCORE_PANEL_SCENE.instantiate()
 	
-	# Agregar el panel al árbol
-	add_child(score_panel)
+	# Crear un CanvasLayer para que aparezca encima de todo
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 100  # Layer alto para aparecer por encima
+	canvas_layer.name = "ScorePanelLayer"
+	add_child(canvas_layer)
 	
-	# Centrar el panel
-	score_panel.position = get_viewport().get_visible_rect().size / 2 - score_panel.size / 2
+	# Agregar el panel al CanvasLayer
+	canvas_layer.add_child(score_panel)
+	
+	# Centrar el panel después de que se agregue al árbol
+	await get_tree().process_frame
+	var viewport_size = get_viewport().get_visible_rect().size
+	score_panel.position = (viewport_size - score_panel.size) / 2
 	
 	# Mostrar el score
 	score_panel.display_score(score_dict, is_new_best)
@@ -198,9 +206,9 @@ func _show_score_panel(score_dict: Dictionary, is_new_best: bool) -> void:
 	score_panel.continue_requested.connect(_on_continue_requested)
 
 func _on_retry_requested() -> void:
-	# Cerrar y eliminar el panel de score
+	# Cerrar y eliminar el panel de score y su CanvasLayer
 	for child in get_children():
-		if child.name.begins_with("MissionScorePanel") or child.has_method("display_score"):
+		if child.name == "ScorePanelLayer":
 			child.queue_free()
 	
 	# Reiniciar la misión
