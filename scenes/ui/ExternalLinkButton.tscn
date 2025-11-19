@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://bqw8k5n7nax2r"]
+
+[ext_resource type="Script" path="res://scripts/ui/ExternalLinkButton.gd" id="1_link_button"]
+
+[node name="ExternalLinkButton" type="Button"]
+script = ExtResource("1_link_button")
+text = "External Link 🔗"
+flat = true
+alignment = 0

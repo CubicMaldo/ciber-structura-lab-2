@@ -91,3 +91,16 @@ signal edge_added(edge: Edge)
 ## @param from_key: Clave del vértice origen
 ## @param to_key: Clave del vértice destino
 signal edge_removed(from_key: Variant, to_key: Variant)
+
+# ============================================================================
+# SEÑALES DEL GLOSARIO INTERACTIVO
+# ============================================================================
+
+## Emitida cuando el usuario selecciona un término del glosario para ver detalles.
+## @param term_id: Identificador del término seleccionado
+signal glossary_term_selected(term_id: String)
+
+## Emitida cuando el usuario busca términos en el glosario.
+## @param query: Texto de búsqueda
+signal glossary_search_performed(query: String)
+

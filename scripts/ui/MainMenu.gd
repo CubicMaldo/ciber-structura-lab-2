@@ -8,3 +8,7 @@ func _on_start_pressed() -> void:
 
 func _on_achievements_pressed() -> void:
 	SceneManager.change_to("res://scenes/AchievementsHub.tscn")
+
+
+func _on_glossary_pressed() -> void:
+	SceneManager.change_to("res://scenes/Glossary.tscn")

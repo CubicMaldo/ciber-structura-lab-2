@@ -1,0 +1,213 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2x8k5qaqw7mn"]
+
+[ext_resource type="Script" path="res://scripts/ui/GlossaryUI.gd" id="1_glossary"]
+[ext_resource type="PackedScene" uid="uid://bv6ck1cqolqmq" path="res://scenes/ui/background.tscn" id="2_background"]
+
+[node name="Glossary" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_glossary")
+
+[node name="Background" parent="." instance=ExtResource("2_background")]
+layout_mode = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "📚 Glosario Interactivo"
+vertical_alignment = 1
+
+[node name="BackButton" type="Button" parent="MarginContainer/VBoxContainer/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "← Volver al Menú"
+
+[node name="FilterBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="SearchInput" type="LineEdit" parent="MarginContainer/VBoxContainer/FilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+placeholder_text = "Buscar términos..."
+
+[node name="CategoryFilter" type="OptionButton" parent="MarginContainer/VBoxContainer/FilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="ComplexityFilter" type="OptionButton" parent="MarginContainer/VBoxContainer/FilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+
+[node name="MainContent" type="HSplitContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TermsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/MainContent"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/MainContent/TermsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent/TermsPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="ListTitle" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermsPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Términos"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/MainContent/TermsPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TermsList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent/TermsPanel/MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="NoResultsLabel" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermsPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "No se encontraron términos"
+horizontal_alignment = 1
+
+[node name="TermDetailPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/MainContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 15
+
+[node name="TermTitle" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Término"
+
+[node name="MetadataContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TermCategoryLabel" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer/MetadataContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Categoría: "
+
+[node name="TermComplexityLabel" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer/MetadataContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Nivel: "
+
+[node name="Divider1" type="HSeparator" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DescriptionTitle" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Descripción"
+
+[node name="TermDescription" type="RichTextLabel" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Descripción del término..."
+fit_content = true
+
+[node name="Divider2" type="HSeparator" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VisualizationTitle" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Visualización"
+
+[node name="VisualizationContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Divider3" type="HSeparator" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="RelatedTermsTitle" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Términos Relacionados"
+
+[node name="RelatedTermsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Divider4" type="HSeparator" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LinksTitle" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Enlaces Externos"
+
+[node name="ExternalLinksContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Divider5" type="HSeparator" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MissionsTitle" type="Label" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Usado en Misiones"
+
+[node name="MissionsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent/TermDetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2

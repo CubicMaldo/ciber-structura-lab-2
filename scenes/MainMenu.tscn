@@ -146,6 +146,17 @@ theme_override_colors/font_hover_color = Color(0.3, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "Ver logros"
 
+[node name="GlossaryButton" type="Button" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.95, 1, 1)
+theme_override_colors/font_hover_color = Color(0.3, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "📚 Glosario Interactivo"
+
 [node name="InfoText" type="Label" parent="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
@@ -166,3 +177,4 @@ horizontal_alignment = 1
 
 [connection signal="pressed" from="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer/StartButton" to="." method="_on_start_pressed"]
 [connection signal="pressed" from="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer/AchievementsButton" to="." method="_on_achievements_pressed"]
+[connection signal="pressed" from="UI/LayoutRoot/CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer/GlossaryButton" to="." method="_on_glossary_pressed"]

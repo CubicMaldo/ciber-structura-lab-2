@@ -1,0 +1,56 @@
+[gd_scene load_steps=2 format=3 uid="uid://c4m8n5x7p2qw9"]
+
+[ext_resource type="Script" path="res://scripts/ui/visualizations/BFSVisualization.gd" id="1_bfs"]
+
+[node name="BFSVisualization" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bfs")
+
+[node name="Canvas" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Controls" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PlayButton" type="Button" parent="Controls"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "▶ Reproducir"
+
+[node name="ResetButton" type="Button" parent="Controls"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "↻ Reiniciar"
+
+[node name="SpeedLabel" type="Label" parent="Controls"]
+layout_mode = 2
+text = "Velocidad:"
+vertical_alignment = 1
+
+[node name="SpeedSlider" type="HSlider" parent="Controls"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+min_value = 0.5
+max_value = 3.0
+step = 0.5
+value = 1.0
