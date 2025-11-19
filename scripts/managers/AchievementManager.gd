@@ -40,6 +40,10 @@ func has_unlocked(id: String) -> bool:
 	return _state.get(id, {}).get("unlocked", false)
 
 
+func get_achievement_definition(id: String) -> Dictionary:
+	return _definitions.get(id, {})
+
+
 func reset_progress() -> void:
 	_state.clear()
 	_ensure_state_entries()

@@ -24,6 +24,7 @@ SceneManager="*res://scripts/managers/SceneManager.gd"
 GameManager="*res://scripts/managers/GameManager.gd"
 EventBus="*res://scripts/managers/EventBus.gd"
 AchievementManager="*res://scripts/managers/AchievementManager.gd"
+NotificationManager="*res://scripts/managers/NotificationManager.gd"
 
 [display]
 
