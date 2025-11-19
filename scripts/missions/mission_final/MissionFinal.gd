@@ -551,8 +551,19 @@ func _fail_current_stage(stage_id: String, message: String) -> void:
 func _reset_visuals(label_mode: String) -> void:
 	if ui == null or graph == null:
 		return
-	ui.edge_label_mode = label_mode
-	ui.display_graph(graph)
+	if ui.has_method("update_edge_label_mode"):
+		ui.update_edge_label_mode(label_mode)
+	else:
+		ui.edge_label_mode = label_mode
+	if ui.has_method("reset_visual_states"):
+		ui.reset_visual_states()
+	else:
+		for node_key in graph.get_nodes().keys():
+			ui.set_node_state(node_key, "unvisited")
+		for edge_data in graph.get_edges():
+			var a = edge_data.get("source")
+			var b = edge_data.get("target")
+			ui.set_edge_state(a, b, "default")
 
 
 func _apply_flow_visual(_flow_result: Dictionary, source, sink) -> void:

@@ -14,6 +14,8 @@ var source_key = null
 var sink_key = null
 var is_computing := false
 var last_result: Dictionary = {}
+var required_flow := 0
+var attempts := 0
 
 @onready var ford_button: Button = %FordButton
 @onready var edmonds_button: Button = %EdmondsButton
@@ -42,8 +44,8 @@ func _init_mission_deferred() -> void:
 
 
 func start() -> void:
-	# Se dispara cuando el jugador presiona "Calcular flujo"
-	_on_compute_pressed()
+	# La misión depende de las selecciones del jugador; no se auto-resuelve.
+	_update_status(DEFAULT_STATUS_PROMPT)
 
 
 func step() -> void:
@@ -83,6 +85,8 @@ func _reset_mission() -> void:
 	sink_key = null
 	is_computing = false
 	last_result.clear()
+	attempts = 0
+	required_flow = _calculate_required_flow()
 	if source_label:
 		source_label.text = "Fuente: --"
 	if sink_label:
@@ -90,13 +94,13 @@ func _reset_mission() -> void:
 	if flow_label:
 		flow_label.text = "Flujo calculado: 0"
 	if result_label:
-		result_label.text = "Selecciona el origen (Centro de Control) y el sumidero (Servidor de Respaldo)."
+		result_label.text = "Selecciona el origen (Centro de Control) y el sumidero (Servidor de Respaldo).\n\n[b]Objetivo:[/b] Encuentra un par fuente/sumidero con flujo ≥ %d" % required_flow
 	if compute_button:
 		compute_button.disabled = true
 	if continue_button:
 		continue_button.visible = false
 	_reset_visuals()
-	_update_status(DEFAULT_STATUS_PROMPT)
+	_update_status("Objetivo: Encuentra un flujo máximo ≥ %d" % required_flow)
 
 
 func _reset_visuals() -> void:
@@ -185,27 +189,48 @@ func _on_continue_pressed() -> void:
 
 func _apply_flow_result(result: Dictionary) -> void:
 	var max_flow: int = int(result.get("max_flow", 0))
+	attempts += 1
 	if flow_label:
-		flow_label.text = "Flujo calculado: %d" % max_flow
+		flow_label.text = "Flujo calculado: %d (requerido: %d)" % [max_flow, required_flow]
 	if ui:
-		ui.edge_label_mode = "both"
-		ui.display_graph(graph)
+		if ui.has_method("update_edge_label_mode"):
+			ui.update_edge_label_mode("both")
+		else:
+			ui.edge_label_mode = "both"
 	_highlight_source_sink()
 	_highlight_flow_edges()
 	_show_flow_summary(result)
-	_update_status(VICTORY_MESSAGE)
-	if continue_button:
-		continue_button.visible = true
-	var mission_result = {
-		"status": "done",
-		"max_flow": max_flow,
-		"algorithm": algorithm,
-		"source": source_key,
-		"sink": sink_key,
-		"flow_paths": result.get("flow_paths", []).duplicate(true),
-		"saturated_edges": result.get("saturated_edges", []).duplicate(true)
-	}
-	complete(mission_result)
+	
+	# Solo completar si se alcanza el umbral
+	if max_flow >= required_flow:
+		_update_status(VICTORY_MESSAGE)
+		if continue_button:
+			continue_button.visible = true
+		var mission_result = {
+			"status": "done",
+			"max_flow": max_flow,
+			"algorithm": algorithm,
+			"source": source_key,
+			"sink": sink_key,
+			"attempts": attempts,
+			"flow_paths": result.get("flow_paths", []).duplicate(true),
+			"saturated_edges": result.get("saturated_edges", []).duplicate(true)
+		}
+		complete(mission_result)
+	else:
+		_update_status("Flujo insuficiente: %d/%d. Intenta otra combinación." % [max_flow, required_flow])
+		# Permitir seleccionar otra pareja
+		if graph and graph.has_method("reset_all_flux"):
+			graph.reset_all_flux()
+		source_key = null
+		sink_key = null
+		if source_label:
+			source_label.text = "Fuente: --"
+		if sink_label:
+			sink_label.text = "Sumidero: --"
+		if compute_button:
+			compute_button.disabled = true
+		_reset_visuals()
 
 
 func _highlight_source_sink() -> void:
@@ -309,3 +334,24 @@ func _format_path(path: Array) -> String:
 	for node in path:
 		segments.append(str(node))
 	return " -> ".join(segments)
+
+
+func _calculate_required_flow() -> int:
+	# Calcular el flujo máximo posible en el grafo y establecer umbral al 75%
+	if graph == null:
+		return 5
+	var node_keys: Array = graph.get_nodes().keys()
+	if node_keys.size() < 2:
+		return 5
+	var max_possible := 0
+	for i in range(min(3, node_keys.size())):
+		for j in range(min(3, node_keys.size())):
+			if i == j:
+				continue
+			var result = GraphAlgorithms.max_flow_edmonds_karp(graph, node_keys[i], node_keys[j], false)
+			var flow = int(result.get("max_flow", 0))
+			if flow > max_possible:
+				max_possible = flow
+			if graph.has_method("reset_all_flux"):
+				graph.reset_all_flux()
+	return int(ceil(float(max_possible) * 0.75))

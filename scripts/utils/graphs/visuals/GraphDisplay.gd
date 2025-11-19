@@ -181,6 +181,21 @@ func _spawn_edge(e_data) -> Node:
 	return inst
 
 
+func update_edge_label_mode(mode: String) -> void:
+	edge_label_mode = mode
+	for edge_view in edge_views:
+		if edge_view and edge_view.has_method("set_label_mode"):
+			edge_view.set_label_mode(mode)
+
+
+func reset_visual_states(default_node_state: String = "unvisited", default_edge_state: String = "default") -> void:
+	for key in node_views.keys():
+		set_node_state(key, default_node_state)
+	for edge_view in edge_views:
+		if edge_view and edge_view.has_method("set_state"):
+			edge_view.set_state(default_edge_state)
+
+
 func _apply_layout(node_keys: Array) -> void:
 	if node_keys.size() == 0:
 		return
