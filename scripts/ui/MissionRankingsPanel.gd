@@ -35,6 +35,7 @@ func _ready() -> void:
 	# Conectar a la señal de score guardado para actualizar stats
 	if MissionScoreManager:
 		MissionScoreManager.score_saved.connect(_on_score_saved)
+		MissionScoreManager.scores_loaded.connect(_on_scores_loaded)
 	
 	refresh_all()
 
@@ -50,7 +51,12 @@ func _on_score_saved(_mission_id: String, _score_dict: Dictionary, _is_new_best:
 	if _mission_id == current_mission:
 		_show_mission_scores(current_mission)
 
+func _on_scores_loaded() -> void:
+	# Actualizar todo cuando se cargan/limpian los scores
+	refresh_all()
+
 func _update_stats() -> void:
+	# Forzar recálculo de estadísticas
 	var stats = MissionScoreManager.get_player_stats()
 	
 	if missions_label:

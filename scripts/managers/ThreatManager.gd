@@ -1,5 +1,4 @@
 extends Node
-class_name ThreatManager
 ## ThreatManager (autoload "ThreatManager")
 ## Centralized risk/turn/resource system shared by all missions.
 
@@ -105,6 +104,10 @@ func add_resource(resource_name: String, amount: int = 1) -> void:
 
 func get_resources() -> Dictionary:
 	return resources.duplicate(true)
+
+
+func get_max_resources() -> Dictionary:
+	return DEFAULT_RESOURCES.duplicate(true)
 
 
 func get_status() -> Dictionary:

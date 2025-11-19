@@ -52,7 +52,7 @@ func _start_demo() -> void:
 	
 	# Mostrar cada notificación con un retraso
 	for i in demo_notifications.size():
-		var notif := demo_notifications[i]
+		var notif: Dictionary = demo_notifications[i]
 		print("Mostrando notificación %d/%d: %s" % [i + 1, demo_notifications.size(), notif.title])
 		
 		NotificationManager.show_custom_notification(
@@ -71,7 +71,7 @@ func _start_demo() -> void:
 
 # Función para llamar desde el inspector o consola
 func show_random_notification() -> void:
-	var notif := demo_notifications[randi() % demo_notifications.size()]
+	var notif: Dictionary = demo_notifications[randi() % demo_notifications.size()]
 	NotificationManager.show_custom_notification(
 		notif.title,
 		notif.description,

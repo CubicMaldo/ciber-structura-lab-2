@@ -443,18 +443,18 @@ func _draw_complexity_diagram(canvas: Control) -> void:
 				if points.size() > 10:
 					canvas.draw_string(ThemeDB.fallback_font, points[points.size() - 1] + Vector2(5, 0), labels[curve_idx], HORIZONTAL_ALIGNMENT_LEFT, -1, 10, colors[curve_idx])
 		
-		canvas.draw_string(ThemeDB.fallback_font, Vector2(origin.x + width / 2, origin.y + 20), "n", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
-		canvas.draw_string(ThemeDB.fallback_font, Vector2(origin.x - 25, origin.y - height / 2), "t", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
+		canvas.draw_string(ThemeDB.fallback_font, Vector2(origin.x + width / 2.0, origin.y + 20), "n", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
+		canvas.draw_string(ThemeDB.fallback_font, Vector2(origin.x - 25, origin.y - height / 2.0), "t", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
 	)
 	canvas.queue_redraw()
 
-func _on_search_changed(new_text: String) -> void:
+func _on_search_changed(_new_text: String) -> void:
 	_apply_filters()
 
-func _on_category_selected(index: int) -> void:
+func _on_category_selected(_index: int) -> void:
 	_apply_filters()
 
-func _on_complexity_selected(index: int) -> void:
+func _on_complexity_selected(_index: int) -> void:
 	_apply_filters()
 
 func _apply_filters() -> void:

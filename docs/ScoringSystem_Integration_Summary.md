@@ -1,12 +1,15 @@
 # Scoring System Integration Summary
 
 ## Overview
+
 Successfully integrated the robust scoring system into all 5 missions (Mission 1-4 and Final). Each mission now tracks moves, mistakes, resources, and time to generate a comprehensive performance score with rankings (Gold/Silver/Bronze).
 
 ## Changes Made
 
 ### 1. MissionController.gd
+
 **Added:**
+
 - `time_target: float = 180.0` - Time objective in seconds for calculating time score
 
 **Impact:** Base class now supports time-based scoring for all missions.
@@ -14,14 +17,17 @@ Successfully integrated the robust scoring system into all 5 missions (Mission 1
 ---
 
 ### 2. Mission 1 - Network Tracer (BFS/DFS)
+
 **Status:** ✅ Already integrated (used as template)
 
 **Configuration:**
+
 - **Optimal Moves:** `node_count` (one click per node)
 - **Time Target:** 180s (3 minutes) - Default from MissionController
 - **Resources:** Tracks scan and firewall usage
 
 **Tracking:**
+
 - `add_move()` called in `_process_player_selection()` for each node click
 - `add_mistake()` called when wrong node is selected
 - Resource usage tracked in `_on_scan_pressed()` and `_on_firewall_pressed()`
@@ -29,14 +35,17 @@ Successfully integrated the robust scoring system into all 5 missions (Mission 1
 ---
 
 ### 3. Mission 2 - Shortest Path (Dijkstra)
+
 **Status:** ✅ Newly integrated
 
 **Configuration:**
+
 - **Optimal Moves:** Set to `optimal_path.size()` after path calculation
 - **Time Target:** 120s (2 minutes)
 - **Resources:** Tracks scan and firewall usage
 
 **Changes Made:**
+
 1. **_on_calculate_pressed():**
    - Initializes `optimal_moves = node_count` (estimated)
    - Sets `time_target = 120.0`
@@ -60,14 +69,17 @@ Successfully integrated the robust scoring system into all 5 missions (Mission 1
 ---
 
 ### 4. Mission 3 - Minimum Spanning Tree (Kruskal/Prim)
+
 **Status:** ✅ Newly integrated
 
 **Configuration:**
+
 - **Optimal Moves:** `graph.get_nodes().size() - 1` initially, then adjusted to `mst_edges.size()`
 - **Time Target:** 150s (2.5 minutes)
 - **Resources:** Tracks scan and firewall usage
 
 **Changes Made:**
+
 1. **_on_start_pressed():**
    - Sets `optimal_moves = max(1, node_count - 1)` (MST property: n-1 edges)
    - Sets `time_target = 150.0`
@@ -91,14 +103,17 @@ Successfully integrated the robust scoring system into all 5 missions (Mission 1
 ---
 
 ### 5. Mission 4 - Maximum Flow (Ford-Fulkerson/Edmonds-Karp)
+
 **Status:** ✅ Newly integrated
 
 **Configuration:**
+
 - **Optimal Moves:** 2 (finding solution in 1-2 attempts)
 - **Time Target:** 180s (3 minutes)
 - **Resources:** No resources in this mission
 
 **Changes Made:**
+
 1. **_init_mission_deferred():**
    - Sets `optimal_moves = 2` (ideal: find correct source/sink pair quickly)
    - Sets `time_target = 180.0`
@@ -115,14 +130,17 @@ Successfully integrated the robust scoring system into all 5 missions (Mission 1
 ---
 
 ### 6. Mission Final - Combined Challenge
+
 **Status:** ✅ Newly integrated
 
 **Configuration:**
+
 - **Optimal Moves:** `node_count * 2.5` (estimated based on all 4 stages)
 - **Time Target:** 300s (5 minutes)
 - **Resources:** Inherits from stage mechanics
 
 **Changes Made:**
+
 1. **_init_mission_deferred():**
    - Calculates `optimal_moves` based on graph size
    - Sets `time_target = 300.0`
@@ -154,9 +172,10 @@ Successfully integrated the robust scoring system into all 5 missions (Mission 1
 
 ## Score Calculation Formula
 
-**Total Score = (Efficiency × 0.35) + (Time × 0.25) + (Moves × 0.25) + (Resources × 0.15)**
+Total Score = (Efficiency × 0.35) + (Time × 0.25) + (Moves × 0.25) + (Resources × 0.15)
 
-### Component Scores:
+### Component Scores
+
 1. **Efficiency Score (35%):**
    - Based on `(nodes_visited + edges_visited) / total_elements`
    - Higher is better
@@ -174,7 +193,8 @@ Successfully integrated the robust scoring system into all 5 missions (Mission 1
    - Based on `(available - used) / available`
    - Conserving resources = higher score
 
-### Rankings:
+### Rankings
+
 - 🥇 **Gold:** ≥ 90% total score
 - 🥈 **Silver:** ≥ 75% total score
 - 🥉 **Bronze:** ≥ 60% total score
@@ -184,6 +204,7 @@ Successfully integrated the robust scoring system into all 5 missions (Mission 1
 ## Statistics Tracking Integration
 
 All missions now automatically emit events that StatisticsManager tracks:
+
 - ✅ `mission_started` - Increments play sessions
 - ✅ `mission_completed` - Tracks completion count
 - ✅ `node_visited` - Cumulative node exploration
@@ -191,6 +212,7 @@ All missions now automatically emit events that StatisticsManager tracks:
 - ✅ Algorithm usage tracked per mission (BFS, DFS, Dijkstra, Kruskal, Prim, Ford-Fulkerson, Edmonds-Karp)
 
 **Global Achievements Unlocked By:**
+
 - Visiting 100/500/1000/5000 nodes total
 - Completing 10/25/50/100 missions
 - 1/5/10/25 hours of playtime
@@ -200,7 +222,8 @@ All missions now automatically emit events that StatisticsManager tracks:
 
 ## Testing Instructions
 
-### Quick Test (Mission 1):
+### Quick Test (Mission 1)
+
 1. Launch Godot Editor
 2. Run Mission 1 scene
 3. Complete the mission with BFS or DFS
@@ -211,7 +234,8 @@ All missions now automatically emit events that StatisticsManager tracks:
    - ✅ Can retry or continue to mission select
    - ✅ Statistics updated (check Main Menu → Statistics)
 
-### Full Integration Test:
+### Full Integration Test
+
 1. Play through all 5 missions
 2. Check Mission Select for rank badges on each mission card
 3. Click "Rankings" button to view top 10 scores per mission
@@ -225,16 +249,19 @@ All missions now automatically emit events that StatisticsManager tracks:
 
 ## Files Modified
 
-### Core Systems:
+### Core Systems
+
 - ✅ `scripts/missions/MissionController.gd` - Added time_target variable
 
-### Mission Scripts:
+### Mission Scripts
+
 - ✅ `scripts/missions/mission_2/Mission2.gd` - Full scoring integration
 - ✅ `scripts/missions/mission_3/Mission3.gd` - Full scoring integration
 - ✅ `scripts/missions/mission_4/Mission4.gd` - Full scoring integration
 - ✅ `scripts/missions/mission_final/MissionFinal.gd` - Synced with MissionController
 
-### No Errors:
+### No Errors
+
 All missions compile without errors and are ready for testing.
 
 ---

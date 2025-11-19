@@ -77,19 +77,23 @@ func get_player_stats() -> Dictionary:
 		"best_mission_score": 0
 	}
 	
+	# Contar todos los rangos de TODOS los scores, no solo los mejores
+	for mission_id in mission_scores.keys():
+		for score in mission_scores[mission_id]:
+			if score.perfect:
+				stats.perfect_completions += 1
+			
+			match score.rank:
+				"gold":
+					stats.gold_ranks += 1
+				"silver":
+					stats.silver_ranks += 1
+				"bronze":
+					stats.bronze_ranks += 1
+	
+	# Usar best_scores para otras estadísticas
 	for mission_id in best_scores.keys():
 		var score = best_scores[mission_id]
-		
-		if score.perfect:
-			stats.perfect_completions += 1
-		
-		match score.rank:
-			"gold":
-				stats.gold_ranks += 1
-			"silver":
-				stats.silver_ranks += 1
-			"bronze":
-				stats.bronze_ranks += 1
 		
 		stats.total_score += score.total_score
 		stats.total_time += score.completion_time
@@ -120,6 +124,8 @@ func clear_all_scores() -> void:
 	mission_scores.clear()
 	best_scores.clear()
 	_save_to_disk()
+	# Emitir señal para notificar cambios
+	scores_loaded.emit()
 
 ## Guardar scores en disco
 func _save_to_disk() -> void:

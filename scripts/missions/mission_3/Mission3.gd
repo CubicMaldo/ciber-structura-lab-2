@@ -542,7 +542,8 @@ func _on_start_pressed() -> void:
 	
 	# Configurar recursos
 	if threat_manager:
-		resources_available = threat_manager.get_max_resources()
+		var max_resources = threat_manager.get_max_resources()
+		resources_available = max_resources.values().reduce(func(sum, val): return sum + val, 0)
 		resources_used = 0
 	
 	start()

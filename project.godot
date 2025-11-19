@@ -28,6 +28,7 @@ NotificationManager="*res://scripts/managers/NotificationManager.gd"
 GlossaryManager="*res://scripts/managers/GlossaryManager.gd"
 MissionScoreManager="*res://scripts/managers/MissionScoreManager.gd"
 StatisticsManager="*res://scripts/managers/StatisticsManager.gd"
+ThreatManager="*res://scripts/managers/ThreatManager.gd"
 
 [display]
 

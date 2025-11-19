@@ -157,13 +157,13 @@ func _format_timestamp(unix_time: float) -> String:
 	if diff < 60:
 		return "Hace un momento"
 	elif diff < 3600:
-		var minutes := diff / 60
+		var minutes := int(diff / 60.0)
 		return "Hace %d minuto%s" % [minutes, "s" if minutes > 1 else ""]
 	elif diff < 86400:
-		var hours := diff / 3600
+		var hours := int(diff / 3600.0)
 		return "Hace %d hora%s" % [hours, "s" if hours > 1 else ""]
 	else:
-		var days := diff / 86400
+		var days := int(diff / 86400.0)
 		return "Hace %d día%s" % [days, "s" if days > 1 else ""]
 
 

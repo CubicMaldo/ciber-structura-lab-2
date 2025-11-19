@@ -2,6 +2,7 @@ extends PanelContainer
 ## StatisticsPanel - Panel para mostrar estadísticas globales del jugador
 
 @onready var close_button: Button = %CloseButton
+@onready var reset_button: Button = %ResetButton if has_node("%ResetButton") else null
 @onready var play_time_value: Label = %PlayTimeValue
 @onready var session_time_value: Label = %SessionTimeValue
 @onready var missions_started_value: Label = %MissionsStartedValue
@@ -20,6 +21,8 @@ signal closed()
 
 func _ready() -> void:
 	close_button.pressed.connect(_on_close_pressed)
+	if reset_button:
+		reset_button.pressed.connect(_on_reset_pressed)
 	_update_statistics()
 	
 	# Actualizar cada segundo
@@ -105,8 +108,8 @@ func _update_algorithms_display(algorithm_usage: Dictionary) -> void:
 
 func _format_time(seconds: float) -> String:
 	var total_seconds = int(seconds)
-	var hours = total_seconds / 3600
-	var minutes = (total_seconds % 3600) / 60
+	var hours = int(total_seconds / 3600.0)
+	var minutes = int((total_seconds % 3600) / 60.0)
 	var secs = total_seconds % 60
 	
 	if hours > 0:
@@ -119,3 +122,35 @@ func _format_time(seconds: float) -> String:
 func _on_close_pressed() -> void:
 	closed.emit()
 	queue_free()
+
+func _on_reset_pressed() -> void:
+	# Crear diálogo de confirmación
+	var dialog = ConfirmationDialog.new()
+	dialog.dialog_text = "¿Estás seguro de que deseas reiniciar TODOS los datos?\n\nEsto borrará:\n• Todas las estadísticas\n• Todos los puntajes y rankings\n• Todos los logros\n• Historial de notificaciones\n\n¡Esta acción no se puede deshacer!"
+	dialog.title = "Reiniciar Todos los Datos"
+	dialog.ok_button_text = "Sí, Reiniciar Todo"
+	dialog.cancel_button_text = "Cancelar"
+	
+	dialog.confirmed.connect(func():
+		# Limpiar todos los datos
+		StatisticsManager.reset_statistics()
+		MissionScoreManager.clear_all_scores()
+		AchievementManager.reset_progress()
+		NotificationManager.clear_history()
+		
+		# Actualizar UI
+		_update_statistics()
+		
+		print("✅ Todos los datos han sido reiniciados")
+		
+		# Mostrar notificación
+		if NotificationManager:
+			NotificationManager.show_custom_notification(
+				"Datos Reiniciados",
+				"Todos los datos han sido borrados exitosamente",
+				"sistema"
+			)
+	)
+	
+	add_child(dialog)
+	dialog.popup_centered()

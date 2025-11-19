@@ -100,7 +100,8 @@ func register_container(container: Control) -> void:
 ## Desregistra el contenedor actual
 func unregister_container() -> void:
 	if current_notification and is_instance_valid(current_notification):
-		current_notification.queue_free()
+		if not current_notification.is_queued_for_deletion():
+			current_notification.queue_free()
 		current_notification = null
 	notification_container = null
 
@@ -181,7 +182,8 @@ func _on_notification_dismissed() -> void:
 	if current_notification and is_instance_valid(current_notification):
 		_animate_notification_exit(current_notification)
 		await get_tree().create_timer(0.3).timeout
-		current_notification.queue_free()
+		if is_instance_valid(current_notification) and not current_notification.is_queued_for_deletion():
+			current_notification.queue_free()
 		current_notification = null
 	
 	# Mostrar siguiente notificación en cola
