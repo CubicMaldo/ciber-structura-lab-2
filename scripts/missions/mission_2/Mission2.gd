@@ -162,7 +162,7 @@ func _reset_mission() -> void:
 	if distance_label:
 		distance_label.text = "Distancia acumulada: 0.0"
 	if result_label:
-		result_label.text = ""
+		result_label.text = "Traza la ruta más segura entre el Centro de Control y el Servidor Infectado.\n\n[b]Objetivo:[/b] Usa el algoritmo de Dijkstra para encontrar el camino con menor costo. Selecciona cada nodo de la ruta en orden."
 	if continue_button:
 		continue_button.visible = false
 	if step_button:

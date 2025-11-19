@@ -116,6 +116,8 @@ func _reset_before_traversal() -> void:
 	awaiting_selection = false
 	if clues_label:
 		clues_label.text = "Pistas: 0"
+	if result_label:
+		result_label.text = "Rastrea el virus hasta su origen navegando por la red.\n\n[b]Objetivo:[/b] Selecciona BFS o DFS, luego sigue el recorrido haciendo clic en cada nodo en orden para recopilar pistas y encontrar el nodo raíz infectado."
 	if continue_button:
 		continue_button.visible = false
 	if step_button:

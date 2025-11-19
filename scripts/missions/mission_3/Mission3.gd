@@ -112,7 +112,7 @@ func _reset_mission() -> void:
 	if cost_label:
 		cost_label.text = "Costo acumulado: 0.0"
 	if result_label:
-		result_label.text = ""
+		result_label.text = "Reconstruye la red con conectividad mínima usando un árbol de expansión mínima.\n\n[b]Objetivo:[/b] Selecciona Kruskal o Prim, luego confirma cada enlace del MST seleccionando ambos nodos conectados en orden."
 	if continue_button:
 		continue_button.visible = false
 	if step_button:
