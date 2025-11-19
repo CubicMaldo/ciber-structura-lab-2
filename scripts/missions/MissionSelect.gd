@@ -52,12 +52,37 @@ func _connect_navigation_buttons() -> void:
 	var achievements_btn = get_node_or_null("%AchievementsButton")
 	if achievements_btn:
 		achievements_btn.pressed.connect(_on_achievements_pressed)
+	var rankings_btn = get_node_or_null("%RankingsButton")
+	if rankings_btn:
+		rankings_btn.pressed.connect(_on_rankings_pressed)
 
 func _on_back_pressed() -> void:
 	SceneManager.change_to("res://scenes/MainMenu.tscn")
 
 func _on_achievements_pressed() -> void:
 	SceneManager.change_to("res://scenes/AchievementsHub.tscn")
+
+func _on_rankings_pressed() -> void:
+	var rankings_scene = preload("res://scenes/ui/MissionRankingsPanel.tscn")
+	var rankings_panel = rankings_scene.instantiate()
+	
+	# Crear un CanvasLayer para que aparezca encima de todo
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 100
+	add_child(canvas_layer)
+	
+	# Agregar el panel al CanvasLayer
+	canvas_layer.add_child(rankings_panel)
+	
+	# Centrar el panel después de que se agregue al árbol
+	await get_tree().process_frame
+	var viewport_size = get_viewport().get_visible_rect().size
+	rankings_panel.position = (viewport_size - rankings_panel.size) / 2
+	
+	# Cuando se cierra, eliminar tanto el panel como el canvas layer
+	rankings_panel.closed.connect(func(): 
+		canvas_layer.queue_free()
+	)
 
 func _populate() -> void:
 	var list = %MissionList
@@ -124,6 +149,20 @@ func _create_mission_card(mission_id: String, _index: int) -> PanelContainer:
 	tags.add_theme_constant_override("separation", 10)
 	content.add_child(tags)
 	
+	# Mostrar ranking de la misión si existe
+	var best_score = MissionScoreManager.get_best_score(mission_id)
+	if best_score:
+		var rank_icon = Label.new()
+		rank_icon.text = _get_rank_icon(best_score.rank)
+		rank_icon.add_theme_font_size_override("font_size", 18)
+		tags.add_child(rank_icon)
+		
+		var score_label = Label.new()
+		score_label.text = "Score: %d" % best_score.total_score
+		score_label.add_theme_font_size_override("font_size", 12)
+		score_label.add_theme_color_override("font_color", _get_rank_color(best_score.rank))
+		tags.add_child(score_label)
+	
 	var algo_tag = Label.new()
 	algo_tag.text = "📊 " + data.get("algorithm", "")
 	algo_tag.add_theme_font_size_override("font_size", 12)
@@ -188,3 +227,25 @@ func _on_mission_selected(mission_id: String) -> void:
 	# Emit mission selected signal with typed parameter
 	EventBus.mission_selected.emit(mission_id)
 	GameManager.start_mission(mission_id)
+
+func _get_rank_icon(rank: String) -> String:
+	match rank:
+		"gold":
+			return "🥇"
+		"silver":
+			return "🥈"
+		"bronze":
+			return "🥉"
+		_:
+			return "○"
+
+func _get_rank_color(rank: String) -> Color:
+	match rank:
+		"gold":
+			return Color(1.0, 0.84, 0.0)
+		"silver":
+			return Color(0.75, 0.75, 0.75)
+		"bronze":
+			return Color(0.8, 0.5, 0.2)
+		_:
+			return Color(0.5, 0.5, 0.5)

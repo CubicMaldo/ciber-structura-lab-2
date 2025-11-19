@@ -114,6 +114,11 @@ func _reset_before_traversal() -> void:
 	last_current = null
 	is_running = false
 	awaiting_selection = false
+	
+	# Reiniciar métricas de puntuación
+	moves_count = 0
+	mistakes_count = 0
+	
 	if clues_label:
 		clues_label.text = "Pistas: 0"
 	if result_label:
@@ -305,6 +310,10 @@ func _on_scan_pressed() -> void:
 	if not threat_manager or not threat_manager.spend_resource("scans", 1):
 		_update_status("Sin escaneos disponibles.")
 		return
+	
+	# Registrar uso de recursos
+	resources_used += 1
+	
 	var expected = _get_expected_key()
 	if expected == null:
 		_update_status("No hay objetivo para revelar.")
@@ -317,6 +326,10 @@ func _on_firewall_pressed() -> void:
 	if not threat_manager or not threat_manager.spend_resource("firewalls", 1):
 		_update_status("Sin firewalls para desplegar.")
 		return
+	
+	# Registrar uso de recursos
+	resources_used += 1
+	
 	threat_manager.apply_relief(12)
 	_update_status("Firewall reforzado. Amenaza reducida.")
 
@@ -383,6 +396,11 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 	if not is_running:
 		_update_status("Inicia la misión antes de interactuar con el grafo.")
 		return
+	
+	# Contar este movimiento
+	if not _is_auto:
+		add_move()
+	
 	_consume_turn_for_action(_is_auto)
 	var expected_key = _get_expected_key()
 	if expected_key == null:
@@ -393,6 +411,7 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 		return
 	if visited.has(node_key):
 		_update_status("Ese servidor ya fue asegurado. Elige otro destino.")
+		add_mistake()  # Error: nodo ya visitado
 		return
 
 	awaiting_selection = false
@@ -444,6 +463,8 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 
 
 func _handle_incorrect_selection(node_key) -> void:
+	add_mistake()  # Registrar el error
+	
 	if ui and ui.has_method("set_node_state"):
 		ui.set_node_state(node_key, "highlighted")
 		call_deferred("_reset_highlighted_node", node_key)
@@ -577,6 +598,16 @@ func _on_dfs_pressed() -> void:
 
 
 func _on_start_pressed() -> void:
+	# Establecer movimientos óptimos para el algoritmo seleccionado
+	if graph:
+		var node_count = graph.get_nodes().size()
+		optimal_moves = node_count  # Un clic por nodo = óptimo
+	
+	# Configurar recursos
+	if threat_manager:
+		resources_available = threat_manager.get_max_resources()
+		resources_used = 0
+	
 	start()
 
 

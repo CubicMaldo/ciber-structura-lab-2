@@ -26,6 +26,7 @@ EventBus="*res://scripts/managers/EventBus.gd"
 AchievementManager="*res://scripts/managers/AchievementManager.gd"
 NotificationManager="*res://scripts/managers/NotificationManager.gd"
 GlossaryManager="*res://scripts/managers/GlossaryManager.gd"
+MissionScoreManager="*res://scripts/managers/MissionScoreManager.gd"
 
 [display]
 

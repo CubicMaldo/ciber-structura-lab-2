@@ -104,3 +104,22 @@ signal glossary_term_selected(term_id: String)
 ## @param query: Texto de búsqueda
 signal glossary_search_performed(query: String)
 
+# ============================================================================
+# SEÑALES DEL SISTEMA DE PUNTUACIÓN
+# ============================================================================
+
+## Emitida cuando se guarda un nuevo score de misión.
+## @param mission_id: Identificador de la misión
+## @param total_score: Puntuación total obtenida
+## @param rank: Rango obtenido (gold, silver, bronze, none)
+## @param is_new_best: True si es el nuevo mejor score
+signal mission_score_saved(mission_id: String, total_score: int, rank: String, is_new_best: bool)
+
+## Emitida cuando el jugador obtiene un rango oro.
+## @param mission_id: Identificador de la misión
+signal gold_rank_achieved(mission_id: String)
+
+## Emitida cuando el jugador obtiene una puntuación perfecta.
+## @param mission_id: Identificador de la misión
+signal perfect_score_achieved(mission_id: String)
+

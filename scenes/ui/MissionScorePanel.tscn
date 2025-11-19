@@ -1,0 +1,204 @@
+[gd_scene load_steps=4 format=3 uid="uid://bhvt2vdx3wnsi"]
+
+[ext_resource type="Script" path="res://scripts/ui/MissionScorePanel.gd" id="1_8suwb"]
+[ext_resource type="Theme" uid="uid://bx57i1llwylts" path="res://scenes/ui/theme.tres" id="1_oq1j4"]
+[ext_resource type="FontFile" uid="uid://bjn74pnttqhpo" path="res://scenes/ui/dungeon-mode.ttf" id="2_1s0dc"]
+
+[node name="MissionScorePanel" type="PanelContainer"]
+custom_minimum_size = Vector2(400, 500)
+offset_right = 400.0
+offset_bottom = 500.0
+theme = ExtResource("1_oq1j4")
+script = ExtResource("1_8suwb")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 32
+text = "¡MISIÓN COMPLETADA!"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="RankContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="RankIcon" type="Label" parent="MarginContainer/VBoxContainer/RankContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 64
+text = "🥇"
+
+[node name="RankLabel" type="Label" parent="MarginContainer/VBoxContainer/RankContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 48
+text = "ORO"
+
+[node name="ScoreLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 40
+text = "SCORE: 8500"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DetailsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EfficiencyRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/DetailsContainer/EfficiencyRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "Eficiencia:"
+
+[node name="EfficiencyScore" type="Label" parent="MarginContainer/VBoxContainer/DetailsContainer/EfficiencyRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "950"
+horizontal_alignment = 2
+
+[node name="TimeRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/DetailsContainer/TimeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "Tiempo:"
+
+[node name="TimeScore" type="Label" parent="MarginContainer/VBoxContainer/DetailsContainer/TimeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "850"
+horizontal_alignment = 2
+
+[node name="MovesRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/DetailsContainer/MovesRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "Movimientos:"
+
+[node name="MovesScore" type="Label" parent="MarginContainer/VBoxContainer/DetailsContainer/MovesRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "900"
+horizontal_alignment = 2
+
+[node name="ResourceRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/DetailsContainer/ResourceRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "Recursos:"
+
+[node name="ResourceScore" type="Label" parent="MarginContainer/VBoxContainer/DetailsContainer/ResourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "800"
+horizontal_alignment = 2
+
+[node name="HSeparator3" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="TimeUsed" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "⏱️ Tiempo: 95.2s / 120s"
+
+[node name="MovesUsed" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🎯 Movimientos: 12 / 10 (óptimo)"
+
+[node name="MistakesCount" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "❌ Errores: 0"
+
+[node name="NewBestLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 24
+text = "🏆 ¡NUEVO MEJOR SCORE!"
+horizontal_alignment = 1
+
+[node name="PerfectLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0.5, 1)
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 24
+text = "✨ ¡PUNTUACIÓN PERFECTA! ✨"
+horizontal_alignment = 1
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="RetryButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "🔄 Reintentar"
+
+[node name="ContinueButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1s0dc")
+theme_override_font_sizes/font_size = 20
+text = "➡️ Continuar"

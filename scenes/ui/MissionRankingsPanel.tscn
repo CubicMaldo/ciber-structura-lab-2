@@ -1,0 +1,114 @@
+[gd_scene load_steps=3 format=3 uid="uid://dh7ujksabmbej"]
+
+[ext_resource type="Script" path="res://scripts/ui/MissionRankingsPanel.gd" id="1_bnxo8"]
+[ext_resource type="Theme" uid="uid://bx57i1llwylts" path="res://scenes/ui/theme.tres" id="1_qxwpr"]
+
+[node name="MissionRankingsPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(800, 600)
+offset_right = 800.0
+offset_bottom = 600.0
+theme = ExtResource("1_qxwpr")
+script = ExtResource("1_bnxo8")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "📊 RANKINGS DE MISIONES"
+
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/HeaderContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "✕"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="MissionsLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🎯 Misiones: 0"
+
+[node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🥇 Oro: 0"
+
+[node name="SilverLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🥈 Plata: 0"
+
+[node name="BronzeLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🥉 Bronce: 0"
+
+[node name="PerfectLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "✨ Perfectas: 0"
+
+[node name="TabsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Mission1Button" type="Button" parent="MarginContainer/VBoxContainer/TabsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "Mission 1"
+
+[node name="Mission2Button" type="Button" parent="MarginContainer/VBoxContainer/TabsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Mission 2"
+
+[node name="Mission3Button" type="Button" parent="MarginContainer/VBoxContainer/TabsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Mission 3"
+
+[node name="Mission4Button" type="Button" parent="MarginContainer/VBoxContainer/TabsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Mission 4"
+
+[node name="MissionFinalButton" type="Button" parent="MarginContainer/VBoxContainer/TabsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Mission Final"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScoresContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
