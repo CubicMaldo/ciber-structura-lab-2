@@ -66,6 +66,12 @@ func start() -> void:
 	mst_edges = mst_data.get("edges", [])
 	planned_cost = float(mst_data.get("cost", 0.0))
 	components = int(mst_data.get("components", 0))
+	
+	# Emitir señal de algoritmo ejecutado
+	EventBus.algorithm_executed.emit(algorithm, mission_id)
+	
+	# Ajustar movimientos óptimos al número real de aristas del MST
+	optimal_moves = mst_edges.size()
 
 	if mst_edges.is_empty():
 		_update_status("No se pudo trazar un árbol de expansión mínima. Revisa las conexiones disponibles.")
@@ -109,6 +115,10 @@ func _reset_mission() -> void:
 	candidate_nodes.clear()
 	connected_nodes.clear()
 	components = 0
+	
+	# Reiniciar métricas de puntuación
+	moves_count = 0
+	mistakes_count = 0
 	if cost_label:
 		cost_label.text = "Costo acumulado: 0.0"
 	if result_label:
@@ -187,6 +197,10 @@ func _process_node_selection(node_key) -> void:
 		return
 	if edge_index >= mst_edges.size():
 		return
+	
+	# Registrar movimiento para scoring (cada selección de nodo cuenta)
+	add_move()
+	
 	var edge = mst_edges[edge_index]
 	var a = edge.get("source")
 	var b = edge.get("target")
@@ -256,6 +270,10 @@ func _confirm_edge(edge: Dictionary) -> void:
 
 
 func _handle_incorrect_node(node_key, expected_a, expected_b) -> void:
+	# Registrar error para scoring
+	add_mistake()
+	EventBus.mistake_made.emit(mission_id)
+	
 	if ui and ui.has_method("set_node_state"):
 		ui.set_node_state(node_key, "highlighted")
 		call_deferred("_reset_highlighted_node", node_key)
@@ -407,6 +425,11 @@ func _on_scan_pressed() -> void:
 	if not threat_manager or not threat_manager.spend_resource("scans", 1):
 		_update_status("Sin escaneos tácticos disponibles.")
 		return
+	
+	# Rastrear uso de recurso para scoring
+	resources_used += 1
+	EventBus.resource_used.emit("scan", mission_id)
+	
 	_update_status("Escaneo remoto asegura el siguiente enlace crítico.")
 	_auto_secure_current_edge()
 
@@ -422,6 +445,11 @@ func _on_firewall_pressed() -> void:
 	if not threat_manager or not threat_manager.spend_resource("firewalls", 1):
 		_update_status("No quedan firewalls para desplegar.")
 		return
+	
+	# Rastrear uso de recurso para scoring
+	resources_used += 1
+	EventBus.resource_used.emit("firewall", mission_id)
+	
 	threat_manager.apply_relief(12)
 	_update_status("Firewall reforzado. Amenaza estabilizada.")
 
@@ -504,6 +532,19 @@ func _on_prim_pressed() -> void:
 
 
 func _on_start_pressed() -> void:
+	# Inicializar métricas de puntuación
+	if graph:
+		# Optimal moves será el número de aristas en el MST (n-1 para grafo conexo)
+		optimal_moves = max(1, graph.get_nodes().size() - 1)
+	
+	# Configurar tiempo objetivo: 2.5 minutos para MST
+	time_target = 150.0
+	
+	# Configurar recursos
+	if threat_manager:
+		resources_available = threat_manager.get_max_resources()
+		resources_used = 0
+	
 	start()
 
 

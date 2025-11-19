@@ -27,6 +27,7 @@ AchievementManager="*res://scripts/managers/AchievementManager.gd"
 NotificationManager="*res://scripts/managers/NotificationManager.gd"
 GlossaryManager="*res://scripts/managers/GlossaryManager.gd"
 MissionScoreManager="*res://scripts/managers/MissionScoreManager.gd"
+StatisticsManager="*res://scripts/managers/StatisticsManager.gd"
 
 [display]
 

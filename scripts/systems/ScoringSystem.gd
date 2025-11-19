@@ -122,15 +122,19 @@ static func calculate_score(
 	score.resource_score = _calculate_resource_score(resources_used, resources_available)
 	
 	# Calcular score total ponderado
-	score.total_score = int(
+	var base_score = int(
 		score.efficiency_score * EFFICIENCY_WEIGHT +
 		score.time_score * TIME_WEIGHT +
 		score.moves_score * MOVES_WEIGHT +
 		score.resource_score * RESOURCE_WEIGHT
 	)
 	
+	# Penalización DIRECTA por errores al score total (50 puntos por error)
+	var mistake_penalty_total = mistakes * 50
+	score.total_score = max(0, base_score - mistake_penalty_total)
+	
 	# Determinar rango
-	score.rank = _calculate_rank(score.total_score)
+	score.rank = calculate_rank(score.total_score)
 	
 	# Verificar si es perfecto
 	score.perfect = (mistakes == 0 and moves_used <= optimal_moves and score.rank == "gold")
@@ -145,8 +149,8 @@ static func _calculate_efficiency_score(moves_used: int, optimal_moves: int, mis
 	var move_ratio = float(optimal_moves) / float(max(moves_used, 1))
 	var move_score = move_ratio * 700  # 70% del score
 	
-	# Penalización por errores
-	var mistake_penalty = mistakes * 50
+	# Penalización por errores (severa)
+	var mistake_penalty = mistakes * 150  # 150 puntos por error
 	var mistake_score = max(0, 300 - mistake_penalty)  # 30% del score
 	
 	return int(clamp(move_score + mistake_score, 0, MAX_EFFICIENCY_SCORE))
@@ -197,13 +201,9 @@ static func _calculate_resource_score(resources_used: int, resources_available: 
 		# Penalización por usar demasiados recursos
 		return int(MAX_RESOURCE_SCORE * (1.0 - usage_ratio) * 0.5)
 
-static func _calculate_rank(total_score: int) -> String:
-	var max_possible = MAX_EFFICIENCY_SCORE * EFFICIENCY_WEIGHT + \
-					   MAX_TIME_SCORE * TIME_WEIGHT + \
-					   MAX_MOVES_SCORE * MOVES_WEIGHT + \
-					   MAX_RESOURCE_SCORE * RESOURCE_WEIGHT
-	
-	var score_ratio = float(total_score) / float(max_possible)
+static func calculate_rank(total_score: int) -> String:
+	# El score máximo es 1000, calculamos el porcentaje directamente
+	var score_ratio = float(total_score) / 1000.0
 	
 	if score_ratio >= GOLD_THRESHOLD:
 		return "gold"

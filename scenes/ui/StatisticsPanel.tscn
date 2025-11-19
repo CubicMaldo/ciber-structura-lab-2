@@ -1,0 +1,240 @@
+[gd_scene load_steps=3 format=3 uid="uid://cshvlx5mhakr0"]
+
+[ext_resource type="Script" path="res://scripts/ui/StatisticsPanel.gd" id="1_5rh3k"]
+[ext_resource type="Theme" uid="uid://bx57i1llwylts" path="res://scenes/ui/theme.tres" id="1_p2m8w"]
+
+[node name="StatisticsPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(900, 650)
+offset_right = 900.0
+offset_bottom = 650.0
+theme = ExtResource("1_p2m8w")
+script = ExtResource("1_5rh3k")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 36
+text = "📊 ESTADÍSTICAS GLOBALES"
+
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/HeaderContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+text = "✕"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContentVBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="GeneralSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "🎮 Estadísticas Generales"
+
+[node name="StatsGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection"]
+layout_mode = 2
+columns = 2
+
+[node name="PlayTimeLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+layout_mode = 2
+text = "⏱️ Tiempo Total de Juego:"
+
+[node name="PlayTimeValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 1, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "0h 0m"
+
+[node name="SessionTimeLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+layout_mode = 2
+text = "🕐 Tiempo de Esta Sesión:"
+
+[node name="SessionTimeValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "0h 0m"
+
+[node name="MissionsStartedLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+layout_mode = 2
+text = "🎯 Misiones Iniciadas:"
+
+[node name="MissionsStartedValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0"
+
+[node name="MissionsCompletedLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+layout_mode = 2
+text = "✅ Misiones Completadas:"
+
+[node name="MissionsCompletedValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "0"
+
+[node name="SuccessRateLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+layout_mode = 2
+text = "📈 Tasa de Éxito:"
+
+[node name="SuccessRateValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/GeneralSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "0%"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox"]
+layout_mode = 2
+
+[node name="ExplorationSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/ExplorationSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "🗺️ Exploración"
+
+[node name="StatsGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/ExplorationSection"]
+layout_mode = 2
+columns = 2
+
+[node name="NodesVisitedLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/ExplorationSection/StatsGrid"]
+layout_mode = 2
+text = "🔵 Nodos Visitados:"
+
+[node name="NodesVisitedValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/ExplorationSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "0"
+
+[node name="EdgesTraversedLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/ExplorationSection/StatsGrid"]
+layout_mode = 2
+text = "➡️ Aristas Recorridas:"
+
+[node name="EdgesTraversedValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/ExplorationSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0"
+
+[node name="HSeparator3" type="HSeparator" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox"]
+layout_mode = 2
+
+[node name="PerformanceSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "⚡ Rendimiento"
+
+[node name="StatsGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection"]
+layout_mode = 2
+columns = 2
+
+[node name="EfficiencyLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection/StatsGrid"]
+layout_mode = 2
+text = "🎯 Eficiencia Promedio:"
+
+[node name="EfficiencyValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "0%"
+
+[node name="MistakesLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection/StatsGrid"]
+layout_mode = 2
+text = "❌ Errores Totales:"
+
+[node name="MistakesValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "0"
+
+[node name="ResourcesLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection/StatsGrid"]
+layout_mode = 2
+text = "🔧 Recursos Usados:"
+
+[node name="ResourcesValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0"
+
+[node name="StreakLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection/StatsGrid"]
+layout_mode = 2
+text = "🔥 Mejor Racha Perfecta:"
+
+[node name="StreakValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/PerformanceSection/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = "0"
+
+[node name="HSeparator4" type="HSeparator" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox"]
+layout_mode = 2
+
+[node name="AlgorithmsSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/AlgorithmsSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "🧠 Algoritmos Ejecutados"
+
+[node name="AlgorithmsGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/AlgorithmsSection"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 2
+
+[node name="MostUsedLabel" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/AlgorithmsSection"]
+layout_mode = 2
+text = "⭐ Más Usado:"
+
+[node name="MostUsedValue" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/ContentVBox/AlgorithmsSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "Ninguno"

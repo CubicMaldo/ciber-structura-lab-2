@@ -85,6 +85,17 @@ func _ready() -> void:
 func _init_mission_deferred() -> void:
 	call_deferred("init_mission_common", "Mission_Final", "Red lista. Inicia con %s." % STAGE_SPECS[0].title)
 	await get_tree().process_frame
+	
+	# Inicializar métricas de puntuación para misión final
+	# Estimación: BFS(n) + Camino(n/2) + MST(n-1) + Flujo(2) = aprox 2.5n movimientos
+	if graph:
+		var node_count = graph.get_nodes().size()
+		optimal_moves = int(node_count * 2.5)  # Estimación de movimientos óptimos
+	else:
+		optimal_moves = 50  # Default para grafo estándar
+	
+	time_target = 300.0  # 5 minutos para completar todas las etapas
+	
 	_reset_progress(true)
 
 
@@ -127,6 +138,10 @@ func _reset_progress(reset_graph: bool = false) -> void:
 	mistake_count = 0
 	stage_move_counters.clear()
 	stage_mistake_counters.clear()
+	
+	# Reiniciar métricas de MissionController
+	moves_count = 0
+	mistakes_count = 0
 	recon_sequence.clear()
 	recon_player_order.clear()
 	path_sequence.clear()
@@ -613,6 +628,9 @@ func _increment_stage_move(stage_id: String, amount: int = 1) -> void:
 	total_moves += amount
 	var current_value: int = int(stage_move_counters.get(stage_id, 0))
 	stage_move_counters[stage_id] = current_value + amount
+	
+	# Sincronizar con MissionController para scoring
+	moves_count = total_moves
 
 
 func _register_stage_mistake(stage_id: String) -> void:
@@ -621,6 +639,9 @@ func _register_stage_mistake(stage_id: String) -> void:
 	mistake_count += 1
 	var current_value: int = int(stage_mistake_counters.get(stage_id, 0))
 	stage_mistake_counters[stage_id] = current_value + 1
+	
+	# Sincronizar con MissionController para scoring
+	mistakes_count = mistake_count
 
 
 func _on_regenerate_pressed() -> void:

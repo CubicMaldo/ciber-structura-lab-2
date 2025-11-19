@@ -166,11 +166,16 @@ func load_scores() -> void:
 			mission_scores[mission_id] = []
 			for score_dict in save_data.mission_scores[mission_id]:
 				var score = ScoringSys.MissionScore.from_dict(score_dict)
+				# RECALCULAR RANK con el sistema actual
+				score.rank = ScoringSys.calculate_rank(score.total_score)
 				mission_scores[mission_id].append(score)
 	
 	# Cargar best_scores
 	if save_data.has("best_scores"):
 		for mission_id in save_data.best_scores.keys():
-			best_scores[mission_id] = ScoringSys.MissionScore.from_dict(save_data.best_scores[mission_id])
+			var score = ScoringSys.MissionScore.from_dict(save_data.best_scores[mission_id])
+			# RECALCULAR RANK con el sistema actual
+			score.rank = ScoringSys.calculate_rank(score.total_score)
+			best_scores[mission_id] = score
 	
 	scores_loaded.emit()

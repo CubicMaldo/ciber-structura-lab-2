@@ -71,6 +71,10 @@ func start() -> void:
 		traversal_result = GraphAlgorithms.dfs(graph, start_key, true)
 	else:
 		traversal_result = GraphAlgorithms.bfs(graph, start_key, true)
+	
+	# Emitir señal de algoritmo ejecutado para estadísticas
+	EventBus.algorithm_executed.emit(algorithm, mission_id)
+	
 	traversal_order = traversal_result.get("visited", [])
 	traversal_index = 0
 	if traversal_order.is_empty():
@@ -313,6 +317,7 @@ func _on_scan_pressed() -> void:
 	
 	# Registrar uso de recursos
 	resources_used += 1
+	EventBus.resource_used.emit("scan", mission_id)
 	
 	var expected = _get_expected_key()
 	if expected == null:
@@ -329,6 +334,7 @@ func _on_firewall_pressed() -> void:
 	
 	# Registrar uso de recursos
 	resources_used += 1
+	EventBus.resource_used.emit("firewall", mission_id)
 	
 	threat_manager.apply_relief(12)
 	_update_status("Firewall reforzado. Amenaza reducida.")
@@ -464,6 +470,7 @@ func _process_player_selection(node_key, _is_auto := false) -> void:
 
 func _handle_incorrect_selection(node_key) -> void:
 	add_mistake()  # Registrar el error
+	EventBus.mistake_made.emit(mission_id)  # Emitir señal para estadísticas
 	
 	if ui and ui.has_method("set_node_state"):
 		ui.set_node_state(node_key, "highlighted")

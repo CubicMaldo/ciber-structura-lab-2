@@ -40,6 +40,12 @@ func _ready() -> void:
 func _init_mission_deferred() -> void:
 	call_deferred("init_mission_common", "Mission_4", DEFAULT_STATUS_PROMPT)
 	await get_tree().process_frame
+	
+	# Inicializar métricas de puntuación
+	# Optimal moves = encontrar solución en 1-2 intentos
+	optimal_moves = 2
+	time_target = 180.0  # 3 minutos para Max Flow
+	
 	_reset_mission()
 
 
@@ -87,6 +93,10 @@ func _reset_mission() -> void:
 	last_result.clear()
 	attempts = 0
 	required_flow = _calculate_required_flow()
+	
+	# Reiniciar métricas de puntuación
+	moves_count = 0
+	mistakes_count = 0
 	if source_label:
 		source_label.text = "Fuente: --"
 	if sink_label:
@@ -172,6 +182,10 @@ func _on_compute_pressed() -> void:
 	is_computing = true
 	_update_status("Calculando flujo máximo usando %s..." % algorithm)
 	EventBus.mission_logic_started.emit(mission_id)
+	
+	# Emitir señal de algoritmo ejecutado
+	EventBus.algorithm_executed.emit(algorithm, mission_id)
+	
 	var method = algorithm.to_lower()
 	var result := {}
 	if method == "ford-fulkerson":
@@ -218,6 +232,10 @@ func _apply_flow_result(result: Dictionary) -> void:
 		}
 		complete(mission_result)
 	else:
+		# Registrar error para scoring (flujo insuficiente)
+		add_mistake()
+		EventBus.mistake_made.emit(mission_id)
+		
 		_update_status("Flujo insuficiente: %d/%d. Intenta otra combinación." % [max_flow, required_flow])
 		# Permitir seleccionar otra pareja
 		if graph and graph.has_method("reset_all_flux"):
@@ -296,6 +314,9 @@ func _on_graph_node_selected(node_key) -> void:
 
 
 func _assign_source(node_key) -> void:
+	# Registrar movimiento para scoring
+	add_move()
+	
 	source_key = node_key
 	if source_label:
 		source_label.text = "Fuente: %s" % str(node_key)
@@ -304,6 +325,9 @@ func _assign_source(node_key) -> void:
 
 
 func _assign_sink(node_key) -> void:
+	# Registrar movimiento para scoring
+	add_move()
+	
 	sink_key = node_key
 	if sink_label:
 		sink_label.text = "Sumidero: %s" % str(node_key)

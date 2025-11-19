@@ -84,6 +84,9 @@ func start() -> void:
 	# Calcular camino óptimo usando Dijkstra
 	var result = GraphAlgorithms.shortest_path(graph, source_key, target_key)
 	
+	# Emitir señal de algoritmo ejecutado
+	EventBus.algorithm_executed.emit("Dijkstra", mission_id)
+	
 	if not result["reachable"]:
 		_handle_unreachable()
 		return
@@ -92,6 +95,9 @@ func start() -> void:
 	total_distance = result["distance"]
 	path_index = 0
 	accumulated_distance = 0.0
+	
+	# Ajustar movimientos óptimos al tamaño real del camino
+	optimal_moves = optimal_path.size()
 	
 	if optimal_path.is_empty():
 		_update_status("Error: No se pudo calcular el camino.")
@@ -159,6 +165,10 @@ func _reset_mission() -> void:
 	is_running = false
 	awaiting_selection = false
 	
+	# Reiniciar métricas de puntuación
+	moves_count = 0
+	mistakes_count = 0
+	
 	if distance_label:
 		distance_label.text = "Distancia acumulada: 0.0"
 	if result_label:
@@ -224,6 +234,10 @@ func _process_player_selection(node_key, from_scan: bool = false) -> void:
 	if path_index >= optimal_path.size():
 		_update_status("Ya completaste la ruta. Presiona 'Continuar' para volver al menú.")
 		return
+	
+	# Registrar movimiento para scoring
+	if not from_scan:
+		add_move()
 	
 	_consume_turn_for_action(from_scan)
 	
@@ -296,6 +310,10 @@ func _mark_node_in_path(node_key, is_first: bool) -> void:
 
 func _handle_incorrect_selection(selected_key, expected_key) -> void:
 	"""Maneja una selección incorrecta del jugador"""
+	# Registrar error para scoring
+	add_mistake()
+	EventBus.mistake_made.emit(mission_id)
+	
 	if ui and ui.has_method("set_node_state"):
 		ui.set_node_state(selected_key, "highlighted")
 		call_deferred("_reset_highlighted_node", selected_key)
@@ -468,6 +486,11 @@ func _on_scan_pressed() -> void:
 	if not threat_manager or not threat_manager.spend_resource("scans", 1):
 		_update_status("Sin escaneos disponibles.")
 		return
+	
+	# Rastrear uso de recurso para scoring
+	resources_used += 1
+	EventBus.resource_used.emit("scan", mission_id)
+	
 	var expected = optimal_path[path_index] if path_index < optimal_path.size() else null
 	if expected == null:
 		_update_status("No hay nodos pendientes.")
@@ -480,6 +503,11 @@ func _on_firewall_pressed() -> void:
 	if not threat_manager or not threat_manager.spend_resource("firewalls", 1):
 		_update_status("No quedan firewalls de refuerzo.")
 		return
+	
+	# Rastrear uso de recurso para scoring
+	resources_used += 1
+	EventBus.resource_used.emit("firewall", mission_id)
+	
 	threat_manager.apply_relief(10)
 	_update_status("Firewall desplegado. Amenaza reducida.")
 
@@ -518,6 +546,7 @@ func _connect_ui_signals() -> void:
 	if scan_button:
 		scan_button.pressed.connect(_on_scan_pressed)
 		scan_button.disabled = true
+		scan_button.disabled = true
 
 	if firewall_button:
 		firewall_button.pressed.connect(_on_firewall_pressed)
@@ -531,6 +560,21 @@ func _subscribe_to_events() -> void:
 
 func _on_calculate_pressed() -> void:
 	# Maneja el evento del botón Calcular Ruta
+	# Inicializar métricas de puntuación
+	if graph:
+		var node_count = graph.get_nodes().size()
+		# Optimal moves = número de nodos en el camino (calculado después)
+		# Por ahora estimamos como node_count, se ajustará después
+		optimal_moves = node_count
+	
+	# Configurar tiempo objetivo: 2 minutos para Dijkstra
+	time_target = 120.0
+	
+	# Configurar recursos
+	if threat_manager:
+		resources_available = threat_manager.get_max_resources()
+		resources_used = 0
+	
 	start()
 
 
@@ -542,6 +586,7 @@ func _on_step_pressed() -> void:
 func _on_continue_pressed() -> void:
 	# Maneja el evento del botón Continuar (volver al menú)
 	SceneManager.change_to("res://scenes/MissionSelect.tscn")
+
 
 
 func _on_node_visited(_vertex) -> void:

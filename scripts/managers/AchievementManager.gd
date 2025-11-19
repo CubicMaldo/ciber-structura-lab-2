@@ -50,6 +50,36 @@ func reset_progress() -> void:
 	_save_progress()
 
 
+## Método público para desbloquear logros acumulativos desde otros managers
+func unlock_achievement(id: String, achievement_data: Dictionary = {}) -> void:
+	if not _definitions.has(id):
+		push_warning("AchievementManager: Intento de desbloquear logro no definido: %s" % id)
+		return
+	
+	if has_unlocked(id):
+		return  # Ya está desbloqueado
+	
+	var entry: Dictionary = _state.get(id, {
+		"unlocked": false,
+		"timestamp": 0,
+		"progress": 0,
+		"meta": {}
+	})
+	
+	entry["unlocked"] = true
+	entry["timestamp"] = Time.get_unix_time_from_system()
+	entry["meta"] = achievement_data
+	
+	var def = _definitions[id]
+	var goal := int(def.get("goal", 1))
+	entry["progress"] = goal
+	
+	_state[id] = entry
+	achievement_unlocked.emit(id, entry)
+	_save_progress()
+	print("Achievement unlocked via external manager: ", id)
+
+
 func _on_mission_completed(mission_id: String, success: bool, result: Dictionary) -> void:
 	var progress_changed := false
 	var unlocked_any := false
@@ -230,6 +260,164 @@ func _register_default_definitions() -> void:
 			"type": "all_completed",
 			"goal": DEFAULT_MISSION_SET.size(),
 			"category": "progresion"
+		},
+		# Logros acumulativos - Exploración de nodos
+		"nodes_100": {
+			"title": "Explorador Novato",
+			"description": "Visita 100 nodos en total",
+			"requirement": "Explora 100 nodos acumulados",
+			"mission_id": "",
+			"type": "cumulative_nodes",
+			"goal": 100,
+			"category": "exploracion"
+		},
+		"nodes_500": {
+			"title": "Cartógrafo Digital",
+			"description": "Visita 500 nodos en total",
+			"requirement": "Explora 500 nodos acumulados",
+			"mission_id": "",
+			"type": "cumulative_nodes",
+			"goal": 500,
+			"category": "exploracion"
+		},
+		"nodes_1000": {
+			"title": "Maestro Explorador",
+			"description": "Visita 1000 nodos en total",
+			"requirement": "Explora 1000 nodos acumulados",
+			"mission_id": "",
+			"type": "cumulative_nodes",
+			"goal": 1000,
+			"category": "exploracion"
+		},
+		"nodes_5000": {
+			"title": "Leyenda de las Redes",
+			"description": "Visita 5000 nodos en total",
+			"requirement": "Explora 5000 nodos acumulados",
+			"mission_id": "",
+			"type": "cumulative_nodes",
+			"goal": 5000,
+			"category": "exploracion"
+		},
+		# Logros acumulativos - Misiones completadas
+		"missions_10": {
+			"title": "Veterano",
+			"description": "Completa 10 misiones en total",
+			"requirement": "Completa 10 misiones acumuladas",
+			"mission_id": "",
+			"type": "cumulative_missions",
+			"goal": 10,
+			"category": "progresion"
+		},
+		"missions_25": {
+			"title": "Profesional",
+			"description": "Completa 25 misiones en total",
+			"requirement": "Completa 25 misiones acumuladas",
+			"mission_id": "",
+			"type": "cumulative_missions",
+			"goal": 25,
+			"category": "progresion"
+		},
+		"missions_50": {
+			"title": "Experto",
+			"description": "Completa 50 misiones en total",
+			"requirement": "Completa 50 misiones acumuladas",
+			"mission_id": "",
+			"type": "cumulative_missions",
+			"goal": 50,
+			"category": "progresion"
+		},
+		"missions_100": {
+			"title": "Campeón",
+			"description": "Completa 100 misiones en total",
+			"requirement": "Completa 100 misiones acumuladas",
+			"mission_id": "",
+			"type": "cumulative_missions",
+			"goal": 100,
+			"category": "progresion"
+		},
+		# Logros acumulativos - Tiempo de juego
+		"playtime_1h": {
+			"title": "Dedicado",
+			"description": "Juega durante 1 hora en total",
+			"requirement": "Acumula 1 hora de juego",
+			"mission_id": "",
+			"type": "cumulative_playtime",
+			"goal": 3600,
+			"category": "dedicacion"
+		},
+		"playtime_5h": {
+			"title": "Comprometido",
+			"description": "Juega durante 5 horas en total",
+			"requirement": "Acumula 5 horas de juego",
+			"mission_id": "",
+			"type": "cumulative_playtime",
+			"goal": 18000,
+			"category": "dedicacion"
+		},
+		"playtime_10h": {
+			"title": "Apasionado",
+			"description": "Juega durante 10 horas en total",
+			"requirement": "Acumula 10 horas de juego",
+			"mission_id": "",
+			"type": "cumulative_playtime",
+			"goal": 36000,
+			"category": "dedicacion"
+		},
+		"playtime_25h": {
+			"title": "Maestro del Tiempo",
+			"description": "Juega durante 25 horas en total",
+			"requirement": "Acumula 25 horas de juego",
+			"mission_id": "",
+			"type": "cumulative_playtime",
+			"goal": 90000,
+			"category": "dedicacion"
+		},
+		# Logros acumulativos - Rachas perfectas
+		"perfect_streak_3": {
+			"title": "En Racha",
+			"description": "Consigue 3 puntuaciones perfectas seguidas",
+			"requirement": "Obtén 3 scores perfectos consecutivos",
+			"mission_id": "",
+			"type": "cumulative_streak",
+			"goal": 3,
+			"category": "precision"
+		},
+		"perfect_streak_5": {
+			"title": "Imparable",
+			"description": "Consigue 5 puntuaciones perfectas seguidas",
+			"requirement": "Obtén 5 scores perfectos consecutivos",
+			"mission_id": "",
+			"type": "cumulative_streak",
+			"goal": 5,
+			"category": "precision"
+		},
+		"perfect_streak_10": {
+			"title": "Perfección Absoluta",
+			"description": "Consigue 10 puntuaciones perfectas seguidas",
+			"requirement": "Obtén 10 scores perfectos consecutivos",
+			"mission_id": "",
+			"type": "cumulative_streak",
+			"goal": 10,
+			"category": "precision"
+		},
+		# Logros especiales
+		"all_algorithms": {
+			"title": "Políglota de Algoritmos",
+			"description": "Ejecuta todos los algoritmos disponibles",
+			"requirement": "Usa BFS, DFS, Dijkstra, Kruskal, Prim y Ford-Fulkerson",
+			"mission_id": "",
+			"type": "cumulative_algorithms",
+			"goal": 6,
+			"category": "dominio"
+		},
+		"master_efficiency": {
+			"title": "Maestría Absoluta",
+			"description": "Obtén una puntuación mayor al 95% en cualquier misión",
+			"requirement": "Score >= 950 puntos en una misión",
+			"mission_id": "",
+			"type": "cumulative_score",
+			"goal": 950,
+			"category": "precision"
 		}
 	}
 

@@ -19,35 +19,70 @@ var current_mission: String = "Mission_1"
 signal closed()
 
 func _ready() -> void:
-	close_button.pressed.connect(_on_close_pressed)
-	mission1_button.pressed.connect(func(): _show_mission_scores("Mission_1"))
-	mission2_button.pressed.connect(func(): _show_mission_scores("Mission_2"))
-	mission3_button.pressed.connect(func(): _show_mission_scores("Mission_3"))
-	mission4_button.pressed.connect(func(): _show_mission_scores("Mission_4"))
-	mission_final_button.pressed.connect(func(): _show_mission_scores("Mission_Final"))
+	if close_button:
+		close_button.pressed.connect(_on_close_pressed)
+	if mission1_button:
+		mission1_button.pressed.connect(func(): _show_mission_scores("Mission_1"))
+	if mission2_button:
+		mission2_button.pressed.connect(func(): _show_mission_scores("Mission_2"))
+	if mission3_button:
+		mission3_button.pressed.connect(func(): _show_mission_scores("Mission_3"))
+	if mission4_button:
+		mission4_button.pressed.connect(func(): _show_mission_scores("Mission_4"))
+	if mission_final_button:
+		mission_final_button.pressed.connect(func(): _show_mission_scores("Mission_Final"))
 	
+	# Conectar a la señal de score guardado para actualizar stats
+	if MissionScoreManager:
+		MissionScoreManager.score_saved.connect(_on_score_saved)
+	
+	refresh_all()
+
+func refresh_all() -> void:
+	# Recargar completamente las estadísticas y scores
 	_update_stats()
 	_show_mission_scores(current_mission)
 
+func _on_score_saved(_mission_id: String, _score_dict: Dictionary, _is_new_best: bool) -> void:
+	# Actualizar estadísticas cuando se guarda un nuevo score
+	_update_stats()
+	# Actualizar la lista de scores si es la misión actual
+	if _mission_id == current_mission:
+		_show_mission_scores(current_mission)
+
 func _update_stats() -> void:
 	var stats = MissionScoreManager.get_player_stats()
-	missions_label.text = "🎯 Misiones: %d" % stats.total_missions_completed
-	gold_label.text = "🥇 Oro: %d" % stats.gold_ranks
-	silver_label.text = "🥈 Plata: %d" % stats.silver_ranks
-	bronze_label.text = "🥉 Bronce: %d" % stats.bronze_ranks
-	perfect_label.text = "✨ Perfectas: %d" % stats.perfect_completions
+	
+	if missions_label:
+		missions_label.text = "🎯 Misiones: %d" % stats.total_missions_completed
+	if gold_label:
+		gold_label.text = "🥇 Oro: %d" % stats.gold_ranks
+	if silver_label:
+		silver_label.text = "🥈 Plata: %d" % stats.silver_ranks
+	if bronze_label:
+		bronze_label.text = "🥉 Bronce: %d" % stats.bronze_ranks
+	if perfect_label:
+		perfect_label.text = "✨ Perfectas: %d" % stats.perfect_completions
 
 func _show_mission_scores(mission_id: String) -> void:
 	current_mission = mission_id
 	
-	# Actualizar botones
-	mission1_button.button_pressed = (mission_id == "Mission_1")
-	mission2_button.button_pressed = (mission_id == "Mission_2")
-	mission3_button.button_pressed = (mission_id == "Mission_3")
-	mission4_button.button_pressed = (mission_id == "Mission_4")
-	mission_final_button.button_pressed = (mission_id == "Mission_Final")
+	# Actualizar botones (con validación)
+	if mission1_button:
+		mission1_button.button_pressed = (mission_id == "Mission_1")
+	if mission2_button:
+		mission2_button.button_pressed = (mission_id == "Mission_2")
+	if mission3_button:
+		mission3_button.button_pressed = (mission_id == "Mission_3")
+	if mission4_button:
+		mission4_button.button_pressed = (mission_id == "Mission_4")
+	if mission_final_button:
+		mission_final_button.button_pressed = (mission_id == "Mission_Final")
 	
 	# Limpiar contenedor
+	if not scores_container:
+		return
+		
 	for child in scores_container.get_children():
 		child.queue_free()
 	

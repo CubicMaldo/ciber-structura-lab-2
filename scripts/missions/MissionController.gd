@@ -14,6 +14,7 @@ var optimal_moves: int = 0
 var mistakes_count: int = 0
 var resources_used: int = 0
 var resources_available: int = 0
+var time_target: float = 180.0  # Tiempo objetivo en segundos (default: 3 min)
 
 const MISSION_ACHIEVEMENT_PANEL := preload("res://scripts/ui/MissionAchievementPanel.gd")
 const DEFAULT_PANEL_PATH := NodePath("HUD/SidePanel/PanelMargin/ScrollContainer/VBoxContainer")
@@ -197,6 +198,11 @@ func _show_score_panel(score_dict: Dictionary, is_new_best: bool) -> void:
 	score_panel.continue_requested.connect(_on_continue_requested)
 
 func _on_retry_requested() -> void:
+	# Cerrar y eliminar el panel de score
+	for child in get_children():
+		if child.name.begins_with("MissionScorePanel") or child.has_method("display_score"):
+			child.queue_free()
+	
 	# Reiniciar la misión
 	if has_method("_reset_mission"):
 		_reset_mission()

@@ -123,3 +123,17 @@ signal gold_rank_achieved(mission_id: String)
 ## @param mission_id: Identificador de la misión
 signal perfect_score_achieved(mission_id: String)
 
+## Emitida cuando se ejecuta un algoritmo en una misión.
+## @param algorithm_name: Nombre del algoritmo ejecutado (BFS, DFS, Dijkstra, etc.)
+## @param mission_id: Identificador de la misión donde se ejecutó
+signal algorithm_executed(algorithm_name: String, mission_id: String)
+
+## Emitida cuando el jugador comete un error.
+## @param mission_id: Identificador de la misión
+signal mistake_made(mission_id: String)
+
+## Emitida cuando el jugador usa un recurso.
+## @param resource_type: Tipo de recurso usado (scan, firewall, etc.)
+## @param mission_id: Identificador de la misión
+signal resource_used(resource_type: String, mission_id: String)
+
