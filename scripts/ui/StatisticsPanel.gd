@@ -137,11 +137,13 @@ func _on_reset_pressed() -> void:
 		MissionScoreManager.clear_all_scores()
 		AchievementManager.reset_progress()
 		NotificationManager.clear_history()
+		SessionManager.reset_session_data()
 		
 		# Actualizar UI
 		_update_statistics()
 		
 		print("✅ Todos los datos han sido reiniciados")
+
 		
 		# Mostrar notificación
 		if NotificationManager:

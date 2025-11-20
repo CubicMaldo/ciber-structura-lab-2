@@ -80,7 +80,7 @@ func _on_rankings_pressed() -> void:
 	rankings_panel.position = (viewport_size - rankings_panel.size) / 2
 	
 	# Cuando se cierra, eliminar tanto el panel como el canvas layer
-	rankings_panel.closed.connect(func(): 
+	rankings_panel.closed.connect(func():
 		canvas_layer.queue_free()
 	)
 
@@ -224,9 +224,19 @@ func _get_game_manager() -> Node:
 	return null
 
 func _on_mission_selected(mission_id: String) -> void:
-	# Emit mission selected signal with typed parameter
-	EventBus.mission_selected.emit(mission_id)
-	GameManager.start_mission(mission_id)
+	# Mostrar cutscene antes de iniciar la misión
+	_show_mission_cutscene(mission_id)
+
+func _show_mission_cutscene(mission_id: String) -> void:
+	var cutscene = preload("res://scenes/ui/Cutscene.tscn").instantiate()
+	add_child(cutscene)
+	cutscene.show_story(mission_id)
+	cutscene.cutscene_finished.connect(func():
+		# Iniciar misión después de la cutscene
+		EventBus.mission_selected.emit(mission_id)
+		GameManager.start_mission(mission_id)
+	)
+
 
 func _get_rank_icon(rank: String) -> String:
 	match rank:
